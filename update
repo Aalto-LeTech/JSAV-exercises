@@ -1,19 +1,19 @@
 #!/bin/bash
 
-#remove 0 directory
-rm -fR 0
+#remove a directory
+rm -fR a
 
-#create 0 directories
-mkdir 0
-mkdir 0/JSAV
+#create a directories
+mkdir a
+mkdir a/JSAV
 
 #copy exercises and lib directories from master
 git checkout master -- exercises
 git checkout master -- lib
 
 #move directories
-git mv exercises 0
-git mv lib 0
+git mv exercises a
+git mv lib a
 
 #build JSAV
 cd JSAV
@@ -21,11 +21,13 @@ make
 cd ..
 
 #copy necessay JSAV files
-cp -r JSAV/build 0/JSAV
-cp -r JSAV/css 0/JSAV
-cp -r JSAV/extras 0/JSAV
-cp -r JSAV/lib 0/JSAV
+cp -r JSAV/build a/JSAV
+cp -r JSAV/css a/JSAV
+cp -r JSAV/extras a/JSAV
+cp -r JSAV/lib a/JSAV
 
-git add 0/JSAV
+git add a/JSAV
+
+python index_creator.py
 
 echo Done! Ready to commit changes!
