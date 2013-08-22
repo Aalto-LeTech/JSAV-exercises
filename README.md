@@ -2,6 +2,12 @@
 
 JavaScript algorithm exercises made using the [JSAV framework](https://github.com/vkaravir/JSAV).
 
+##Exercises
+
+Check the exercises here:
+
+http://x455u.github.io/JSAV-exercises/
+
 ##Getting started
 
 After cloning the repo you should run the following commands:
