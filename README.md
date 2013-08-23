@@ -6,7 +6,7 @@ JavaScript algorithm exercises made using the [JSAV framework](https://github.co
 
 Check the exercises here:
 
-http://x455u.github.io/JSAV-exercises/
+http://aalto-letech.github.io/JSAV-exercises/
 
 ##Getting started
 
