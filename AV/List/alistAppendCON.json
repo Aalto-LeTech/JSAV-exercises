@@ -1,0 +1,57 @@
+{
+  "translations": {
+    "en": {
+      "sc1": "Inserting at the tail of the list is easy.",
+      "sc2": "We will append the value 23.",
+      "sc3": "First check that the array has a free slot.",
+      "sc4": "Now simply insert the value into the empty position, and update <code>listSize</code>.",
+      "sc5": "The append operation therefore requires $\\Theta(1)$ time."
+    }
+  },
+  "code": {
+    "processing": [{
+      "url": "../../../SourceCode/Processing/Lists/AList.pde",
+      "lineNumbers": false,
+      "startAfter": "/* *** ODSATag: AListAppend *** */",
+      "endBefore": "/* *** ODSAendTag: AListAppend *** */",
+      "tags": {
+        "sig": 2,
+        "check": 3,
+        "assign": 4
+      }
+    }],
+    "java": [{
+      "url": "../../../SourceCode/Java/Lists/AList.java",
+      "lineNumbers": false,
+      "startAfter": "/* *** ODSATag: AListAppend *** */",
+      "endBefore": "/* *** ODSAendTag: AListAppend *** */",
+      "tags": {
+        "sig": 2,
+        "check": 3,
+        "assign": 4
+      }
+    }],
+    "java_generic": [{
+      "url": "../../../SourceCode/Java_Generic/Lists/AList.java",
+      "lineNumbers": false,
+      "startAfter": "/* *** ODSATag: AListAppend *** */",
+      "endBefore": "/* *** ODSAendTag: AListAppend *** */",
+      "tags": {
+        "sig": 2,
+        "check": 3,
+        "assign": 4
+      }
+    }],
+    "c++": [{
+      "url": "../../../SourceCode/C++/Lists/AList.java",
+      "lineNumbers": false,
+      "startAfter": "/* *** ODSATag: AListAppend *** */",
+      "endBefore": "/* *** ODSAendTag: AListAppend *** */",
+      "tags": {
+        "sig": 2,
+        "check": 3,
+        "assign": 4
+      }
+    }]
+  }
+}
