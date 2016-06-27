@@ -17,7 +17,7 @@
       "av_c6": "Swap."
     },
     "fi": {
-      ".avTitle": "Lomitusjärjestäminen",
+      ".avTitle": "Lisäysjärjestäminen",
       "av_Authors": "Cliff Shaffer and Nayef Copty",
       "#about": "Lisätietoa",
       "#run": "Suorita",
@@ -25,28 +25,28 @@
       "#arraysizeLabel": " Taulukon koko: ",
       "#arrayValuesLabel": " Omat arvot: ",
       "av_arrValsPlaceholder": "Erottele arvot välilyönnillä tai jätä tyhjäksi satunnaislukuja varten",
-      "av_c1": "FIStarting Insertion Sort.",
-      "av_c2": "FIDone sorting!",
-      "av_c3": "FIHighlighted yellow records to the left are always sorted. We begin with the record in position 0 in the sorted portion, and we will be moving the record in position 1 (in blue) to the left until it is sorted.",
-      "av_c4": "FIProcessing record in position ",
-      "av_c5": "FIMove the blue record to the left until it reaches the correct position.",
-      "av_c6": "FISwap."
+      "av_c1": "Aloitetaan lisäysjärjestäminen.",
+      "av_c2": "Valmis!",
+      "av_c3": "Keltaiset alkiot vasemmalla ovat järjestyksessä. Aloitetaan siten, että alkio kohdassa 0 on järjestetty, ja siirretään alkiota kohdassa 1 (sininen) vasemmalle kunnes se on järjestyksessä.",
+      "av_c4": "Käsitellään alkio kohdassa ",
+      "av_c5": "Siirretään sinistä alkiota vasemmalle kunnes se on oikeassa kohdassa.",
+      "av_c6": "Vaihdetaan."
     },
     "sv": {
-      ".avTitle": "Visualisering av Mergesort",
+      ".avTitle": "Insertion Sort Visualization",
       "av_Authors": "Cliff Shaffer and Nayef Copty",
-      "#about": "Om",
-      "#run": "Kör",
-      "#reset": "Återställ",
-      "#arraysizeLabel": " Liststorlek: ",
-      "#arrayValuesLabel": " Dina värden: ",
-      "av_arrValsPlaceholder": "Skriv in dina värden eller lämna blankt för att använda slumpmässiga värden",
-      "av_c1": "SVStarting Insertion Sort.",
-      "av_c2": "SVDone sorting!",
-      "av_c3": "SVHighlighted yellow records to the left are always sorted. We begin with the record in position 0 in the sorted portion, and we will be moving the record in position 1 (in blue) to the left until it is sorted.",
-      "av_c4": "SVProcessing record in position ",
-      "av_c5": "SVMove the blue record to the left until it reaches the correct position.",
-      "av_c6": "SVSwap."
+      "#about": "About",
+      "#run": "Run",
+      "#reset": "Reset",
+      "#arraysizeLabel": " List size: ",
+      "#arrayValuesLabel": " Your values: ",
+      "av_arrValsPlaceholder": "Type some array values, or click 'run' to use random values",
+      "av_c1": "Starting Insertion Sort.",
+      "av_c2": "Done sorting!",
+      "av_c3": "Highlighted yellow records to the left are always sorted. We begin with the record in position 0 in the sorted portion, and we will be moving the record in position 1 (in blue) to the left until it is sorted.",
+      "av_c4": "Processing record in position ",
+      "av_c5": "Move the blue record to the left until it reaches the correct position.",
+      "av_c6": "Swap."
     }
   },
   "code" : {
