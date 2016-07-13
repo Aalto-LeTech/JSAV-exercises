@@ -110,6 +110,19 @@
     border-color: #adadad;
 }
 
+.jsavexercisecontrols input[type="button"][disabled] {
+    cursor: not-allowed;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    opacity: .65;
+}
+
+.jsavexercisecontrols input[type="button"][disabled]:hover {
+    background-color: #fff;
+    border-color: #ccc;
+}
+
 /* /TRAKY MODIFICATIONS END/ */
 
 /*! normalize.css v3.0.1 | MIT License | git.io/normalize */
