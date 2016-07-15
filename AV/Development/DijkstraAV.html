@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Kruskal's Algorithm</title>
+  <title>Dijkstra's Algorithm</title>
   <meta charset="utf-8" />
   <link rel="stylesheet" href="../../JSAV/css/JSAV.css" type="text/css" />
   <link rel="stylesheet" href="../../lib/odsaAV-min.css" type="text/css" />
-  <link rel="stylesheet" href="KruskalAV.css" type="text/css" />
+  <link rel="stylesheet" href="DijkstraAV.css" type="text/css" />
 </head>
 
 <body>
@@ -16,7 +16,7 @@
         <input type="button" id="help" name="help" value="Help" />
       </td>
       <td class="headerCenter avTitle">
-        Kruskal's Minimum Spanning Tree Algorithm
+        Dijsktra's Shortest Path Algorithm
       </td>
       <td class="headerRight">
         <input type="button" id="about" name="about" value="About" />
@@ -26,8 +26,10 @@
 
   <form id="ssperform">
     <p>
-      <input type="button" id="runit" name="runit" value="Run" />
+      <input type="button" id="runit" name="runit" value="Run Example" />
       <input type="button" id="reset" name="reset" value="Reset" />
+    <input type="button" id="create" value="Create Your Own Graph" />
+    <input type="button" id="show" value="Run on your Graph"/>
     </p>
   </form>
   <div class="avcontainer">
@@ -44,6 +46,6 @@
 <script src="../../JSAV/build/JSAV-min.js"></script>
 <script src="../../lib/odsaUtils-min.js"></script>
 <script src="../../lib/odsaAV-min.js"></script>
-<script src="KruskalAV.js"></script>
+<script src="DijkstraAV.js"></script>
 </body>
 </html>
