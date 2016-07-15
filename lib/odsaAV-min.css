@@ -9,7 +9,7 @@
 }
 
 .jsavcontainer h1.exerciseTitle {
-  margin-top: 20px;
+    margin-top: 20px;
     margin-bottom: 10px;
     font-size: 24px;
     /* font-family: inherit; */
@@ -24,7 +24,8 @@
 }
 
 .jsavcontainer h1:first-child {
-    margin-top: 0;
+    display: none;
+    /* margin-top: 0; */
 }
 
 .jsavcontainer p.instructLabel {
