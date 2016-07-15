@@ -6,6 +6,8 @@
     line-height: 1.42857143;
     color: #333;
     background-color: #fff;
+
+    padding: 0;
 }
 
 .jsavcontainer h1.exerciseTitle {
@@ -24,8 +26,11 @@
 }
 
 .jsavcontainer h1:first-child {
-    display: none;
-    /* margin-top: 0; */
+    margin-top: 0;
+}
+
+.jsavcontainer h1.exerciseTitle {
+  display: none;
 }
 
 .jsavcontainer p.instructLabel {
