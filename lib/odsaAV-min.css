@@ -54,6 +54,15 @@
 }
 
 
+.instructions::before {
+  content: 'Ohjeet: ';
+  font-weight: 700;
+}
+
+.instructLabel {
+  display: none !important;
+}
+
 
 .jsavexercisecontrols {
     display: table;
