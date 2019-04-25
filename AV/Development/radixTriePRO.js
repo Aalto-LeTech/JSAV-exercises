@@ -8,12 +8,11 @@
     this.label = this.jsav.label(val, {container: this.element});
     this.label.element.css({
       left: this.element.outerWidth() - 42,
-      top: - this.label.element.outerHeight() - 5,
-      "z-index": 110
+      top: - this.label.element.outerHeight() - 5
     });
     //set z-index to prevent the label from disappearing behind the edge to its nodes parent node
     //if z-index < 110 the label disappears behind the edge
-    //this.element.css({"z-index": 110});
+    this.element.css({"z-index": 110});
   };
 
   JSAV._types.ds.BinaryTreeNode.prototype.clearLabel = function () {
