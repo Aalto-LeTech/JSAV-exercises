@@ -7,9 +7,13 @@
     }
     this.label = this.jsav.label(val, {container: this.element});
     this.label.element.css({
-      left: this.element.outerWidth() - 10,
-      top: - this.label.element.outerHeight() + 10
+      left: this.element.outerWidth() - 42,
+      top: - this.label.element.outerHeight() - 5,
+      "z-index": 110
     });
+    //set z-index to prevent the label from disappearing behind the edge to its nodes parent node
+    //if z-index < 110 the label disappears behind the edge
+    //this.element.css({"z-index": 110});
   };
 
   JSAV._types.ds.BinaryTreeNode.prototype.clearLabel = function () {
@@ -109,8 +113,8 @@
     for (i = 0; i < insertSize; i++) {
       var l = av.label(getBinary(insertArray[i]), {container: stack.get(i).element, visible: i === 0});
       l.element.css({
-        left: stack.last().element.outerWidth() - 10,
-        top: - l.element.outerHeight() + 10
+        left: stack.last().element.outerWidth() - 42,
+        top: - l.element.outerHeight() - 5
       });
       stackLabels.push(l);
     }
@@ -127,11 +131,11 @@
     tree.layout();
     clickHandler.addTree(tree, {
       onSelect: function () {
-        // select the value if 
+        // select the value if
         if (this.value()) {
           return true;
         }
-        // don't continue (and don't select the node) if it doesn't have the class "emptynode" 
+        // don't continue (and don't select the node) if it doesn't have the class "emptynode"
         if (!this.hasClass("emptynode")) {
           return false;
         }
@@ -180,8 +184,8 @@
     modelStack.layout();
     var l = jsav.label(getBinary(insertArray[0]), { container: modelStack.first().element });
     l.element.css({
-      left: modelStack.first().element.outerWidth() - 10,
-      top: - l.element.outerHeight() + 10
+      left: modelStack.first().element.outerWidth() - 42,
+      top: - l.element.outerHeight() - 5
     });
 
     var modelTree = jsav.ds.binarytree({center: true, visible: true, nodegap: 10});
@@ -253,8 +257,8 @@
         //add label to stack node
         l = jsav.label(getBinary(insertArray[i + 1]), {container: modelStack.first().element});
         l.element.css({
-          left: modelStack.first().element.outerWidth() - 10,
-          top: - l.element.outerHeight() + 10
+          left: modelStack.first().element.outerWidth() - 42,
+          top: - l.element.outerHeight() - 5
         });
       }
 
