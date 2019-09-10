@@ -14,7 +14,7 @@
       "av_ms_com_push": "<br/>And the value is pushed back onto the stack."
     },
     "fi": {
-      ".exerciseTitle": "Postfix lausekkeen evaluointi",
+      ".exerciseTitle": "Postfix-lausekkeen evaluointi",
       ".instructLabel": "Ohjeet:",
       ".instructions": "Evaluoi taulukossa näkyvä postfix lauseke viemällä operandit pinoon ja operaattorit laskimelle. Arvoja voi siirtää paikasta toiseen klikkaamalla. Laskuoperaatio suoritetaan pinon kahdelle ylimmälle alkiolle kun operaattori viedään laskimeen.",
       "av_postfix_expression": "Postfix-lauseke",
@@ -38,7 +38,7 @@
       "4. finally, the value of the whole postfix expression remains in the stack"
     ],
     "finnish": [
-      "1. lue postfix lauseke merkki merkiltä",
+      "1. lue postfix-lauseke merkki merkiltä",
       "2.   jos merkki on operandi, lisää se pinoon",
       "3.   jos merkki on operaattori,",
       "3.1    poista kaksi päällimmäistä operandia pinosta",
