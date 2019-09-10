@@ -669,7 +669,7 @@ form {
 }
 
 .jsavline {
-  height: 30px;
+  min-height: 30px;
   margin: 0;
   width: 100%;
 }
