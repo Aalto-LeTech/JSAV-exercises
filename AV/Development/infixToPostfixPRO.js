@@ -84,7 +84,8 @@
       bitBucket.css(0, {padding: 5});
       clickHandler.addArray(bitBucket, {
         onSelect: function () { return false; },
-        onDrop: restoreInfix(infixArray),
+        //onDrop: restoreInfix(infixArray),
+        onDrop: function () { restoreInfix(infixArray).call(this); },
         effect: "toss"
       });
     }
@@ -168,12 +169,9 @@
         jsav.step();
         break;
       case ")":
-        // throw the right parenthesis into the bit bucket and pop operators into the expression
-        modelArray.value(i, "");
-        restoreInfix(modelArray).call(this);
-        jsav.umsg(interpret("av_ms_com_rightpar"));
-        //  jsav.stepOption("grade", true);
-        jsav.step();
+        // pop operators from the stack to the expression until a left
+        // parenthesis is reached
+        jsav.umsg(interpret("av_ms_com_rightpar_1"));
         node = modelStack.first();
         while (node.value() !== "(") {
           jsav.effects.moveValue(node, modelResultArray, postfixInd++);
@@ -184,8 +182,16 @@
           node = modelStack.first();
         }
         // pop the left parenthesis into the bit bucket
+        jsav.umsg(interpret("av_ms_com_rightpar_2"));
         modelStack.removeFirst();
         modelStack.layout();
+        jsav.stepOption("grade", true);
+        jsav.step();
+        // throw the right parenthesis into the bit bucket to indicate that
+        // it has been processed
+        modelArray.value(i, "");
+        restoreInfix(modelArray).call(this);
+        jsav.umsg(interpret("av_ms_com_rightpar_3"));
         jsav.stepOption("grade", true);
         jsav.step();
         break;
