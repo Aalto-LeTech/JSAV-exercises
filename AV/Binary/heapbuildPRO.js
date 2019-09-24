@@ -35,7 +35,7 @@ $(document).ready(function () {
     $.fx.off = false;
     return bh;
   }
-    
+
   function model(modeljsav) {
     var modelbh = modeljsav.ds.binheap(initData, {heapify: false, nodegap: 20});
     modelbh.origswap = modelbh.swap; // store original heap grade function
@@ -46,9 +46,13 @@ $(document).ready(function () {
     };
     modeljsav._undo = [];
     for (var i = Math.floor(modelbh.size() / 2); i > 0; i--) {
-      modeljsav.umsg(interpret("av_c1") + i + ")");
+      // The pseudocode calls heapify(i) for h-1 ... 0 where
+      // h = Math.floor(modelbh.size() / 2), while the JavaScript implementation
+      // must be called for h ... 1.
+      modeljsav.umsg(interpret("av_c1") + (i - 1) + ").");
       modeljsav.step();
-      modeljsav.umsg("");
+      modeljsav.umsg(interpret("av_c2a") + (i - 1) + interpret("av_c2b"));
+      modeljsav.step();
       modelbh.heapify(i);
     }
     return modelbh;
@@ -56,7 +60,7 @@ $(document).ready(function () {
 
   function fixState(modelHeap) {
     var size = modelHeap.size();
-    swapIndex.value(-1); // only swaps are graded so swapIndex cannot be anything else after correct step                                                    
+    swapIndex.value(-1); // only swaps are graded so swapIndex cannot be anything else after correct step
     for (var i = 0; i < size; i++) {
       if (bh.value(i) !== modelHeap.value(i)) {
         bh.value(i, modelHeap.value(i));
@@ -84,7 +88,7 @@ $(document).ready(function () {
       exercise.gradeableStep();
     }
   }
-    
+
   //////////////////////////////////////////////////////////////////
   // Start processing here
   //////////////////////////////////////////////////////////////////
@@ -120,9 +124,9 @@ $(document).ready(function () {
     var index = $(this).data("jsav-heap-index") - 1;
     clickHandler(index);
   });
-    
+
   var exercise = av.exercise(model, init,
                      {controls: $('.jsavexercisecontrols'), fix: fixState});
   exercise.reset();
-    
+
 });
