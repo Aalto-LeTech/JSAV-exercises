@@ -6011,18 +6011,44 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
   };
 
   var SpringLayout = function(graph, options) {
+    // References to a JSAV graph instance.
     this.graph = graph;
-    this.iterations = 2000;
-    this.maxRepulsiveForceDistance = 6;
-    this.k = 2;
-    this.c = 0.01;
-    this.maxVertexMovement = 0.5;
-    this.results = {};
-    this.items = {};
     this.nodes = graph.nodes();
     this.edges = graph.edges();
+
+    // Number of steps in the physical simulation
+    this.iterations = 2000;
+
+    // Threshold distance for not applying a force between two items.
+    // (In simulation distance units)
+    this.maxRepulsiveForceDistance = 6;
+
+    // Force coefficient: repelling force ~ this.k^2
+    this.k = 2;
+
+    // Conversion from force to movement (in simulation)
+    this.c = 0.01;
+
+    // Maximum vertex movement in one step (in simulation distance units)
+    this.maxVertexMovement = 0.5;
+
+    // Dictionary: key is a JSAV id of each vertex.
+    // Value has layoutPosX and layoutPosY (in simulation distance units).
+    // See function layoutPrepare().
+    this.results = {};
+
+    // Temporary array for easier layout computation during simulation.
+    // See function layoutPrepare().
+    this.items = {};
+
+    // Helper dictionary for constructing this.items
     this.jsavIdToNodeInteger = {};
+
+    // Call the layout procedure
     this.layout();
+
+    // Convert node and edge positions: from simulation distance units in
+    // this.results to pixels in the JSAV visualisation.
     var factorX = (graph.element.width() - this.maxNodeWidth) / (this.layoutMaxX - this.layoutMinX),
         factorY = (graph.element.height() - this.maxNodeHeight) / (this.layoutMaxY - this.layoutMinY),
         node, edge, res;
@@ -6101,7 +6127,7 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
 
     layoutFinish: function() {
       // Copies results from this.items to this.results
-      for (var i = 0; i < this.nodes.length; i++) {        
+      for (var i = 0; i < this.nodes.length; i++) {
       }
     },
 
