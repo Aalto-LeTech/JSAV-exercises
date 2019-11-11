@@ -6072,7 +6072,6 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
    */
   SpringLayout.prototype = {
     layout: function() {
-      console.log("JSAV-Artturin.js: graph layout here!")
       this.layoutPrepare();
       for (var i = 0; i < this.iterations; i++) {
         this.layoutIteration();
@@ -6132,6 +6131,7 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     },
 
     layoutCalcBounds: function() {
+      // Computes minimum and maximum coordinates for the finished layout
       var minx = Infinity,
           maxx = -Infinity,
           miny = Infinity,
@@ -6153,15 +6153,19 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
         maxNodeHeight = Math.max(maxNodeHeight, n.element.outerHeight());
       }
 
-      this.layoutMinX = minx;
-      this.layoutMaxX = maxx;
-      this.layoutMinY = miny;
-      this.layoutMaxY = maxy;
-      this.maxNodeWidth = maxNodeWidth;
-      this.maxNodeHeight = maxNodeHeight;
+      this.layoutMinX = minx;             // Simulation distance units
+      this.layoutMaxX = maxx;             // Simulation distance units
+      this.layoutMinY = miny;             // Simulation distance units
+      this.layoutMaxY = maxy;             // Simulation distance units
+      this.maxNodeWidth = maxNodeWidth;   // pixels
+      this.maxNodeHeight = maxNodeHeight; // pixels
     },
 
     layoutIteration: function() {
+      // Computes one iteration of physical simulation:
+      // 1. Compute sum of forces for each pair of items (vertices and edges)
+      // 2. Move vertices according to forces.
+
       // Forces on nodes due to node-node repulsions
       var prev = [],
           nodes, edges,
