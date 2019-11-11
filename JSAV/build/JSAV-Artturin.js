@@ -6019,9 +6019,13 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     // Number of steps in the physical simulation
     this.iterations = 2000;
 
-    // Threshold distance for not applying a force between two items.
+    // Threshold distance^2 for not applying a force between two items.
     // (In simulation distance units)
     this.maxRepulsiveForceDistance = 6;
+
+    // Threshold distance^2: magnitude and direction of force is randomized
+    // for very small distances
+    this.randomForceDistance = 0.01;
 
     // Force coefficient: repelling force ~ this.k^2
     this.k = 2;
@@ -6074,10 +6078,11 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
     layout: function() {
       this.layoutPrepare();
       for (var i = 0; i < this.iterations; i++) {
-        this.layoutIteration();
+        this.layoutIterationOld();
+        // TODO: stop if maximum movement was below some threshold
       }
-      this.layoutCalcBounds();
       this.layoutFinish();
+      this.layoutCalcBounds();
     },
 
     layoutPrepare: function() {
@@ -6103,8 +6108,8 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
           'type'   : 'v',
           'x'      : 0,
           'y'      : 0,
-          'force_x': 0,
-          'force_y': 0 };
+          'forceX': 0,
+          'forceX': 0 };
       }
       // The edges have integer identifiers m...(m+n-1).
       for (i = 0; i < this.edges.length; i++) {
@@ -6117,8 +6122,8 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
           'v2'     : v2,
           'x'      : 0,
           'y'      : 0,
-          'force_x': 0,
-          'force_y': 0 };
+          'forceX': 0,
+          'forceX': 0 };
       }
       console.log(this.items);
       console.log(this.jsavIdToNodeInteger);
@@ -6161,7 +6166,7 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
       this.maxNodeHeight = maxNodeHeight; // pixels
     },
 
-    layoutIteration: function() {
+    layoutIterationOld: function() {
       // Computes one iteration of physical simulation:
       // 1. Compute sum of forces for each pair of items (vertices and edges)
       // 2. Move vertices according to forces.
@@ -6204,7 +6209,122 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
         node.layoutPosY += ymove;
         node.layoutForceX = 0;
         node.layoutForceY = 0;
-      }    this.nodeIntegerToJsavId = {};
+      }
+    },
+
+    layoutIteration: function() {
+      // Computes one iteration of physical simulation:
+      // 1. Compute sum of forces for each pair of items (vertices and edges)
+      // 2. Move vertices according to forces.
+
+      var i, j;
+
+      // Compute repulsive forces for each unique pair
+      for (i = 0; i < this.items.length; i++) {
+        var item1 = this.items[i];
+        for (j = i + 1; j < this.items; j++) {
+          var item2 = this.items[j];
+          this.layoutRepulsiveNew(item1, item2);
+        }
+      }
+
+      // Compute attractive forces for each edge
+      for (i = this.nodes.length; i < this.items.length; i++) {
+        this.layoutAttractiveNew(this.items[i]);
+      }
+
+      // Transfer forces on edges to forces on nodes
+      for (i = this.nodes.length; i < this.items.length; i++) {
+        this.edgeForceToVertices(this.items[i]);
+      }
+
+      // Move vertices by the given forces
+      var maxXmove = 0, maxYmove = 0;
+      for (i = 0; i < this.nodes.length; i++) {
+        var node = this.nodes[i];
+        var xmove = this.c * node[i].forceX;
+        var ymove = this.c * node[i].forceY;
+        var max = this.maxVertexMovement;
+        if (xmove > max) { xmove = max; }
+        if (xmove < -max) { xmove = -max; }
+        if (ymove > max) { ymove = max; }
+        if (ymove < -max) { ymove = -max; }
+
+        node.x += xmove;
+        node.y += ymove;
+        if (xmove > maxXmove) { maxXmove = xmove};
+        if (ymove > maxYmove) { maxYmove = ymove};
+        node.forceX = 0;
+        node.forceY = 0;
+      }
+
+      // Update edges
+      for (; i < this.items.length; i++) {
+        var edge = this.items[i];
+        edge.x = 0.5 * (edge.v1.x + edge.v2.x);
+        edge.y = 0.5 * (edge.v1.y + edge.v2.y);
+        edge.forceX = 0;
+        edge.forceY = 0;
+      }
+
+      return maxXmove * maxXmove + maxYmove * maxYmove;
+    },
+
+    layoutRepulsiveNew: function(item1, item2) {
+      var dx = item1.x - item2.x;
+      var dy = item1.y - item2.y;
+      var d2 = dx * dx + dy * dy;
+      if (d2 < this.randomForceDistance) {
+        dx = 0.1 * Math.random() + 0.1;
+        dy = 0.1 * Math.random() + 0.1;
+        d2 = dx * dx + dy * dy;
+      }
+      var d = Math.sqrt(d2);
+      if (d < this.maxRepulsiveForceDistance) {
+        var repulsiveForce = this.k * this.k / (d * d);
+        item2.forceX += repulsiveForce * dx;
+        item2.forceY += repulsiveForce * dy;
+        item1.forceX -= repulsiveForce * dx;
+        item1.forceY -= repulsiveForce * dy;
+      }
+    },
+
+    layoutAttractiveNew: function(edge) {
+      var v1 = this.items[edge.v1];
+      var v2 = this.items[edge.v1];
+      var dx = v2.x - v1.x;
+      var dy = v2.y - v1.y;
+
+      var d2 = dx * dx + dy * dy;
+      if (d2 < this.randomForceDistance) {
+        dx = 0.1 * Math.random() + 0.1;
+        dy = 0.1 * Math.random() + 0.1;
+        d2 = dx * dx + dy * dy;
+      }
+      var d = Math.sqrt(d2);
+      if (d > this.maxRepulsiveForceDistance) {
+        d = this.maxRepulsiveForceDistance;
+        d2 = d * d;
+      }
+      var attractiveForce = (d2 - this.k * this.k) / this.k;
+      // if (edge.attraction === undefined) {
+      //   edge.attraction = 1;
+      // }
+      // attractiveForce *= Math.log(edge.attraction) * 0.5 + 1;
+      v2.forceX -= attractiveForce * dx / d;
+      v2.forceY -= attractiveForce * dy / d;
+      v1.forceX += attractiveForce * dx / d;
+      v1.forceY += attractiveForce * dy / d;
+    },
+
+    edgeForceToVertices: function(edge) {
+      // Transfer forces on edges to forces on nodes
+      var v1 = this.items[edge.v1];
+      var v2 = this.items[edge.v1];
+      v1.forceX += edge.forceX * 0.5;
+      v1.forceY += edge.forceY * 0.5;
+      v2.forceX += edge.forceX * 0.5;
+      v2.forceY += edge.forceY * 0.5;
     },
 
     layoutRepulsive: function(node1, node2) {
