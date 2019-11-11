@@ -6043,7 +6043,7 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
 
     // Temporary array for easier layout computation during simulation.
     // See function layoutPrepare().
-    this.items = {};
+    this.items = [];
 
     // Helper dictionary for constructing this.items
     this.jsavIdToNodeInteger = {};
@@ -6077,8 +6077,16 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
   SpringLayout.prototype = {
     layout: function() {
       this.layoutPrepare();
+      // for (var i = 0; i < this.iterations; i++) {
+      //   this.layoutIterationOld();
+      // }
       for (var i = 0; i < this.iterations; i++) {
-        this.layoutIterationOld();
+        this.layoutIteration();
+        // var s = ""
+        // for (var j = 0; j < this.nodes.length; j++) {
+        //   s += (" (" + this.items[j].x + ", " + this.items[j].y + ")");
+        // }
+        // console.log(s);
         // TODO: stop if maximum movement was below some threshold
       }
       this.layoutFinish();
@@ -6104,34 +6112,35 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
       // pair.
       // The vertices have integer identifiers 0...(m-1).
       for (i = 0; i < this.nodes.length; i++) {
-        this.items[i] = {
+        this.items.push({
           'type'   : 'v',
           'x'      : 0,
           'y'      : 0,
           'forceX': 0,
-          'forceX': 0 };
+          'forceY': 0 });
       }
       // The edges have integer identifiers m...(m+n-1).
       for (i = 0; i < this.edges.length; i++) {
         var edge = this.edges[i];
         var v1 = this.jsavIdToNodeInteger[edge.start().id()];
         var v2 = this.jsavIdToNodeInteger[edge.end().id()];
-        this.items[i + this.nodes.length] = {
+        this.items.push({
           'type'   : 'e',
           'v1'     : v1,
           'v2'     : v2,
           'x'      : 0,
           'y'      : 0,
           'forceX': 0,
-          'forceX': 0 };
+          'forceY': 0 });
       }
-      console.log(this.items);
-      console.log(this.jsavIdToNodeInteger);
     },
 
     layoutFinish: function() {
       // Copies results from this.items to this.results
       for (var i = 0; i < this.nodes.length; i++) {
+        var node = this.nodes[i];
+        this.results[node.id()].layoutPosX = this.items[i].x;
+        this.results[node.id()].layoutPosY = this.items[i].y;
       }
     },
 
@@ -6197,7 +6206,7 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
       for (i = 0, l = nodes.length; i < l; i++) {
         var node = this.results[nodes[i].id()];
         var xmove = this.c * node.layoutForceX;
-        var ymove = this.c * node.layoutForceY;
+        var ymove = this.c * node.layoutForceY;[i + this.nodes.length]
 
         var max = this.maxVertexMovement;
         if (xmove > max) { xmove = max; }
@@ -6219,10 +6228,16 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
 
       var i, j;
 
+      // Reset forces
+      for (i = 0; i < this.items.length; i++) {
+        this.items[i].forceX = 0;
+        this.items[i].forceY = 0;
+      }
+
       // Compute repulsive forces for each unique pair
       for (i = 0; i < this.items.length; i++) {
         var item1 = this.items[i];
-        for (j = i + 1; j < this.items; j++) {
+        for (j = i + 1; j < this.items.length; j++) {
           var item2 = this.items[j];
           this.layoutRepulsiveNew(item1, item2);
         }
@@ -6238,12 +6253,19 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
         this.edgeForceToVertices(this.items[i]);
       }
 
+      // Debug
+      // var s = "";
+      // for (i = 0; i < this.items.length; i++) {
+      //   s += (" (" + this.items[i].forceX + ", " + this.items[i].forceY + ")");
+      // }
+      // console.log("iteration: forces: " + s);
+
       // Move vertices by the given forces
       var maxXmove = 0, maxYmove = 0;
       for (i = 0; i < this.nodes.length; i++) {
-        var node = this.nodes[i];
-        var xmove = this.c * node[i].forceX;
-        var ymove = this.c * node[i].forceY;
+        var node = this.items[i];
+        var xmove = this.c * node.forceX;
+        var ymove = this.c * node.forceY;
         var max = this.maxVertexMovement;
         if (xmove > max) { xmove = max; }
         if (xmove < -max) { xmove = -max; }
@@ -6291,7 +6313,7 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
 
     layoutAttractiveNew: function(edge) {
       var v1 = this.items[edge.v1];
-      var v2 = this.items[edge.v1];
+      var v2 = this.items[edge.v2];
       var dx = v2.x - v1.x;
       var dy = v2.y - v1.y;
 
