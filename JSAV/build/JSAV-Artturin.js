@@ -6,8 +6,6 @@
  */
 /**
 * Module that contains JSAV core.
-*
-* Artturi's version for improving graph layout.
 */
 /*global JSAV, jQuery, Raphael */
 (function($) {
@@ -6011,56 +6009,26 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
   };
 
   var SpringLayout = function(graph, options) {
-    // References to a JSAV graph instance.
     this.graph = graph;
+    this.iterations = 2000;
+    this.maxRepulsiveForceDistance = 6;
+    this.k = 2;
+    this.c = 0.01;
+    this.maxVertexMovement = 0.5;
+    this.results = {};
     this.nodes = graph.nodes();
     this.edges = graph.edges();
+    this.layout(graph.element.width(), graph.element.height());
 
-    // Number of steps in the physical simulation
-    this.iterations = 2000;
-
-    // Threshold distance^2 for not applying a force between two items.
-    // (In simulation distance units)
-    this.maxRepulsiveForceDistance = 6;
-
-    // Threshold distance^2: magnitude and direction of force is randomized
-    // for very small distances
-    this.randomForceDistance = 0.01;
-
-    // Force coefficient: repelling force ~ this.k^2
-    this.k = 2;
-
-    // Conversion from force to movement (in simulation)
-    this.c = 0.01;
-
-    // Maximum vertex movement in one step (in simulation distance units)
-    this.maxVertexMovement = 0.5;
-
-    // Dictionary: key is a JSAV id of each vertex.
-    // Value has layoutPosX and layoutPosY (in simulation distance units).
-    // See function layoutPrepare().
-    this.results = {};
-
-    // Temporary array for easier layout computation during simulation.
-    // See function layoutPrepare().
-    this.items = [];
-
-    // Helper dictionary for constructing this.items
-    this.jsavIdToNodeInteger = {};
-
-    // Call the layout procedure
-    this.layout();
-
-    // Convert node and edge positions: from simulation distance units in
-    // this.results to pixels in the JSAV visualisation.
-    var factorX = (graph.element.width() - this.maxNodeWidth) / (this.layoutMaxX - this.layoutMinX),
-        factorY = (graph.element.height() - this.maxNodeHeight) / (this.layoutMaxY - this.layoutMinY),
+    // Scale from simulation units to pixels
+    var scaleX = (graph.element.width() - this.maxNodeWidth) / (this.layoutMaxX - this.layoutMinX),
+        scaleY = (graph.element.height() - this.maxNodeHeight) / (this.layoutMaxY - this.layoutMinY),
         node, edge, res;
     for (var i = 0, l = this.nodes.length; i < l; i++) {
       node = this.nodes[i];
       res = this.results[node.id()];
-      node.moveTo((res.layoutPosX - this.layoutMinX) * factorX,
-                  Math.max(0, (res.layoutPosY - this.layoutMinY) * factorY -
+      node.moveTo((res.layoutPosX - this.layoutMinX) * scaleX,
+                  Math.max(0, (res.layoutPosY - this.layoutMinY) * scaleY -
                     node.element.outerHeight()));
     }
     for (i = 0, l = this.edges.length; i < l; i++) {
@@ -6075,27 +6043,18 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
    * Graph Dracula is "released under the MIT license"
    */
   SpringLayout.prototype = {
-    layout: function() {
+    layout: function(viewWidth, viewHeight) {
+      this.viewWidth = viewWidth;  // pixels
+      this.viewHeight = viewHeight; // pixels
       this.layoutPrepare();
-      // for (var i = 0; i < this.iterations; i++) {
-      //   this.layoutIterationOld();
-      // }
       for (var i = 0; i < this.iterations; i++) {
         this.layoutIteration();
-        // var s = ""
-        // for (var j = 0; j < this.nodes.length; j++) {
-        //   s += (" (" + this.items[j].x + ", " + this.items[j].y + ")");
-        // }
-        // console.log(s);
-        // TODO: stop if maximum movement was below some threshold
       }
-      this.layoutFinish();
       this.layoutCalcBounds();
+      this.layoutValidate();
     },
 
     layoutPrepare: function() {
-      // Prepares layout computing
-      // this.results will have the end result
       for (var i = 0, l = this.nodes.length; i < l; i++) {
         var node = {};
         node.layoutPosX = 0;
@@ -6103,49 +6062,10 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
         node.layoutForceX = 0;
         node.layoutForceY = 0;
         this.results[this.nodes[i].id()] = node;
-        this.jsavIdToNodeInteger[this.nodes[i].id()] = i;
-      }
-
-      // Array this.items is for temporary results during layout computation.
-      // It contains m nodes and n edges. Both vertices and edges must be in
-      // the same array because we want to compute forces between each unique
-      // pair.
-      // The vertices have integer identifiers 0...(m-1).
-      for (i = 0; i < this.nodes.length; i++) {
-        this.items.push({
-          'type'   : 'v',
-          'x'      : 0,
-          'y'      : 0,
-          'forceX': 0,
-          'forceY': 0 });
-      }
-      // The edges have integer identifiers m...(m+n-1).
-      for (i = 0; i < this.edges.length; i++) {
-        var edge = this.edges[i];
-        var v1 = this.jsavIdToNodeInteger[edge.start().id()];
-        var v2 = this.jsavIdToNodeInteger[edge.end().id()];
-        this.items.push({
-          'type'   : 'e',
-          'v1'     : v1,
-          'v2'     : v2,
-          'x'      : 0,
-          'y'      : 0,
-          'forceX': 0,
-          'forceY': 0 });
-      }
-    },
-
-    layoutFinish: function() {
-      // Copies results from this.items to this.results
-      for (var i = 0; i < this.nodes.length; i++) {
-        var node = this.nodes[i];
-        this.results[node.id()].layoutPosX = this.items[i].x;
-        this.results[node.id()].layoutPosY = this.items[i].y;
       }
     },
 
     layoutCalcBounds: function() {
-      // Computes minimum and maximum coordinates for the finished layout
       var minx = Infinity,
           maxx = -Infinity,
           miny = Infinity,
@@ -6167,19 +6087,15 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
         maxNodeHeight = Math.max(maxNodeHeight, n.element.outerHeight());
       }
 
-      this.layoutMinX = minx;             // Simulation distance units
-      this.layoutMaxX = maxx;             // Simulation distance units
-      this.layoutMinY = miny;             // Simulation distance units
-      this.layoutMaxY = maxy;             // Simulation distance units
-      this.maxNodeWidth = maxNodeWidth;   // pixels
-      this.maxNodeHeight = maxNodeHeight; // pixels
+      this.layoutMinX = minx;
+      this.layoutMaxX = maxx;
+      this.layoutMinY = miny;
+      this.layoutMaxY = maxy;
+      this.maxNodeWidth = maxNodeWidth;
+      this.maxNodeHeight = maxNodeHeight;
     },
 
-    layoutIterationOld: function() {
-      // Computes one iteration of physical simulation:
-      // 1. Compute sum of forces for each pair of items (vertices and edges)
-      // 2. Move vertices according to forces.
-
+    layoutIteration: function() {
       // Forces on nodes due to node-node repulsions
       var prev = [],
           nodes, edges,
@@ -6206,7 +6122,7 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
       for (i = 0, l = nodes.length; i < l; i++) {
         var node = this.results[nodes[i].id()];
         var xmove = this.c * node.layoutForceX;
-        var ymove = this.c * node.layoutForceY;[i + this.nodes.length]
+        var ymove = this.c * node.layoutForceY;
 
         var max = this.maxVertexMovement;
         if (xmove > max) { xmove = max; }
@@ -6219,135 +6135,6 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
         node.layoutForceX = 0;
         node.layoutForceY = 0;
       }
-    },
-
-    layoutIteration: function() {
-      // Computes one iteration of physical simulation:
-      // 1. Compute sum of forces for each pair of items (vertices and edges)
-      // 2. Move vertices according to forces.
-
-      var i, j;
-
-      // Reset forces
-      for (i = 0; i < this.items.length; i++) {
-        this.items[i].forceX = 0;
-        this.items[i].forceY = 0;
-      }
-
-      // Compute repulsive forces for each unique pair
-      for (i = 0; i < this.items.length; i++) {
-        var item1 = this.items[i];
-        //for (j = i + 1; j < this.items.length; j++) {
-        for (j = i + 1; j < this.nodes.length; j++) {
-          var item2 = this.items[j];
-          this.layoutRepulsiveNew(item1, item2);
-        }
-      }
-
-      // Compute attractive forces for each edge
-      for (i = this.nodes.length; i < this.items.length; i++) {
-        this.layoutAttractiveNew(this.items[i]);
-      }
-
-      // Transfer forces on edges to forces on nodes
-      // for (i = this.nodes.length; i < this.items.length; i++) {
-      //   this.edgeForceToVertices(this.items[i]);
-      // }
-
-      // Debug
-      // var s = "";
-      // for (i = 0; i < this.items.length; i++) {
-      //   s += (" (" + this.items[i].forceX + ", " + this.items[i].forceY + ")");
-      // }
-      // console.log("iteration: forces: " + s);
-
-      // Move vertices by the given forces
-      var maxXmove = 0, maxYmove = 0;
-      for (i = 0; i < this.nodes.length; i++) {
-        var node = this.items[i];
-        var xmove = this.c * node.forceX;
-        var ymove = this.c * node.forceY;
-        var max = this.maxVertexMovement;
-        if (xmove > max) { xmove = max; }
-        if (xmove < -max) { xmove = -max; }
-        if (ymove > max) { ymove = max; }
-        if (ymove < -max) { ymove = -max; }
-
-        node.x += xmove;
-        node.y += ymove;
-        if (xmove > maxXmove) { maxXmove = xmove};
-        if (ymove > maxYmove) { maxYmove = ymove};
-        node.forceX = 0;
-        node.forceY = 0;
-      }
-
-      // Update edges
-      for (; i < this.items.length; i++) {
-        var edge = this.items[i];
-        edge.x = 0.5 * (edge.v1.x + edge.v2.x);
-        edge.y = 0.5 * (edge.v1.y + edge.v2.y);
-        edge.forceX = 0;
-        edge.forceY = 0;
-      }
-
-      return maxXmove * maxXmove + maxYmove * maxYmove;
-    },
-
-    layoutRepulsiveNew: function(item1, item2) {
-      var dx = item1.x - item2.x;
-      var dy = item1.y - item2.y;
-      var d2 = dx * dx + dy * dy;
-      if (d2 < this.randomForceDistance) {
-        dx = 0.1 * Math.random() + 0.1;
-        dy = 0.1 * Math.random() + 0.1;
-        d2 = dx * dx + dy * dy;
-      }
-      var d = Math.sqrt(d2);
-      if (d < this.maxRepulsiveForceDistance) {
-        var repulsiveForce = this.k * this.k / (d * d);
-        item2.forceX += repulsiveForce * dx;
-        item2.forceY += repulsiveForce * dy;
-        item1.forceX -= repulsiveForce * dx;
-        item1.forceY -= repulsiveForce * dy;
-      }
-    },
-
-    layoutAttractiveNew: function(edge) {
-      var v1 = this.items[edge.v1];
-      var v2 = this.items[edge.v2];
-      var dx = v2.x - v1.x;
-      var dy = v2.y - v1.y;
-
-      var d2 = dx * dx + dy * dy;
-      if (d2 < this.randomForceDistance) {
-        dx = 0.1 * Math.random() + 0.1;
-        dy = 0.1 * Math.random() + 0.1;
-        d2 = dx * dx + dy * dy;
-      }
-      var d = Math.sqrt(d2);
-      if (d > this.maxRepulsiveForceDistance) {
-        d = this.maxRepulsiveForceDistance;
-        d2 = d * d;
-      }
-      var attractiveForce = (d2 - this.k * this.k) / this.k;
-      // if (edge.attraction === undefined) {
-      //   edge.attraction = 1;
-      // }
-      // attractiveForce *= Math.log(edge.attraction) * 0.5 + 1;
-      v2.forceX -= attractiveForce * dx / d;
-      v2.forceY -= attractiveForce * dy / d;
-      v1.forceX += attractiveForce * dx / d;
-      v1.forceY += attractiveForce * dy / d;
-    },
-
-    edgeForceToVertices: function(edge) {
-      // Transfer forces on edges to forces on nodes
-      var v1 = this.items[edge.v1];
-      var v2 = this.items[edge.v1];
-      v1.forceX += edge.forceX * 0.5;
-      v1.forceY += edge.forceY * 0.5;
-      v2.forceX += edge.forceX * 0.5;
-      v2.forceY += edge.forceY * 0.5;
     },
 
     layoutRepulsive: function(node1, node2) {
@@ -6405,6 +6192,7 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
       lay1.layoutForceX += attractiveForce * dx / d;
       lay1.layoutForceY += attractiveForce * dy / d;
     }
+
   };
   /*! End Graph Dracula -based code
   */

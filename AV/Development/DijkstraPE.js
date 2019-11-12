@@ -10,7 +10,7 @@
 
   jsav.recorded();
 
-  function init() {
+  function init_old() {
     // create the graph
     if (graph) {
       graph.clear();
@@ -22,6 +22,26 @@
       directed: false
     });
     graphUtils.generatePlanar(graph, {weighted: true}); // Randomly generate the graph with weights
+    graph.layout();
+    // mark the 'A' node
+    graph.nodes()[0].addClass("marked");
+
+    jsav.displayInit();
+    return graph;
+  }
+
+  function init() {
+    // create the graph
+    if (graph) {
+      graph.clear();
+    }
+    graph = jsav.ds.graph({
+      width: 400,
+      height: 400,
+      layout: "manual",
+      directed: false
+    });
+    graphUtils.generatePlanar(graph, {weighted: true, nodes: 9, edges: 11}); // Randomly generate the graph with weights
     graph.layout();
     // mark the 'A' node
     graph.nodes()[0].addClass("marked");
