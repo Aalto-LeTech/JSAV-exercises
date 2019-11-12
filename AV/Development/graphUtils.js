@@ -120,14 +120,34 @@
       edges,
       i;
 
+    // Place nodes in a square grid:
+    //   A---B---C---D
+    //   |   |   |   |
+    //   E---F---G---H
+    //   |   |
+    //   I---J
+    //
+    const gridWidth = Math.ceil(Math.sqrt(nNodes));
+    const gridHeight = Math.ceil(nNodes / gridWidth);
+    const gridStepX = Math.floor(graph.options.width / gridWidth);
+    const gridStepY = Math.floor(graph.options.height / gridHeight);
+
     // Generate node labels and nodes
-    for (i = 0; i < nNodes; i++) {
-      nodes[i] = String.fromCharCode(i + 65);
-      graph.addNode(nodes[i]);
+    for (var y = 0, i = 0; y < gridHeight; y++) {
+      for (var x = 0; x < gridWidth; x++) {
+        if (i < nNodes) {
+          nodes[i] = String.fromCharCode(i + 65);
+          var left = Math.floor((x + 0.5) * gridStepX);
+          var top  = Math.floor((y + 0.5) * gridStepY);
+          graph.addNode(nodes[i], {"left": left, "top": top});
+          console.log("Node " + nodes[i] + " left: " + left + " top: " + top);
+          i++;
+        }
+      }
     }
 
     // Generate set of candidate edges
-    var candEdges = candidateEdges(nNodes);
+    var candEdges = candidateEdges(nNodes, gridWidth, gridHeight);
 
     // Choose nEdges from candEdges
     var selectedEdges = []
@@ -155,17 +175,20 @@
     }
   }
 
-  function candidateEdges(nNodes) {
+  function candidateEdges(nNodes, gridWidth, gridHeight) {
     /*  A----B----C    Create the set of candidate edges: a square grid with
      *  |\   |   /|    a diagonal inside each square. Choose one of two
      *  | \  |  / |    diagonals for each square: either right-down or
      *  |  \ | /  |    left-down. In the figure left, there is a right-down
      *  |   \|/   |    diagonal AE and left-down diagonal CE.
      *  D----E----F
-     *                 Idea: Ari Korhonen @ Aalto University */
-
-    const gridWidth = Math.ceil(Math.sqrt(nNodes));
-    const gridHeight = Math.ceil(nNodes / gridWidth);
+     *                 Idea: Ari Korhonen @ Aalto University
+     *
+     * Parameters:
+     * nNodes (integer): number of nodes in the graph
+     * gridWidth: width of the grid in nodes
+     * gridHeight: height of the frid in nodes
+     */
 
     var candidateEdges = [];
     var x, y, xLimit, yLimit, v1, v2, v3, v4;
