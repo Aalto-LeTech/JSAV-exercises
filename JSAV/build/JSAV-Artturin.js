@@ -6237,7 +6237,8 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
       // Compute repulsive forces for each unique pair
       for (i = 0; i < this.items.length; i++) {
         var item1 = this.items[i];
-        for (j = i + 1; j < this.items.length; j++) {
+        //for (j = i + 1; j < this.items.length; j++) {
+        for (j = i + 1; j < this.nodes.length; j++) {
           var item2 = this.items[j];
           this.layoutRepulsiveNew(item1, item2);
         }
@@ -6249,9 +6250,9 @@ if (typeof Raphael !== "undefined") { // only execute if Raphael is loaded
       }
 
       // Transfer forces on edges to forces on nodes
-      for (i = this.nodes.length; i < this.items.length; i++) {
-        this.edgeForceToVertices(this.items[i]);
-      }
+      // for (i = this.nodes.length; i < this.items.length; i++) {
+      //   this.edgeForceToVertices(this.items[i]);
+      // }
 
       // Debug
       // var s = "";
