@@ -41,7 +41,7 @@
       layout: "manual",
       directed: false
     });
-    graphUtils.generatePlanar(graph, {weighted: true, nodes: 9, edges: 11}); // Randomly generate the graph with weights
+    graphUtils.generatePlanar(graph, {weighted: true, nodes: 9, edges: 12}); // Randomly generate the graph with weights
     graph.layout();
     // mark the 'A' node
     graph.nodes()[0].addClass("marked");

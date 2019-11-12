@@ -140,7 +140,6 @@
           var left = Math.floor((x + 0.5) * gridStepX);
           var top  = Math.floor((y + 0.5) * gridStepY);
           graph.addNode(nodes[i], {"left": left, "top": top});
-          console.log("Node " + nodes[i] + " left: " + left + " top: " + top);
           i++;
         }
       }
@@ -149,8 +148,21 @@
     // Generate set of candidate edges
     var candEdges = candidateEdges(nNodes, gridWidth, gridHeight);
 
+    // First choose at least one edge that has the first vertex
+    var selectedEdges = [];
+    var firstEdges = [];
+    for (var i = 0; i < candEdges.length; i++) {
+      if (candEdges[i][0] === 0 || candEdges[i][1] === 0) {
+        firstEdges.push(i);
+      }
+    }
+    var firstEdgeI = Math.floor(Math.random() * firstEdges.length);
+    firstEdgeI = firstEdges[firstEdgeI];
+    selectedEdges.push(candEdges[firstEdgeI]);
+    candEdges[firstEdgeI] = undefined;
+
     // Choose nEdges from candEdges
-    var selectedEdges = []
+
     while (selectedEdges.length < nEdges) {
       var i = Math.floor(Math.random() * candEdges.length);
       if (candEdges[i] !== undefined) {
