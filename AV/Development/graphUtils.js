@@ -109,8 +109,8 @@
   function generatePlanarGraph(graph, options) {
     var defaultOptions = {
       weighted: false,
-      nodes: 15, // number of nodes
-      edges: 20 // number of edges
+      nodes: 7, // number of nodes
+      edges: 10 // number of edges
     };
     var opts = $.extend(defaultOptions, options),
       weighted = opts.weighted,
@@ -120,32 +120,40 @@
       edges,
       i;
 
-    // Generate the node values
+    // Generate node labels and nodes
     for (i = 0; i < nNodes; i++) {
       nodes[i] = String.fromCharCode(i + 65);
-    }
-
-
-
-    // Generate edges
-    edges = generateRandomEdges(nNodes, nEdges, weighted);
-
-    // Add the nodes to the graph
-    for (i = 0; i < nNodes; i++) {
       graph.addNode(nodes[i]);
     }
-    // Add the edges to the graph
-    for (i = 0; i < nEdges; i++) {
-      var gNodes = graph.nodes(),
-        start = gNodes[edges[i].startIndex],
-        end = gNodes[edges[i].endIndex],
-        eOpts = edges[i].weight ? {
-          weight: edges[i].weight
-        } : {};
 
-      graph.addEdge(start, end, eOpts);
+    // Generate set of candidate edges
+    var candEdges = candidateEdges(nNodes);
+
+    // Choose nEdges from candEdges
+    var selectedEdges = []
+    while (selectedEdges.length < nEdges) {
+      var i = Math.floor(Math.random() * candEdges.length);
+      if (candEdges[i] !== undefined) {
+        selectedEdges.push(candEdges[i]);
+        candEdges[i] = undefined;
+      }
     }
-  },
+
+    // Add the edges to the graph
+    // Note: graph.addEdge() requires references to nodes as JSAV graph node
+    // instances. Variable gNodes does the conversion from integer index to
+    // the node instance.
+    const gNodes  = graph.nodes();
+    for (i = 0; i < nEdges; i++) {
+      var v1 = selectedEdges[i][0];
+      var v2 = selectedEdges[i][1];
+      var edgeOptions = {};
+      if (weighted) {
+        edgeOptions.weight = 1 + Math.floor((Math.random() * 9));
+      }
+      graph.addEdge(gNodes[v1], gNodes[v2], edgeOptions);
+    }
+  }
 
   function candidateEdges(nNodes) {
     /*  A----B----C    Create the set of candidate edges: a square grid with
@@ -154,7 +162,7 @@
      *  |  \ | /  |    left-down. In the figure left, there is a right-down
      *  |   \|/   |    diagonal AE and left-down diagonal CE.
      *  D----E----F
-     */
+     *                 Idea: Ari Korhonen @ Aalto University */
 
     const gridWidth = Math.ceil(Math.sqrt(nNodes));
     const gridHeight = Math.ceil(nNodes / gridWidth);
@@ -163,35 +171,39 @@
     var x, y, xLimit, yLimit, v1, v2, v3, v4;
 
     // Horizontal edge (right)
-    for (y = 0, yLimit = gridHeight - 1; y < yLimit; y++) {
-      for (x = 1, xLimit = gridWidth - 2; x < xLimit; x++) {
+    for (y = 0, yLimit = gridHeight; y < yLimit; y++) {
+      for (x = 0, xLimit = gridWidth - 1; x < xLimit; x++) {
         v1 = y * gridWidth + x;
         v2 = v1 + 1;
-        if (v1 < opts.nNodes && v2 < opts.nNodes) {
+        if (v1 < nNodes && v2 < nNodes) {
           candidateEdges.push([v1, v2]);
         }
       }
     }
     // Vertical edge (down)
-    for (y = 0, yLimit = gridHeight - 2; y < yLimit; y++) {
-      for (x = 1, xLimit = gridWidth - 1; x < xLimit; x++) {
+    for (y = 0, yLimit = gridHeight - 1; y < yLimit; y++) {
+      for (x = 0, xLimit = gridWidth; x < xLimit; x++) {
         v1 = y * gridWidth + x;
-        v2 = v1 + 1;
-        if (v1 < opts.nNodes && v2 < opts.nNodes) {
+        v2 = v1 + gridWidth;
+        if (v1 < nNodes && v2 < nNodes) {
           candidateEdges.push([v1, v2]);
         }
       }
     }
     // Diagonal edges (right-down; move v1 right, then edge left-down)
     var v3, v4;
-    for (y = 0, yLimit = gridHeight - 2; y < yLimit; y++) {
-      for (x = 1, xLimit = gridWidth - 2; x < xLimit; x++) {
+    for (y = 0, yLimit = gridHeight - 1; y < yLimit; y++) {
+      for (x = 0, xLimit = gridWidth - 1; x < xLimit; x++) {
+        // v1--v3
+        // | \  |
+        // |  \ |
+        // v4--v2
         v1 = y * gridWidth + x;
         v2 = v1 + gridWidth + 1; // right-down
         v3 = v1 + 1; // right
-        v4 = v3 + gridWidth; // down
-        var diag1valid = (v1 < opts.nNodes && v2 < opts.nNodes);
-        var diag2valid = (v3 < opts.nNodes && v4 < opts.nNodes);
+        v4 = v1 + gridWidth; // down
+        var diag1valid = (v1 < nNodes && v2 < nNodes);
+        var diag2valid = (v3 < nNodes && v4 < nNodes);
         if (diag1valid) {
           if (diag2valid) {
             if (Math.random() < 0.5) {
@@ -208,7 +220,7 @@
       }
     }
     return candidateEdges;
-  },
+  }
 
   function copyGraph(source, destination, options) {
     var sourceNodes = source.nodes(),
