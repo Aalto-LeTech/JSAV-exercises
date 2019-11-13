@@ -315,9 +315,37 @@
     return destination;
   }
 
+  function jsavGraphToNeighbourList(graph) {
+    // Converts a JSAV graph into an integer arrays for easy computation
+    //
+    // Parameters:
+    // graph - a JSAV graph instance
+    //
+    // Returns:
+    // (Array): [n_1, n_2, ..., n_v]   for each start vertex 1...v
+    //          n_i = [u_1, u_2, ...,]  for each neighbor of vertex i
+    //          u_i = {'v': x, 'weight': w} end vertex is x, weight is w
+    //
+    const nodes = graph.nodes();
+    const edges = graph.edges();
+    var nodeIndex = {};
+    var neighbours = [];
+    for (let i = 0; i < graph.nodeCount(); i++) {
+      nodeIndex[nodes[i].id()] = i;
+      neighbours.push([]);
+    }
+    for (let e of edges) {
+      let v1 = nodeIndex[e.start().id()];
+      let v2 = nodeIndex[e.end().id()];
+      neighbours[v1].push({v: v2, weight: e.weight()});
+    }
+    return neighbours;
+  }
+
   window.graphUtils = {
     generate: generateGraph,
     generatePlanar: generatePlanarGraph,
-    copy: copyGraph
+    copy: copyGraph,
+    neighbourList: jsavGraphToNeighbourList,
   };
 })();
