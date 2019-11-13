@@ -43,9 +43,13 @@
     });
     // Randomly generate the graph with weights
     graphUtils.generatePlanar(graph, {weighted: true, nodes: 10, edges: 12});
+
+
     graph.layout();
     // mark the 'A' node
     graph.nodes()[0].addClass("marked");
+
+    validateInput(graph);
 
     jsav.displayInit();
     return graph;
@@ -196,6 +200,82 @@
     }
   }
 
+  function validateInput(graph) {
+    // Checks whether the random graph is a valid exercise input
+    testDijkstra(graph);
+  }
+
+  function testDijkstra(graph) {
+    // Runs Dijkstra's algorithm on given graph and computes statistics on
+    // goodness of the input
+
+    // 1. At some point of algorithm, there is a unique choice for the closest
+    // unvisited vertex.
+
+    // 2. At some point of algorithm, there are multiple equal choices for
+    // closest unvisited vertex.
+
+    // 3. There is at least one vertex which is unreachable from the initial
+    // vertex v0.
+
+    // There is a vertex u such that there are at least two different paths,
+    // p1 and p2, such that both lead from v0 to u, p1 is explored before p2,
+    // and p2 has lower weight than p1.
+
+    // There is a vertex u such that there are at least two different paths,
+    // p1 and p2, such that both lead from v0 to u, p1 is explored before p2,
+    // and p2 has equal or greater weight than p1.
+
+    const neighbours = graphUtils.neighbourList(graph);
+    const nNodes = neighbours.length;
+
+    // Initial vertex is at index 0. Array 'distances' stores length of
+    // shortest path from the initial vertex to each other vertex.
+    // Array 'visited' stores the visitedness of each vertex. A visited vertex
+    // has their minimum distance decided permanently.
+    var distance = Array(nNodes);
+    var visited = Array(nNodes);
+    for (let i = 0; i < nNodes; i++) {
+      distance[i] = Infinity;
+      visited[i] = false;
+    }
+    distance[0] = 0;
+
+    for (let i = 0; i < nNodes; i++) {
+      var v = dijkstraMinVertex(distance, visited);
+      visited[v] = true;
+      if (distance[v] === Infinity) {
+        return; // Unreachable
+      }
+      for (let n of neighbours[v]) {
+        if (distance[n.v] > distance[v] + n.weight) {
+          // Relax an edge
+          distance[n.v] = distance[v] + n.weight;
+        }
+      }
+    }
+    console.log(distance);
+  }
+
+  function dijkstraMinVertex(distance, visited) {
+    // Find the unvisited vertex with the smalled distance
+    let v = 0; // Initialize v to first unvisited vertex;
+    for (let i = 0; i < visited.length; i++) {
+      if (visited[i] === false) {
+        v = i;
+        break;
+      }
+    }
+    // Now find the smallest value
+    for (let i = 0; i < visited.length; i++) {
+      if (visited[i] === false &&
+          (distance[i] < distance[v] ||
+           (distance[i] === distance[v] && i < v))) {
+        v = i;
+      }
+    }
+    return v;
+  }
 
   // Process About button: Pop up a message with an Alert
   function about() {
