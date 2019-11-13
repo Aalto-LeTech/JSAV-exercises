@@ -114,11 +114,28 @@
     };
     var opts = $.extend(defaultOptions, options),
       weighted = opts.weighted,
-      nNodes = opts.nodes,
-      nEdges = opts.edges,
-      nodes = new Array(nNodes),
+      nNodes = parseInt(opts.nodes),
+      nEdges = parseInt(opts.edges),
+      nodes = [],
       edges,
       i;
+
+    // Validate input
+    const minNodes = 2, maxNodes = 100, minEdges = 1, maxEdges = maxNodes * 3;
+    if (nNodes < minNodes || nNodes > maxNodes || isNaN(nNodes)) {
+      console.warn("The number of nodes is " + nNodes +
+        ", but it should be within range (" + minNodes + ", " + maxNodes +
+        ").");
+      return;
+    }
+    if (nEdges < minEdges || nEdges > maxEdges || isNaN(nEdges)) {
+      console.warn("The number of edges is " + nEdges +
+        ", but it should be within range (" + minEdges + ", " + maxEdges +
+        ").");
+      return;
+    }
+
+    nodes = new Array(nNodes);
 
     // Place nodes in a square grid:
     //   A---B---C---D
@@ -147,6 +164,12 @@
 
     // Generate set of candidate edges
     var candEdges = candidateEdges(nNodes, gridWidth, gridHeight);
+    if (nEdges > candEdges.length) {
+      console.warn("A graph with " + nNodes + " nodes can have at most " +
+        candEdges.length + " edges, " + "but " + nEdges + " was requested. " +
+        "Limiting the number of edges to the maximum amount.")
+      nEdges = candEdges.length;
+    }
 
     // First choose at least one edge that has the first vertex
     var selectedEdges = [];
