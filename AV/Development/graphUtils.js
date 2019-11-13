@@ -326,6 +326,8 @@
     //          n_i = [u_1, u_2, ...,]  for each neighbor of vertex i
     //          u_i = {'v': x, 'weight': w} end vertex is x, weight is w
     //
+    // The sublist of each start vertex will contain the end vertices in an
+    // ascending order of their index number.
     const nodes = graph.nodes();
     const edges = graph.edges();
     var nodeIndex = {};
@@ -338,6 +340,15 @@
       let v1 = nodeIndex[e.start().id()];
       let v2 = nodeIndex[e.end().id()];
       neighbours[v1].push({v: v2, weight: e.weight()});
+      if (graph.options.directed === false) {
+        neighbours[v2].push({v: v1, weight: e.weight()});
+      }
+    }
+    for (let n of neighbours) {
+        n.sort(
+          function(e1, e2) {
+            return e1.v - e2.v
+          });
     }
     return neighbours;
   }
