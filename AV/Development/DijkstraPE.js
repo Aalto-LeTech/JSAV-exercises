@@ -35,7 +35,7 @@
     const width = 400, height = 400,  // pixels
           weighted = true,
           directed = false,
-          nVertices = 10, nEdges = 14;
+          nVertices = 10, nEdges = 12;
 
     // First create a random planar graph instance in neighbour list format
     let nlGraph = undefined,
@@ -49,8 +49,6 @@
       multipleClosest: 0,
       longerPath: 0,
       unreachable: 0 };
-    const statKeys = ['relaxations', 'singleClosest', 'multipleClosest',
-      'longerPath', 'unreachable'];
 
     let result = {score: 0};
     while (result.score < targetScore && trials < maxTrials) {
@@ -61,7 +59,7 @@
         bestNlGraph = nlGraph;
         bestResult = result;
       }
-      for (let k of statKeys) {
+      for (let k of Object.keys(result.stats)) {
         if (result.stats[k] > 0) {
           sumStats[k]++;
         }
@@ -69,10 +67,11 @@
       trials++;
     }
     nlGraph = bestNlGraph;
-    console.log("Trials: " + trials);
-    for (let k of statKeys) {
-      console.log(k + ": " + sumStats[k]);
+    let statsText = "Trials: " + trials + "\n";
+    for (let k of Object.keys(sumStats)) {
+      statsText += k + ": " + sumStats[k] + "\n";
     }
+    console.log(statsText);
 
     // Create a JSAV graph instance
     if (graph) {
