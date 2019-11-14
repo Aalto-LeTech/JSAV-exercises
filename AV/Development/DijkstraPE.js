@@ -35,19 +35,44 @@
     const width = 400, height = 400,  // pixels
           weighted = true,
           directed = false,
-          nVertices = 10, nEdges = 12;
+          nVertices = 10, nEdges = 14;
 
     // First create a random planar graph instance in neighbour list format
-    let nlGraph = [];
-    let score = 0, trials = 0;
-    const targetScore = 5, maxTrials = 50;
-    while (score < targetScore && trials < maxTrials) {
+    let nlGraph = undefined,
+        bestNlGraph = undefined,
+        bestResult = {score: 0},
+        trials = 0;
+    const targetScore = 5, maxTrials = 100;
+    let sumStats = {
+      relaxations: 0,
+      singleClosest: 0,
+      multipleClosest: 0,
+      longerPath: 0,
+      unreachable: 0 };
+    const statKeys = ['relaxations', 'singleClosest', 'multipleClosest',
+      'longerPath', 'unreachable'];
+
+    let result = {score: 0};
+    while (result.score < targetScore && trials < maxTrials) {
       nlGraph = graphUtils.generatePlanarNl(nVertices, nEdges, weighted,
         directed, width, height);
-      score = validateInput(nlGraph);
+      result = testDijkstra(nlGraph);
+      if (result.score > bestResult.score) {
+        bestNlGraph = nlGraph;
+        bestResult = result;
+      }
+      for (let k of statKeys) {
+        if (result.stats[k] > 0) {
+          sumStats[k]++;
+        }
+      }
       trials++;
     }
-    console.log("Trials: " + trials + " score: " + score);
+    nlGraph = bestNlGraph;
+    console.log("Trials: " + trials);
+    for (let k of statKeys) {
+      console.log(k + ": " + sumStats[k]);
+    }
 
     // Create a JSAV graph instance
     if (graph) {
@@ -146,6 +171,10 @@
     }
   }
 
+  /*
+   * Dijkstra's algorithm which creates the model solution used in grading
+   * the exercise or creating an algorithm animation.
+   */
   function dijkstra(nodes, distances, av) {
     // returns the distance given a node index
     function getDistance(index) {
@@ -211,18 +240,19 @@
     }
   }
 
+
   function validateInput(graph) {
     // Checks whether the random graph is a valid exercise input
-    return 5;
-    // return testDijkstra(graph);
+    return testDijkstra(graph);
   }
 
+  /*
+   * Dijkstra's algorithm for a neighbour list format graph and validates
+   * its goodness as an exercise instance.
+   */
   function testDijkstra(graph) {
-    // Runs Dijkstra's algorithm on given graph and computes statistics on
-    // goodness of the input
 
-    const neighbours = graphUtils.neighbourList(graph);
-    const nNodes = neighbours.length;
+    const nNodes = graph.vertices.length;
     let stats = {
       relaxations: 0,
       singleClosest: 0,
@@ -236,7 +266,6 @@
     // has their minimum distance decided permanently.
     var distance = Array(nNodes);
     var visited = Array(nNodes);
-    var pathCount = Array(nNodes);
     for (let i = 0; i < nNodes; i++) {
       distance[i] = Infinity;
       visited[i] = false;
@@ -250,16 +279,16 @@
         stats.unreachable++;
         continue;
       }
-      for (let n of neighbours[v]) {
-        let d = distance[n.v];
-        let dNew = distance[v] + n.weight;
+      for (let e of graph.edges[v]) {
+        let d = distance[e.v];
+        let dNew = distance[v] + e.weight;
         if (dNew < d) {
           // Update distance
           if (d < Infinity) {
             stats.relaxations++;
           }
-          distance[n.v] = dNew;
-        } else if (visited[n.v] === false) {
+          distance[e.v] = dNew;
+        } else if (visited[e.v] === false) {
           stats.longerPath++;
         }
       }
@@ -267,44 +296,49 @@
 
     // Analyse statistics
     let score = 0;
+    for (let k of Object.keys(stats)) {
+      score += (stats[k] > 0) ? 1 : 0;
+    }
 
+    // Properties of a good Dijkstra input:
+    //
     // 1. At some point of algorithm, there is a unique choice for the closest
-    // unvisited vertex.
-    if (stats.singleClosest > 0) {
-      score++;
-    }
-
+    //    unvisited vertex.
+    //    Condition: stats.singleClosest > 0
+    //
     // 2. At some point of algorithm, there are multiple equal choices for
-    // closest unvisited vertex.
-    if (stats.multipleclosest > 0) {
-      score++;
-    }
-
+    //    closest unvisited vertex.
+    //    Condition: stats.multipleClosest > 0
+    //
     // 3. There is at least one vertex which is unreachable from the initial
-    // vertex v0.
-    if (stats.unreachable > 0) {
-      score++;
-    }
-
+    //    vertex v0.
+    //    Condition: stats.unreachable > 0
+    //
     // 4. There is a vertex u such that there are at least two different paths,
-    // p1 and p2, such that both lead from v0 to u, p1 is explored before p2,
-    // and p2 has lower weight than p1.
-    if (stats.relaxations > 0) {
-      score++;
-    }
-
+    //    p1 and p2, such that both lead from v0 to u, p1 is explored before
+    //    p2, and p2 has lower weight than p1.
+    //    Condition: stats.relaxations > 0
+    //
     // 5. There is a vertex u such that there are at least two different paths,
-    // p1 and p2, such that both lead from v0 to u, p1 is explored before p2,
-    // and p2 has equal or greater weight than p1.
-    if (stats.longerPath > 0) {
-      score++;
-    }
+    //    p1 and p2, such that both lead from v0 to u, p1 is explored before p2,
+    //    and p2 has equal or greater weight than p1.
+    //    Condition: stats.longerPath > 0
 
-    console.log(distance, stats);
-
-    return score;
+    return {score: score, stats: stats}
   }
 
+  /*
+   * Helper for testDijkstra(): select nearest unvisited vertex.
+   * If there are multiple nearest vertices, select the one with lowest index.
+   *
+   * Parameters:
+   * distance: array of integers, each having a positive value
+   * visited: array of booleans indicating which vertices are visited
+   * stats: a statistics object created by testDijkstra(). This is updated.
+   *
+   * Returns:
+   * (int): index of the nearest unvisited vertex.
+   */
   function dijkstraMinVertex(distance, visited, stats) {
     // Find the unvisited vertex with the smalled distance
     let v = 0; // Initialize v to first unvisited vertex;
