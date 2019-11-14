@@ -392,6 +392,7 @@
    *
    * This graph format is used for generating random graphs and validating
    * their properties for an algorithm simulation (proficiency) exercise.
+   * It refers to vertices as integers and edges as pair of integers.
    * Creating a neighbour list graph does not utilise JSAV, and thus it does
    * not affect DOM (the web page) which is faster. It is meant that an
    * exercise will finally convert a graphUtils.nlGraph type object into a
@@ -463,7 +464,7 @@
     });
 
     // copy source node positions
-    var destinationNodes = destination.nodes();generatePlanatGraphNl
+    var destinationNodes = destination.nodes();
     destinationNodes.forEach(function(node, i) {
       var pos = sourceNodes[i].position();
       node.moveTo(pos.left, pos.top);
