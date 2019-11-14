@@ -280,6 +280,179 @@
     return candidateEdges;
   }
 
+  /*
+   * Generates a grid-based random planar graph in a neighbour list format.
+   * Computes a layout for each vertex in pixel coordinates: origo at left-top
+   * corner, x grows to right, y grows to down.
+   *
+   * Parameters:
+   * nVertices (int):    number of vertices (2..100)
+   * nEdges   (int):     number of edges (1..300)
+   * weighted (boolean): should the graph be weighted
+   * directed (boolean): should the graph be directed
+   * width (int):        width of the graph layout in pixels
+   * height (int):       height of the graph layout in pixels
+   *
+   * Returns:
+   * { vertices: v, edges: e}:
+   *   v[i]   : list of vertices (0 <= i < nVertices)
+   *   v[i].x
+   *   v[i].y : pixel coordinates of the vertex.
+   *   e[i]   : neighbour list for vertex 0 <= i < nodes.
+   *   e[i][j].v: index of end vertex (0 <= j < neighbour count of i)
+   *   e[i][j].weight: the weight of the edge; an integer from range [1,9] if
+   *                  parameter weighted === true.
+   *
+   * If parameter directed === true, for each pair of (i, j)
+   * e[i][j] === e[j][i].
+   */
+  function generatePlanarGraphNl(nVertices, nEdges, weighted, directed, width,
+    height)
+  {
+    // Place nodes in a square grid:
+    //   A---B---C---D
+    //   |   |   |   |
+    //   E---F---G---H
+    //   |   |
+    //   I---J
+    //
+    const gridWidth = Math.ceil(Math.sqrt(nVertices));
+    const gridHeight = Math.ceil(nVertices / gridWidth);
+    const gridStepX = Math.floor(width / gridWidth);
+    const gridStepY = Math.floor(height / gridHeight);
+
+    // Generate graph and vertices.
+    let g = nlGraph(nVertices, nEdges, weighted, directed, width, height);
+    for (let y = 0, i = 0; y < gridHeight; y++) {
+      for (let x = 0; x < gridWidth && i < nVertices; x++, i++) {
+        g.vertices[i] = { x: Math.floor((x + 0.5) * gridStepX),
+                          y: Math.floor((y + 0.5) * gridStepY) };
+      }
+    }
+
+    // Generate set of candidate edges.
+    let candEdges = candidateEdges(nVertices, gridWidth, gridHeight);
+
+    // Select nEdges from candEdges.
+    let selectedEdges = [];
+    if (nEdges > candEdges.length) {
+      console.warn("A graph with " + nVertices + " nodes can have at most " +
+        candEdges.length + " edges, " + "but " + nEdges + " was requested. " +
+        "Limiting the number of edges to the maximum amount.")
+      nEdges = candEdges.length;
+    }
+
+    // First choose randombly one edge that begins from or ends to the first
+    // vertex.
+    let firstEdges = [];
+    for (let i = 0; i < candEdges.length; i++) {
+      if (candEdges[i][0] === 0 || candEdges[i][1] === 0) {
+        firstEdges.push(i);
+      }
+    }
+    let i = Math.floor(Math.random() * firstEdges.length);
+    i = firstEdges[i];
+    selectedEdges.push(candEdges[i]);
+    candEdges[i] = undefined;
+
+    // Choose nEdges-1 from candEdges
+    while (selectedEdges.length < nEdges) {
+      let i = Math.floor(Math.random() * candEdges.length);
+      if (candEdges[i] !== undefined) {
+        selectedEdges.push(candEdges[i]);
+        candEdges[i] = undefined;
+      }
+    }
+
+    // Add the edges to the graph
+    // Note: graph.addEdge() requires references to nodes as JSAV graph node
+    // instances. Variable gNodes does the conversion from integer index to
+    // the node instance.
+    let weight = 0;
+    for (i = 0; i < nEdges; i++) {
+      let v1 = selectedEdges[i][0];
+      let v2 = selectedEdges[i][1];
+      if (weighted) {
+        weight = 1 + Math.floor((Math.random() * 9));
+      }
+      g.edges[v1].push({v: v2, weight: weight});
+      if (!directed) {
+        g.edges[v2].push({v: v1, weight: weight});
+      }
+    }
+    // Sort edges by start vertex, end vertex.
+    for (let n of g.edges) {
+      n.sort(function(e1, e2) { return e1.v - e2.v });
+    }
+    return g;
+  }
+
+  /*
+   * Constructs a neighbour list graph instance.
+   *
+   * This graph format is used for generating random graphs and validating
+   * their properties for an algorithm simulation (proficiency) exercise.
+   * Creating a neighbour list graph does not utilise JSAV, and thus it does
+   * not affect DOM (the web page) which is faster. It is meant that an
+   * exercise will finally convert a graphUtils.nlGraph type object into a
+   * JSAV graph (jsav.dl.graph()), compute its final layout and display it in
+   * the visualisation.
+   *
+   * Parameters:
+   * nVertices (int):    number of vertices
+   * nEdges   (int):     number of edges
+   * weighted (boolean): should the graph be weighted
+   * directed (boolean): should the graph be directed
+   * width (int):        width of the graph layout in pixels
+   * height (int):       height of the graph layout in pixels
+   */
+  function nlGraph(nVertices, nEdges, weighted, directed, width, height) {
+    let g = {
+      vertices: new Array(nVertices),
+      edges: new Array(nVertices),
+      weighted: weighted,
+      directed: directed,
+      width: width,
+      height: height
+    };
+    for (let i = 0; i < nVertices; i++) {
+      g.edges[i] = [];
+    }
+    return g;
+  }
+
+  /*
+   * Copies edge and vertex data from a neighbour list graph into a JSAV graph.
+   *
+   * Parameters:
+   * nlGraph: a neighbour list graph, such as one created with
+   *          generatePlanarGraphNl().
+   *
+   * Returns:
+   * an object created with jsav.dl.graph()
+   */
+  function nlToJsav(nlGraph, jsavGraph) {
+    for (let i = 0; i < nlGraph.vertices.length; i++) {
+      let label = String.fromCharCode(i + 65); // A, B, C, ...
+      jsavGraph.addNode(label,
+        { left: nlGraph.vertices[i].x,
+          top: nlGraph.vertices[i].y } );
+    }
+    const gNodes  = jsavGraph.nodes();
+    let options = {};
+    for (let i = 0; i < nlGraph.vertices.length; i++) {
+      for (let e of nlGraph.edges[i]) {
+        if (nlGraph.weighted) {
+          options.weight = e.weight
+        }
+        jsavGraph.addEdge(gNodes[i], gNodes[e.v], options);
+      }
+    }
+  }
+
+  /*
+   * Creates a copy of a JSAV graph instance
+   */
   function copyGraph(source, destination, options) {
     var sourceNodes = source.nodes(),
         sourceEdges = source.edges(),
@@ -290,7 +463,7 @@
     });
 
     // copy source node positions
-    var destinationNodes = destination.nodes();
+    var destinationNodes = destination.nodes();generatePlanatGraphNl
     destinationNodes.forEach(function(node, i) {
       var pos = sourceNodes[i].position();
       node.moveTo(pos.left, pos.top);
@@ -315,48 +488,11 @@
     return destination;
   }
 
-  function jsavGraphToNeighbourList(graph) {
-    // Converts a JSAV graph into an integer arrays for easy computation
-    //
-    // Parameters:
-    // graph - a JSAV graph instance
-    //
-    // Returns:
-    // (Array): [n_1, n_2, ..., n_v]   for each start vertex 1...v
-    //          n_i = [u_1, u_2, ...,]  for each neighbor of vertex i
-    //          u_i = {'v': x, 'weight': w} end vertex is x, weight is w
-    //
-    // The sublist of each start vertex will contain the end vertices in an
-    // ascending order of their index number.
-    const nodes = graph.nodes();
-    const edges = graph.edges();
-    var nodeIndex = {};
-    var neighbours = [];
-    for (let i = 0; i < graph.nodeCount(); i++) {
-      nodeIndex[nodes[i].id()] = i;
-      neighbours.push([]);
-    }
-    for (let e of edges) {
-      let v1 = nodeIndex[e.start().id()];
-      let v2 = nodeIndex[e.end().id()];
-      neighbours[v1].push({v: v2, weight: e.weight()});
-      if (graph.options.directed === false) {
-        neighbours[v2].push({v: v1, weight: e.weight()});
-      }
-    }
-    for (let n of neighbours) {
-        n.sort(
-          function(e1, e2) {
-            return e1.v - e2.v
-          });
-    }
-    return neighbours;
-  }
-
+  // Map public functions to graphUtils object with the following public names
   window.graphUtils = {
     generate: generateGraph,
-    generatePlanar: generatePlanarGraph,
+    generatePlanarNl: generatePlanarGraphNl,
+    nlToJsav: nlToJsav,
     copy: copyGraph,
-    neighbourList: jsavGraphToNeighbourList,
   };
 })();

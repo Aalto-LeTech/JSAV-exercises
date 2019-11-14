@@ -31,26 +31,37 @@
   }
 
   function init() {
-    // create the graph
+    // Settings for input
+    const width = 400, height = 400,  // pixels
+          weighted = true,
+          directed = false,
+          nVertices = 10, nEdges = 12;
+
+    // First create a random planar graph instance in neighbour list format
+    let nlGraph = [];
+    let score = 0, trials = 0;
+    const targetScore = 5, maxTrials = 50;
+    while (score < targetScore && trials < maxTrials) {
+      nlGraph = graphUtils.generatePlanarNl(nVertices, nEdges, weighted,
+        directed, width, height);
+      score = validateInput(nlGraph);
+      trials++;
+    }
+    console.log("Trials: " + trials + " score: " + score);
+
+    // Create a JSAV graph instance
     if (graph) {
       graph.clear();
     }
     graph = jsav.ds.graph({
-      width: 400,
-      height: 400,
+      width: width,
+      height: height,
       layout: "manual",
-      directed: false
+      directed: directed
     });
-    // Randomly generate the graph with weights
-    graphUtils.generatePlanar(graph, {weighted: true, nodes: 10, edges: 12});
-
-
+    graphUtils.nlToJsav(nlGraph, graph);
     graph.layout();
-    // mark the 'A' node
-    graph.nodes()[0].addClass("marked");
-
-    validateInput(graph);
-
+    graph.nodes()[0].addClass("marked"); // mark the 'A' node
     jsav.displayInit();
     return graph;
   }
@@ -202,32 +213,22 @@
 
   function validateInput(graph) {
     // Checks whether the random graph is a valid exercise input
-    testDijkstra(graph);
+    return 5;
+    // return testDijkstra(graph);
   }
 
   function testDijkstra(graph) {
     // Runs Dijkstra's algorithm on given graph and computes statistics on
     // goodness of the input
 
-    // 1. At some point of algorithm, there is a unique choice for the closest
-    // unvisited vertex.
-
-    // 2. At some point of algorithm, there are multiple equal choices for
-    // closest unvisited vertex.
-
-    // 3. There is at least one vertex which is unreachable from the initial
-    // vertex v0.
-
-    // There is a vertex u such that there are at least two different paths,
-    // p1 and p2, such that both lead from v0 to u, p1 is explored before p2,
-    // and p2 has lower weight than p1.
-
-    // There is a vertex u such that there are at least two different paths,
-    // p1 and p2, such that both lead from v0 to u, p1 is explored before p2,
-    // and p2 has equal or greater weight than p1.
-
     const neighbours = graphUtils.neighbourList(graph);
     const nNodes = neighbours.length;
+    let stats = {
+      relaxations: 0,
+      singleClosest: 0,
+      multipleClosest: 0,
+      longerPath: 0,
+      unreachable: 0 };
 
     // Initial vertex is at index 0. Array 'distances' stores length of
     // shortest path from the initial vertex to each other vertex.
@@ -235,6 +236,7 @@
     // has their minimum distance decided permanently.
     var distance = Array(nNodes);
     var visited = Array(nNodes);
+    var pathCount = Array(nNodes);
     for (let i = 0; i < nNodes; i++) {
       distance[i] = Infinity;
       visited[i] = false;
@@ -242,22 +244,68 @@
     distance[0] = 0;
 
     for (let i = 0; i < nNodes; i++) {
-      var v = dijkstraMinVertex(distance, visited);
+      var v = dijkstraMinVertex(distance, visited, stats);
       visited[v] = true;
       if (distance[v] === Infinity) {
-        return; // Unreachable
+        stats.unreachable++;
+        continue;
       }
       for (let n of neighbours[v]) {
-        if (distance[n.v] > distance[v] + n.weight) {
-          // Relax an edge
-          distance[n.v] = distance[v] + n.weight;
+        let d = distance[n.v];
+        let dNew = distance[v] + n.weight;
+        if (dNew < d) {
+          // Update distance
+          if (d < Infinity) {
+            stats.relaxations++;
+          }
+          distance[n.v] = dNew;
+        } else if (visited[n.v] === false) {
+          stats.longerPath++;
         }
       }
     }
-    console.log(distance);
+
+    // Analyse statistics
+    let score = 0;
+
+    // 1. At some point of algorithm, there is a unique choice for the closest
+    // unvisited vertex.
+    if (stats.singleClosest > 0) {
+      score++;
+    }
+
+    // 2. At some point of algorithm, there are multiple equal choices for
+    // closest unvisited vertex.
+    if (stats.multipleclosest > 0) {
+      score++;
+    }
+
+    // 3. There is at least one vertex which is unreachable from the initial
+    // vertex v0.
+    if (stats.unreachable > 0) {
+      score++;
+    }
+
+    // 4. There is a vertex u such that there are at least two different paths,
+    // p1 and p2, such that both lead from v0 to u, p1 is explored before p2,
+    // and p2 has lower weight than p1.
+    if (stats.relaxations > 0) {
+      score++;
+    }
+
+    // 5. There is a vertex u such that there are at least two different paths,
+    // p1 and p2, such that both lead from v0 to u, p1 is explored before p2,
+    // and p2 has equal or greater weight than p1.
+    if (stats.longerPath > 0) {
+      score++;
+    }
+
+    console.log(distance, stats);
+
+    return score;
   }
 
-  function dijkstraMinVertex(distance, visited) {
+  function dijkstraMinVertex(distance, visited, stats) {
     // Find the unvisited vertex with the smalled distance
     let v = 0; // Initialize v to first unvisited vertex;
     for (let i = 0; i < visited.length; i++) {
@@ -267,12 +315,23 @@
       }
     }
     // Now find the smallest value
+    let equalValues = 1;
     for (let i = 0; i < visited.length; i++) {
-      if (visited[i] === false &&
-          (distance[i] < distance[v] ||
-           (distance[i] === distance[v] && i < v))) {
-        v = i;
+      if (visited[i] === false) {
+        if (distance[i] < distance[v]) {
+          v = i;
+          equalValues = 1;
+        } else if (distance[i] === distance[v]) {
+          // There are multiple vertices with the same distance
+          equalValues++;
+        }
+
       }
+    }
+    if (equalValues === 1) {
+      stats.singleClosest++;
+    } else {
+      stats.multipleClosest++;
     }
     return v;
   }
