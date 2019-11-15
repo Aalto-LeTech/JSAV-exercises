@@ -32,7 +32,7 @@
 
   function init() {
     // Settings for input
-    const width = 400, height = 400,  // pixels
+    const width = 600, height = 400,  // pixels
           weighted = true,
           directed = false,
           nVertices = 10, nEdges = 12;
@@ -111,7 +111,7 @@
         graphNodes = graph.nodes();
     // create the model
     var modelGraph = modeljsav.ds.graph({
-      width: 400,
+      width: 600,
       height: 400,
       layout: "automatic",
       directed: false
