@@ -19,11 +19,11 @@
   background-color: #FFF050;
 }
 .jsavgraph .jsavedge {
-  stroke-width: 8;
+  stroke-width: 10;
   stroke: #d59f0d;
 }
 .jsavgraph .jsavedge.marked {
-  stroke-width: 14;
+  stroke-width: 16;
   stroke: #F6B611;
 }
 .jsavgraph .jsavedgelabel {
