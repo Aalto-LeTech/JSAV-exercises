@@ -32,7 +32,7 @@
 
   function init() {
     // Settings for input
-    const width = 600, height = 400,  // pixels
+    const width = 500, height = 400,  // pixels
           weighted = true,
           directed = false,
           nVertices = 10, nEdges = 12;
@@ -77,7 +77,7 @@
     if (graph) {
       graph.clear();
     }
-    graph = jsav.ds.graph({
+    graph = jsav.ds.graph({//    Condition:
       width: width,
       height: height,
       layout: "manual",
@@ -111,7 +111,7 @@
         graphNodes = graph.nodes();
     // create the model
     var modelGraph = modeljsav.ds.graph({
-      width: 600,
+      width: 500,
       height: 400,
       layout: "automatic",
       directed: false
@@ -295,33 +295,33 @@
 
     // Analyse statistics
     let score = 0;
-    for (let k of Object.keys(stats)) {
-      score += (stats[k] > 0) ? 1 : 0;
-    }
+    // for (let k of Object.keys(stats)) {
+    //   score += (stats[k] > 0) ? 1 : 0;
+    // }
 
     // Properties of a good Dijkstra input:
     //
     // 1. At some point of algorithm, there is a unique choice for the closest
     //    unvisited vertex.
-    //    Condition: stats.singleClosest > 0
-    //
+    score += (stats.singleClosest > 0) ? 1 : 0;
+
     // 2. At some point of algorithm, there are multiple equal choices for
     //    closest unvisited vertex.
-    //    Condition: stats.multipleClosest > 0
-    //
+    score += (stats.multipleClosest > 0) ? 1 : 0;
+
     // 3. There is at least one vertex which is unreachable from the initial
     //    vertex v0.
-    //    Condition: stats.unreachable > 0
-    //
+    score += (stats.unreachable > 0) ? 1 : 0;
+
     // 4. There is a vertex u such that there are at least two different paths,
     //    p1 and p2, such that both lead from v0 to u, p1 is explored before
     //    p2, and p2 has lower weight than p1.
-    //    Condition: stats.relaxations > 0
-    //
+    score += (stats.relaxations > 0) ? 1: 0;
+
     // 5. There is a vertex u such that there are at least two different paths,
     //    p1 and p2, such that both lead from v0 to u, p1 is explored before p2,
     //    and p2 has equal or greater weight than p1.
-    //    Condition: stats.longerPath > 0
+    score += (stats.longerPath > 0) ? 1 : 0;
 
     return {score: score, stats: stats}
   }
@@ -354,8 +354,10 @@
         if (distance[i] < distance[v]) {
           v = i;
           equalValues = 1;
-        } else if (distance[i] === distance[v]) {
-          // There are multiple vertices with the same distance
+        } else if (distance[i] === distance[v] && i !== v &&
+                   distance[v] < Infinity) {
+          // There are multiple unvisited vertices with the same finite
+          // distance
           equalValues++;
         }
 
