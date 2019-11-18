@@ -19,10 +19,11 @@
   background-color: #FFF050;
 }
 .jsavgraph .jsavedge {
-  stroke-width: 8;
-  stroke: #7D8879;
+  stroke-width: 10;
+  stroke: #d59f0d;
 }
 .jsavgraph .jsavedge.marked {
+  stroke-width: 16;
   stroke: #F6B611;
 }
 .jsavgraph .jsavedgelabel {
@@ -31,6 +32,6 @@
   text-shadow: 0 0 5px #fff;
 }
 .jsavautoresize .jsavnode {
-  min-width: 45px; 
-  min-height: 45px; 
+  min-width: 45px;
+  min-height: 45px;
 }

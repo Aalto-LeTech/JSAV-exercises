@@ -586,8 +586,11 @@
     return destination;
   }
 
+  // Map public functions to graphUtils object with the following public names
   window.graphUtils = {
     generate: generateGraph,
-    copy: copyGraph
+    generatePlanarNl: generatePlanarGraphNl,
+    nlToJsav: nlToJsav,
+    copy: copyGraph,
   };
 })();
