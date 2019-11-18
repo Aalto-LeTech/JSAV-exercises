@@ -35,7 +35,8 @@
     const width = 500, height = 400,  // pixels
           weighted = true,
           directed = false,
-          nVertices = 10, nEdges = 12;
+          nVertices = [11, 3],
+          nEdges = [14, 2];
 
     // First create a random planar graph instance in neighbour list format
     let nlGraph = undefined,
