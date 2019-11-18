@@ -35,8 +35,8 @@
     const width = 500, height = 400,  // pixels
           weighted = true,
           directed = false,
-          nVertices = [11, 3],
-          nEdges = [14, 2];
+          nVertices = [9, 3],
+          nEdges = [12, 2];
 
     // First create a random planar graph instance in neighbour list format
     let nlGraph = undefined,
@@ -68,6 +68,7 @@
       trials++;
     }
     nlGraph = bestNlGraph;
+
     let statsText = "Trials: " + trials + "\n";
     for (let k of Object.keys(sumStats)) {
       statsText += k + ": " + sumStats[k] + "\n";
@@ -292,9 +293,6 @@
 
     // Analyse statistics
     let score = 0;
-    // for (let k of Object.keys(stats)) {
-    //   score += (stats[k] > 0) ? 1 : 0;
-    // }
 
     // Properties of a good Dijkstra input:
     //
@@ -354,10 +352,9 @@
         } else if (distance[i] === distance[v] && i !== v &&
                    distance[v] < Infinity) {
           // There are multiple unvisited vertices with the same finite
-          // distance
+          // distance.
           equalValues++;
         }
-
       }
     }
     if (equalValues === 1) {
