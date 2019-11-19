@@ -9,10 +9,6 @@
 .jsavgraph svg {
   z-index: 0;
 }
-.jsavline {
-  height: 35px;
-}
-
 .jsavnode.marked {
   background-color: #FFF050;
 }
@@ -41,6 +37,15 @@
 }
 
 .jsavmatrix .jsavarray li.jsavnode {
-  width: 40px;
+  min-width: 35px;
   height: 35px;
+}
+
+.jsavmatrix .jsavarray li.jsavnode:first-child {
+  min-width: 50px;
+  height: 35px;
+}
+
+.jsavmatrix .jsavarray .marked {
+  background-color: #F6B611;
 }
