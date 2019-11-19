@@ -35,8 +35,8 @@
     const width = 500, height = 400,  // pixels
           weighted = true,
           directed = false,
-          nVertices = [9, 3],
-          nEdges = [12, 2];
+          nVertices = [12, 3],
+          nEdges = [15, 2];
 
     // First create a random planar graph instance in neighbour list format
     let nlGraph = undefined,
@@ -69,11 +69,11 @@
     }
     nlGraph = bestNlGraph;
 
-    let statsText = "Trials: " + trials + "\n";
-    for (let k of Object.keys(sumStats)) {
-      statsText += k + ": " + sumStats[k] + "\n";
-    }
-    console.log(statsText);
+    // let statsText = "Trials: " + trials + "\n";
+    // for (let k of Object.keys(sumStats)) {
+    //   statsText += k + ": " + sumStats[k] + "\n";
+    // }
+    // console.log(statsText);
 
     // Create a JSAV graph instance
     if (graph) {
@@ -181,7 +181,7 @@
     function getDistance(index) {
       var dist = parseInt(distances.value(index, 1), 10);
       if (isNaN(dist)) {
-        dist = 99999;
+        dist = Infinity;
       }
       return dist;
     }
@@ -191,7 +191,7 @@
     }
 
     while (true) {
-      var min = 100000,
+      var min = Infinity,
           node,
           prev,
           neighbors,
@@ -205,6 +205,11 @@
             nodeIndex = i;
           }
         }
+      }
+      if (min === Infinity || nodeIndex === -1) {
+        av.umsg(interpret("av_ms_unreachable"));
+        av.step();
+        break;
       }
       node = nodes[nodeIndex];
       if (!node) { break; }
