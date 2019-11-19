@@ -157,7 +157,7 @@
     let component = verticesToComponents(nVertices, gridWidth, gridHeight,
       candEdges);
 
-    // Select nEdges from candEdges.
+    // Select nEdges[i] from candEdges for each component i.
     candEdges = edgesToComponents(candEdges, component, nEdges);
     let selectedEdges = [];
     let edgesPerComponent = Array(nConnectedComponents);
@@ -165,23 +165,7 @@
       edgesPerComponent[i] = 0;
     }
 
-    // First choose randomly one edge from the first component that connects the
-    // first vertex.
-    let firstEdgeCandidates = []; // index in candEdges[0]
-    for (let i = 0; i < candEdges[0].length; i++) {
-      let e = candEdges[0][i];
-      if (e[0] === 0 || e[1] === 0) {
-        firstEdgeCandidates.push(i);
-      }
-    }
-    //let i = Math.floor(Math.random() * firstEdgeCandidates.length);
-    //i = firstEdgeCandidates[i];
-    i = randomChoice(firstEdgeCandidates);
-    swap(candEdges[0], i, candEdges[0].length - 1);
-    selectedEdges.push(candEdges[0].pop());
-    edgesPerComponent[0] = 1;
-
-    // Choose the rest of the edges for each component c
+    // Choose the edges for each component c
     for (let c = 0; c < nEdges.length; c++) {
       shuffle(candEdges[c]);
       for (let i = 0; edgesPerComponent[c] < nEdges[c] &&
