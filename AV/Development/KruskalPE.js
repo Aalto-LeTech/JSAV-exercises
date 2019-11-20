@@ -8,7 +8,11 @@
       settings = config.getSettings(),
       jsav = new JSAV($(".avcontainer"), {settings: settings});
 
-  function init() {
+  /*
+   * Old exercise initialiser. Creates a random graph which has messy output
+   * at 50% probability.
+   */
+  function init_old() {
     // create the graph
     if (graph) {
       graph.clear();
@@ -30,6 +34,48 @@
     return graph;
   }
 
+  /*
+   * New exercise initializer. Creates a random graph with nodes and edges
+   * placed in a fixed grid, two connected components.
+   */
+  function init() {
+    // Settings for input.
+    // It is safest to generate one connected component that has more edges
+    // than vertices. This is always a valid input.
+    const width = 500, height = 400,  // pixels
+          weighted = true,
+          directed = false,
+          nVertices = [11],
+          nEdges = [14];
+          // nVertices = [11, 4],
+          // nEdges = [15, 3];
+
+    // First create a random planar graph instance in neighbour list format
+    let nlGraph = undefined,
+        bestNlGraph = undefined,
+        bestResult = {score: 0},
+        trials = 0;
+
+    nlGraph = graphUtils.generatePlanarNl(nVertices, nEdges, weighted,
+      directed, width, height);
+
+    // Create a JSAV graph instance
+    if (graph) {
+      graph.clear();
+    }
+    graph = jsav.ds.graph({//    Condition:
+      width: width,
+      height: height,
+      layout: "manual",
+      directed: directed
+    });
+    graphUtils.nlToJsav(nlGraph, graph);
+    graph.layout();
+
+    jsav.displayInit();
+    return graph;
+  }
+
   function fixState(modelGraph) {
     var graphEdges = graph.edges(),
         modelEdges = modelGraph.edges();
@@ -37,7 +83,19 @@
     // compare the edges between exercise and model
     for (var i = 0; i < graphEdges.length; i++) {
       var edge = graphEdges[i],
-          modelEdge = modelEdges[i];
+          modelEdge = modelEdges[i];  /*
+   * Validated randomly generated input for the exercise.
+   *
+   * Parameters:
+   * nlGraph: weighted, undirected graph in a neighbour list format.
+   */
+  function validateInput(nlGraph) {
+    return true;
+  }
+
+  function testKrustal(nlGraph) {
+
+  }
       if (modelEdge.hasClass("marked") && !edge.hasClass("marked")) {
         // mark the edge that is marked in the model, but not in the exercise
         markEdge(edge);
@@ -46,11 +104,14 @@
     }
   }
 
+  /*
+   * Creates step-by-step visualisation of the model solution.
+   */
   function model(modeljsav) {
     var i;
     // create the model
     var modelGraph = modeljsav.ds.graph({
-      width: 400,
+      width: 500,
       height: 400,
       layout: "automatic",
       directed: false
@@ -102,6 +163,9 @@
     return modelGraph;
   }
 
+  /*
+   * Kruskal's algorithm implementation for the correct (model) solution.
+   */
   function kruskal(modelNodes, modelEdges, edgeMatrix, modeljsav) {
     // Array of strings for book keeping of connected parts of the graph
     // Initially equal to ["A", "B", "C" ...]
@@ -131,6 +195,7 @@
       }, -1);
     }
 
+    // Connect two sets of vertices with an edge (the UNION operation).
     function addEdge(edge) {
       var startSetIndex = findSet(edge.start()),
           endSetIndex = findSet(edge.end());
@@ -188,6 +253,9 @@
     return [edge.start(), edge.end()].map(getValue).sort().join(s);
   }
 
+  /*
+   * Comparator function for two weighted edges in a JSAV graph.
+   */
   function sortEdges(a, b) {
     var weightA = a.weight(),
         weightB = b.weight();

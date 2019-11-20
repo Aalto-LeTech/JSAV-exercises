@@ -282,7 +282,7 @@
    * gridWidth: width of the grid in nodes
    * gridHeight: height of the frid in nodes
    */
-  function verticesToComponents(nVertices, gridWidth, gridHeight) {
+  function verticesToComponents_old(nVertices, gridWidth, gridHeight) {
     let totalVertices = 0;
     for (let v of nVertices) {
       totalVertices += v;
@@ -360,6 +360,10 @@
       component[i] = 0;
       neighbours[i] = [];
     }
+    if (nVertices.length === 1) {
+      return component;
+    }
+
     // Create a neighbour list of undirected edges from candEdges
     for (let e of candEdges) {
       neighbours[e[0]].push(e[1]);
