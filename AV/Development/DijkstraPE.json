@@ -18,7 +18,7 @@
       ".avTitle": "Dijkstran algoritmi",
       "av_Authors": "Mohammed Fawzi, Kasper Hellström",
       ".instructLabel": "Ohjeet:",
-      ".instructions": "Lisää särmät virityspuuhun Dijkstran algoritmin antamassa järjestyksessä. Aloita läpikäynti solmusta A. Klikkaa <strong>särmiä</strong> lisätäksesi ne virityspuuhun. Solmun naapurit käydään läpi aakkosjärjestyksessä.",
+      ".instructions": "Lisää särmät virityspuuhun Dijkstran algoritmin antamassa järjestyksessä. Aloita läpikäynti solmusta A. Klikkaa <strong>särmiä</strong> lisätäksesi ne virityspuuhun. Jos kahdella särmällä on sama paino, kaari, jonka solmut ovat aakkosjärjestyksessä ensimmäisenä.",
       "av_ms_shortest": "Lyhyin reitti A:sta.",
       "av_ms_select_a": "Aloitetaan valitsemalla solmu A.",
       "av_ms_select_node": "Valitaan {node}, koska sillä on lyhin etäisyys A:han.",
