@@ -16,7 +16,7 @@
       ".avTitle": "Kruskalin algoritmi",
       "av_Authors": "Mohammed Fawzi, Kasper Hellström",
       ".instructLabel": "Ohjeet:",
-      ".instructions": "Lisää särmät pienimpään virityspuuhun Kruskalin algoritmin antamassa järjestyksessä. Klikkaa <strong>särmiä</strong> lisätäksesi ne virityspuuhun. Jos kahdella särmällä on sama paino, valitse se, jolla on aakkosjärjestyksessä ensimmäinen kirjain soljmussa.",
+      ".instructions": "Lisää särmät pienimpään virityspuuhun Kruskalin algoritmin antamassa järjestyksessä. Klikkaa <strong>särmiä</strong> lisätäksesi ne virityspuuhun. Jos kahdella särmällä on sama paino, kaari, jonka solmut ovat aakkosjärjestyksessä ensimmäisenä.",
       "av_ms_mst": "Verkon pienin virityspuu",
       "av_ms_processing": "Prosessoidaan särmää: ({edge})<br>",
       "av_ms_adding": "Lisätään särmä virityspuuhun",

@@ -21,7 +21,7 @@
 }
 .jsavgraph .jsavedge.marked {
   stroke-width: 16;
-  stroke: #F6B611;
+  stroke: #ffe000;
 }
 .jsavgraph .jsavedge.discarded {
   stroke: rgba(125, 136, 121, 0.2);
@@ -47,5 +47,5 @@
 }
 
 .jsavmatrix .jsavarray .marked {
-  background-color: #F6B611;
+  background-color: #ffe000;
 }
