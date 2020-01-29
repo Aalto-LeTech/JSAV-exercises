@@ -83,19 +83,7 @@
     // compare the edges between exercise and model
     for (var i = 0; i < graphEdges.length; i++) {
       var edge = graphEdges[i],
-          modelEdge = modelEdges[i];  /*
-   * Validated randomly generated input for the exercise.
-   *
-   * Parameters:
-   * nlGraph: weighted, undirected graph in a neighbour list format.
-   */
-  function validateInput(nlGraph) {
-    return true;
-  }
-
-  function testKrustal(nlGraph) {
-
-  }
+          modelEdge = modelEdges[i];
       if (modelEdge.hasClass("marked") && !edge.hasClass("marked")) {
         // mark the edge that is marked in the model, but not in the exercise
         markEdge(edge);
