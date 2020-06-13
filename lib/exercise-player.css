@@ -11,7 +11,7 @@
 
 .jsavautoresize .jsavnode {
   min-width: 30px !important;
-  background-color: transparent;
+  /* background-color: transparent; */
 }
 
 .jsavline {
@@ -171,8 +171,9 @@ display: none;
   width: 80%; /* Could be more or less, depending on screen size */
 }
 
-/* A Close Button */
-.close {
+/* A Close button. This must be named with `jaal-` because the Bootstrap
+ * library also has a `close` class. */
+.jaal-close {
   color: #aaa;
   float: right;
   font-size: 28px;
@@ -180,8 +181,8 @@ display: none;
   display: block;
 }
 
-.close:hover,
-.close:focus {
+.jaal-close:hover,
+.jaal-close:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;
