@@ -53,12 +53,6 @@
     border-color: #bce8f1;
 }
 
-
-.instructions::before {
-  content: 'Ohjeet: ';
-  font-weight: 700;
-}
-
 .instructLabel {
   display: none !important;
 }
