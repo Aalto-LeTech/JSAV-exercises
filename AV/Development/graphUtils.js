@@ -420,18 +420,18 @@
   }
 
   /*
-   * Randomises the order of array by Fisher-Yates shuffle algorithm.
+   * Randomises the order of array by the Fisher-Yates shuffle algorithm.
    * https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
    *
    * Parameters:
    * a: array
    */
-  function shuffle(a, firstN) {
+  function shuffle(a) {
     if (a === undefined) {
       console.warn("shuffle(undefined)!")
       return;
     }
-    const end_i = a.length - 1;
+    const end_i = a.length;
     let i, j, k, tmp;
     // Iterate from beginning to end.
     // Indices 0...(i-1) contain processed portion of the array.
