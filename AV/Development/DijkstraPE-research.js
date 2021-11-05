@@ -1,3 +1,10 @@
+/*
+ * Research version of Dijkstra's algorithm JSAV exercise
+ * Artturi Tilanterä
+ * artturi.tilantera@aalto.fi
+ * 5 November 2021
+ */
+
 /* global ODSA, graphUtils */
 (function ($) {
   "use strict";
@@ -31,61 +38,20 @@
   }
 
   function init() {
-    // Settings for input
-    const width = 500, height = 400,  // pixels
-          weighted = true,
-          directed = false,
-          nVertices = [12, 3],
-          nEdges = [17, 2];
-
-    // First create a random planar graph instance in neighbour list format
-    let nlGraph = undefined,
-        bestNlGraph = undefined,
-        bestResult = {score: 0},
-        trials = 0;
-    const targetScore = 5, maxTrials = 100;
-    let sumStats = {
-      relaxations: 0,
-      singleClosest: 0,
-      multipleClosest: 0,
-      longerPath: 0,
-      unreachable: 0 };
-
-    let result = {score: 0};
-    while (result.score < targetScore && trials < maxTrials) {
-      nlGraph = graphUtils.generatePlanarNl(nVertices, nEdges, weighted,
-        directed, width, height);
-      result = testDijkstra(nlGraph);
-      if (result.score > bestResult.score) {
-        bestNlGraph = nlGraph;
-        bestResult = result;
-      }
-      for (let k of Object.keys(result.stats)) {
-        if (result.stats[k] > 0) {
-          sumStats[k]++;
-        }
-      }
-      trials++;
-    }
-    nlGraph = bestNlGraph;
-
-    let statsText = "Dijkstra: trials: " + trials + "\n";
-    for (let k of Object.keys(sumStats)) {
-      statsText += k + ": " + sumStats[k] + "\n";
-    }
-    console.log(statsText);
-
     // Create a JSAV graph instance
     if (graph) {
       graph.clear();
     }
-    graph = jsav.ds.graph({//    Condition:
-      width: width,
-      height: height,
+    graph = jsav.ds.graph({
+      width: 500,      // pixels
+      height: 400,     // pixels
       layout: "manual",
       directed: directed
     });
-    graphUtils.nlToJsav(nlGraph, graph);
+
+    researchGraph = generateInstance();
+    researchInstanceToJsav(researchGraph, graph);
+
     graph.layout();
     graph.nodes()[0].addClass("marked"); // mark the 'A' node
     jsav.displayInit();
@@ -246,134 +212,6 @@
     }
   }
 
-
-  function validateInput(graph) {
-    // Checks whether the random graph is a valid exercise input
-    return testDijkstra(graph);
-  }
-
-  /*
-   * Dijkstra's algorithm for a neighbour list format graph and validates
-   * its goodness as an exercise instance.
-   */
-  function testDijkstra(graph) {
-
-    const nNodes = graph.vertices.length;
-    let stats = {
-      relaxations: 0,
-      singleClosest: 0,
-      multipleClosest: 0,
-      longerPath: 0,
-      unreachable: 0 };
-
-    // Initial vertex is at index 0. Array 'distances' stores length of
-    // shortest path from the initial vertex to each other vertex.
-    // Array 'visited' stores the visitedness of each vertex. A visited vertex
-    // has their minimum distance decided permanently.
-    var distance = Array(nNodes);
-    var visited = Array(nNodes);
-    for (let i = 0; i < nNodes; i++) {
-      distance[i] = Infinity;
-      visited[i] = false;
-    }
-    distance[0] = 0;
-
-    for (let i = 0; i < nNodes; i++) {
-      var v = dijkstraMinVertex(distance, visited, stats);
-      visited[v] = true;
-      if (distance[v] === Infinity) {
-        stats.unreachable++;
-        continue;
-      }
-      for (let e of graph.edges[v]) {
-        let d = distance[e.v];
-        let dNew = distance[v] + e.weight;
-        if (dNew < d) {
-          // Update distance
-          if (d < Infinity) {
-            stats.relaxations++;
-          }
-          distance[e.v] = dNew;
-        } else if (visited[e.v] === false) {
-          stats.longerPath++;
-        }
-      }
-    }
-
-    // Analyse statistics
-    let score = 0;
-
-    // Properties of a good Dijkstra input:
-    //
-    // 1. At some point of algorithm, there is a unique choice for the closest
-    //    unvisited vertex.
-    score += (stats.singleClosest > 0) ? 1 : 0;
-
-    // 2. At some point of algorithm, there are multiple equal choices for
-    //    closest unvisited vertex.
-    score += (stats.multipleClosest > 0) ? 1 : 0;
-
-    // 3. There is at least one vertex which is unreachable from the initial
-    //    vertex v0.
-    score += (stats.unreachable > 0) ? 1 : 0;
-
-    // 4. There is a vertex u such that there are at least two different paths,
-    //    p1 and p2, such that both lead from v0 to u, p1 is explored before
-    //    p2, and p2 has lower weight than p1.
-    score += (stats.relaxations > 1) ? 1: 0;
-
-    // 5. There is a vertex u such that there are at least two different paths,
-    //    p1 and p2, such that both lead from v0 to u, p1 is explored before p2,
-    //    and p2 has equal or greater weight than p1.
-    score += (stats.longerPath > 0) ? 1 : 0;
-
-    return {score: score, stats: stats}
-  }
-
-  /*
-   * Helper for testDijkstra(): select nearest unvisited vertex.
-   * If there are multiple nearest vertices, select the one with lowest index.
-   *
-   * Parameters:
-   * distance: array of integers, each having a positive value
-   * visited: array of booleans indicating which vertices are visited
-   * stats: a statistics object created by testDijkstra(). This is updated.
-   *
-   * Returns:
-   * (int): index of the nearest unvisited vertex.
-   */
-  function dijkstraMinVertex(distance, visited, stats) {
-    // Find the unvisited vertex with the smalled distance
-    let v = 0; // Initialize v to first unvisited vertex;
-    for (let i = 0; i < visited.length; i++) {
-      if (visited[i] === false) {
-        v = i;
-        break;
-      }
-    }
-    // Now find the smallest value
-    let equalValues = 1;
-    for (let i = 0; i < visited.length; i++) {
-      if (visited[i] === false) {
-        if (distance[i] < distance[v]) {
-          v = i;
-          equalValues = 1;
-        } else if (distance[i] === distance[v] && i !== v &&
-                   distance[v] < Infinity) {
-          // There are multiple unvisited vertices with the same finite
-          // distance.
-          equalValues++;
-        }
-      }
-    }
-    if (equalValues === 1) {
-      stats.singleClosest++;
-    } else {
-      stats.multipleClosest++;
-    }
-    return v;
-  }
-
   // Process About button: Pop up a message with an Alert
   function about() {
     window.alert(ODSA.AV.aboutstring(interpret(".avTitle"), interpret("av_Authors")));
@@ -398,5 +236,571 @@
   });
 
   $("#about").click(about);
+
+  /*
+   * Preconfigured template for research
+   */
+
+   // Dijkstra's algorithm
+   // Preconfigured template 3
+   //
+   //       a       b
+   //   A-------B-------C       D
+   //         / |               |
+   //      c/   |d              |s
+   //     /     |   g           |
+   //   E       F-------G       H
+   //   | \       \     | \
+   //  e|   \f     h\   |i  \j
+   //   |     \       \ |     \
+   //   I---k---J-------K-------L
+   //     \     |       |   m
+   //      n\   |o      |p
+   //         \ |       |
+   //   M-------N       O-------P
+   //       q               r
+   //
+   // Edge order: AB, BC, BE, BF, EI, EJ, FG, FK, JN, KL, NM, KO, OP
+
+   function randomInt(a, b) {
+     // Returns a random integer between a and b (both inclusive).
+     return Math.floor(Math.random() * (b - a + 1)) + 1
+   }
+
+   function determineWeights() {
+     function rnd(x) {
+       // Returns a random integer between 1 and x (both inclusive)
+       return Math.floor(Math.random() * x) + 1;
+     }
+     // Randomize 1: try to fulfill inequalities for single-source sourcest
+     // paths.
+     let a = rnd(6);                           // Path AB
+     let b = rnd(6);                           // ABC
+     let c = b + rnd(5);                       // ABE
+     let d = c + rnd(5);                       // ABF
+     let e = d - c + rnd(5);                   // ABEI
+     let f = e + rnd(5);                       // ABEJ
+     let g = c + f - d + rnd(5);               // ABFG
+     let h = g + rnd(5);                       // ABFK
+     let o = d + h - (c + f) + rnd(5);         // ABEJN
+     let m = c + f + o - (d + h) + rnd(5);     // ABFKL
+     let q = d + h + m - (c + f + o) + rnd(5); // ABEJNM
+     let p = c + f + o + q - (d + h) + rnd(5); // ABFKO
+     let r = rnd(9);                           // ABFKOP
+
+     // Randomize 2: try to fulfill inequalities for discarded edges.
+     let k = f - e + rnd(5);            // ABEJ shorter than ABEIJ
+     let l = d + h - (c + f) + rnd(5);  // ABFK shorter than ABEJK
+     let n = f + o - e + rnd(5);        // ABEJN shorter than ABEIN
+     let i = h - g + rnd(5);            // ABFK shorter than ABFGK
+     let j = h + m - g + rnd(5);        // ABFKL shorter than ABFGL
+
+     // Randomize 3: edge weights for the connected component unreachable
+     // from the start node.
+     let s = rnd(9);                    // DH is unreachable
+
+     // Validation. In the above, we used a randomized algorithm to determine the
+     // edge weights. There is less than zero probability that in some cases
+     // the randomized edge weights do not fulfill the original inequations.
+
+     // Validate 1: Single-source shortest path tree: list paths from each node
+     // reachable from A in increasing order of path weigths. Ensure that the order
+     // is correct and each path weight is unique.
+     let path_weights = [
+       a,                 // AB
+       a + b,             // ABC
+       a + c,             // ABE
+       a + d,             // ABF
+       a + c + e,         // ABEI
+       a + c + f,         // ABEJ
+       a + d + g,         // ABFG
+       a + d + h,         // ABFK
+       a + c + f + o,     // ABEJN
+       a + d + h + m,     // ABFKL
+       a + c + f + o + q, // ABEJNM
+       a + d + h + p,     // ABFKO
+       a + d + h + p + r, // ABFKOP
+     ]
+     for (let ind = 1; ind < path_weights.length; ind++) {
+       if (path_weights[ind - 1] >= path_weights[ind]) {
+         return undefined;
+       }
+     }
+
+     // Validate 2: inequalities for discarded edges
+     let pass = (
+       (f < e + k) &&         // IJ
+       (d + h < c + f + l) && // JK
+       (f + o < e + n) &&     // IN
+       (h < g + i) &&         // GK
+       (n + m < g + j)        // GL
+     )
+     if (!pass) {
+       return undefined;
+     }
+     return {
+       'a': a, 'b': b, 'c': c, 'd': d, 'e': e, 'f': f, 'g': g, 'h': h,
+       'i': i, 'j': j, 'k': k, 'l': l, 'm': m, 'n': n, 'o': o, 'p': p,
+       'q': q, 'r': r, 's': s
+     }
+
+   }
+
+   /*
+    * Generates a graph from weights.
+    *
+    * Parameters:
+    * w: dictionary with keys 'a'...'o' and positive integer values
+    *
+    * Returns: undirected graph with positive integer weights
+    *
+    * Returns:
+    * g = {
+    *   vertexLabels: ['A', ..., 'O'],
+    *   edges: [
+    *     [[v, w], ..., [v, w]],
+    *     ...
+    *   ]
+    * }
+    * g.edges[v1] contains a neighbor list for vertex v1. Each entry in
+    * neighbor list is [v2, w], where v2 is the integer ID of the end vertex in
+    * the edge and w is the weight. Thus (g.edges[v1][i] == [v2, w]) means that
+    * there is edge from v1 to v2 with weight w.
+    */
+   function graphFromWeights(w) {
+
+     // Node labels (letters A-O) are mapped to integers (0-14),
+     // because then graph algorithms have simpler code and greater performance
+     // on neighbor lists. (Access by direct integer index is faster than access
+     // by letter because of hashing.)
+
+     const vertexCount = 16;
+
+     // Maps from vertex number (0...14) to node label (letters A-O)
+     vertexLabels = ['A', 'B', 'C', 'D', // 0..3
+                     'E', 'F', 'G', 'H', // 4..7
+                     'I', 'J', 'K', 'L', // 8..11
+                     'M', 'N', 'O', 'P'];     // 12..14
+
+     let g = {
+       vertexLabels: vertexLabels,
+       edges: new Array(vertexCount)
+     }
+     for (let i = 0; i < vertexCount; i++) {
+       g.edges[i] = [];
+     }
+
+     // 'XY:z' means that:
+     // - X is the letter of the source vertex,
+     // - Y is the letter of the destination vertex,
+     // - z is the letter of the weight variable
+     graphSpec =
+       ['AB:a',
+        'BC:b', 'BE:c', 'BF:d',
+        'DH:s',
+        'EI:e', 'EJ:f',
+        'FG:g', 'FK:h',
+        'GK:i', 'GL:j',
+        'IJ:k', 'IN:n',
+        'JK:l', 'JN:o',
+        'KL:m', 'KO:p',
+        'MN:q', 'OP:r'];
+
+     for (let e of graphSpec) {
+       v1 = e.charCodeAt(0) - 65;
+       v2 = e.charCodeAt(1) - 65;
+       weight = w[e[3]];
+       g.edges[v1].push([v2, weight])
+       g.edges[v2].push([v1, weight])
+     }
+
+     return g;
+   }
+
+   /*
+    * Prints a text description of the given graph.
+    *
+    * Parameters:
+    * g = {
+    *   vertexLabels: ['A', ..., 'O'],
+    *   edges: [
+    *     [[v, w], ..., [v, w]],
+    *     ...
+    *   ]
+    * }
+    * g.edges[v1] contains a neighbor list for vertex v1. Each entry in
+    * neighbor list is [v2, w], where v2 is the integer ID of the end vertex in
+    * the edge and w is the weight. Thus (g.edges[v1][i] == [v2, w]) means that
+    * there is edge from v1 to v2 with weight w.
+    */
+   function printGraph(g) {
+     console.log("Vertex labels: " + g.vertexLabels);
+     for (let i = 0; i < g.edges.length; i++) {
+       let s = [g.vertexLabels[i], " : "];
+       for (let e of g.edges[i]) {
+         s.push(g.vertexLabels[e[0]], " ", e[1], ", ");
+       }
+       console.log(s.join(""));
+     }
+   }
+
+   /*
+    * Perform a linear transformation of the graph topology: rotate or reflect
+    * edge configuration so that the 4 x 4 grid is preserved.
+    *
+    * There are eight transformations. The letters A-P indicate how start and
+    * end vertices of the edges are remapped.
+    *
+    * A B C D     M I E A     P O N M     D H L P
+    * E F G H     N J F W     L K J I     G C K O
+    * I J K L     O K G C     H G F E     B F J N
+    * M N O P     P L H D     D C B A     A E I M
+    *    0           1           2           3
+    *
+    * M N O P     D C B A     A E I M     P L H D
+    * I J K L     H G F E     B F J N     O K G C
+    * E F G H     L K J I     C G K O     N J F B
+    * A B C D     P O N M     D H L P     M I E A
+    *    4           5           6
+    *(s === expected)
+    * 0:   no transformation
+    * 1-3: 90, 180, and 270 degrees clockwise
+    * 4:   reflection respect to the horizontal axis
+    * 5:   reflection respect to the vertical axis
+    * 6:   reflection respect to the diagonal axis AFKP
+    * 7:   reflection respect to the diagonal axis MJGD
+    *
+    * Parameters:
+    * t: number of the transformation (0..7)
+    * sourceArray: an array with length of 16
+    *
+    * Returns:
+    * A copy of sourceArray where elements have been permuted according to the
+    * transformation.
+    */
+
+   function linearTransform(t, sourceArray) {
+     if (sourceArray.length != 16) {
+       throw "Length of sourceArray must be 16."
+     }
+     // transformation[t][i] gives the *new* index of original index i at
+     // transformation t.
+     //
+     const transformation = [
+       [ 0,  1 , 2 , 3,   // 0: no transformation.
+         4,  5,  6,  7,   // These are the original indices in the 4 x 4
+         8,  9, 10, 11,   // element grid.
+        12, 13, 14, 15],
+
+       [ 3,  7, 11, 15,    // 1: rotation 90 degrees clockwise
+         2,  6, 10, 14,
+         1,  5,  9, 13,
+         0,  4,  8, 12],
+
+       [15, 14, 13, 12,   // 2: rotation 180 degrees clockwise
+        11, 10,  9,  8,
+         7,  6,  5,  4,
+         3,  2,  1,  0],
+
+       [12,  8 , 4 , 0,   // 3: rotation 270 degrees clockwise
+        13,  9,  5,  1,
+        14, 10,  6,  2,
+        15, 11,  7,  3],
+
+       [12, 13, 14, 15,   // 4: reflection respect to the horizontal axis
+         8,  9, 10, 11,
+         4,  5,  6,  7,
+         0,  1,  2,  3],
+
+       [ 3,  2 , 1 , 0,   // 5: reflection respect to the vertical axis
+         7,  6,  5,  4,
+        11, 10,  9,  8,
+        15, 14, 13, 12],
+
+       [ 0,  4,  8, 12,   // 6: reflection respect to the diagonal axis 0-5-10-15
+         1,  5,  9, 13,
+         2,  6, 10, 14,
+         3,  7, 11, 15],
+
+       [15, 11,  7,  3,   // 7: reflection respect to the diagonal axis 3-6-9-12
+        14, 10,  6,  2,
+        13,  9,  5,  1,
+        12,  8,  4,  0]
+     ]
+
+     let transformedArray = new Array(sourceArray.length);
+     for (let i = 0; i < sourceArray.length; i++) {
+       transformedArray[i] = sourceArray[transformation[t][i]];
+     }
+     return transformedArray;
+   }
+
+   /*
+    * Randomises the order of the array using the Fisher-Yates shuffle algorithm.
+    * https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+    * "Algorithm P" on page 145 in:
+    * Donald E. Knuth : The Art of Computer Programming (3rd. ed.). Volume 2 /
+    * Seminumerical Algorithms. Addison-Wesley, 1998. ISBN 0-201-89684-2.
+    *
+    * Parameters:
+    * a: array
+    *
+    * Returns:
+    * A copy of the array
+    */
+   function shuffle(sourceArray) {
+     if (sourceArray === undefined) {
+       console.warn("shuffle(undefined)!")
+       return;
+     }
+     let shuffled = [...sourceArray];
+     // Iterate from end to beginning.
+     // At each round,
+     //  indices 0...j contain the unprocessed region of the array, and
+     //  indices j+1...a.length contain the processed region of the array.
+     // Choose random element from the unprocessed portion and swap it to the
+     // beginning of the portion. Then that element belongs to the processed
+     // region.
+     let j, k, tmp;
+     for (j = shuffled.length - 1; j > 0; j--) {
+       // j is the upper index
+       // k is the lower index: a random integer from range [0, j-1]
+       // (At first round, we have a.length choices, then a.length - 1, etc.)
+       k = Math.floor((j + 1) * Math.random());
+       // swap elements at indices j and k
+       tmp = shuffled[j];
+       shuffled[j] = shuffled[k];
+       shuffled[k] = tmp;
+     }
+     return shuffled;
+   }
+
+   // A mock shuffle for test purposes. It shuffles adjacent pairs of elements.
+   function mockShuffle(sourceArray) {
+     let shuffled = [...sourceArray];
+     let tmp;
+     for (j = 1; j < shuffled.length; j += 2) {
+       tmp = shuffled[j - 1];
+       shuffled[j - 1] = shuffled[j];
+       shuffled[j] = tmp;
+     }
+     return shuffled;
+   }
+
+   /*
+    * Returns a permuted copy of the array using the given mapping.
+    *
+    * Parameters:
+    * a: array
+    * mapping: mapping[i] is the new index of element at originally index i
+    *
+    * Returns:
+    * a copy of array a transformed by mapping.
+    */
+   function permuteArray(a, mapping) {
+     let newA = new Array(a.length);
+     for (let i = 0; i < a.length; i++) {
+       newA[i] = a[mapping[i]];
+     }
+     return newA;
+   }
+
+   /*
+    * Returns an inverse mapping of the given mapping.
+    *
+    * Parameters:
+    * mapping: j = mapping[i] is the new index of element at originally index i
+    *
+    * Returns:
+    * inverse: inverse[mapping[i]] = i
+    */
+   function inverseMap(mapping) {
+     let inverse = new Array(mapping.length);
+     for (let i = 0; i < mapping.length; i++) {
+       inverse[mapping[i]] = i;
+     }
+     return inverse;
+   }
+
+   /*
+    * Remaps the edges of the graph.
+    *
+    * Parameters:
+    * graph = {
+    *   vertexLabels: ['A', ..., 'O'],
+    *   edges: [
+    *     [[v, w], ..., [v, w]],
+    *     ...
+    *   ]
+    * }
+    * vertexMap: i is the old index, vertexMap[i] is the new index.
+    *
+    * Returns: a transformed graph instance
+    */
+
+   function remapEdges(graph, vertexMap) {
+     let newGraph = {
+       vertexLabels: [...graph.vertexLabels],
+       edges: new Array(vertexMap.length)
+     }
+     for (let i = 0; i < vertexMap.length; i++) {
+       newGraph.edges[i] = [];
+     }
+
+     // Process by source vertex.
+     // vertexMap[i] is the old index, i is the new index.
+     let newStart, newEnd, weight;
+     for (let i = 0; i < vertexMap.length; i++) {
+       newStart = vertexMap[i];
+       for (e of graph.edges[i]) {
+         newEnd = vertexMap[e[0]];
+         weight = e[1];
+         newGraph.edges[newStart].push([newEnd, weight]);
+       }
+     }
+     return newGraph;
+   }
+
+   /*
+    * Reorganizes the vertex labels in the given graph.
+    *
+    * Parameters:
+    * graph = {
+    *   vertexLabels: ['A', ..., 'O'],
+    *   edges: [
+    *     [[v, w], ..., [v, w]],
+    *     ...
+    *   ]
+    * }
+    * vertexMap: vertexMap[i] is the old index, i is the new index
+    *
+    * Example return value:
+    * ['C', 'P', 'D', ..., 'O']
+    */
+
+   function relabelVertices(graph, vertexMap) {
+     a = [];
+     for (let i = 0; i < graph.vertexLabels.length; i++) {
+       a.push(graph.vertexLabels[vertexMap[i]]);
+     }
+     graph.vertexLabels = a;
+   }
+
+   // TODO: general algorithm
+   // 1. generate graph from the preconfigured template
+   // 2. perform a linear transformation of the topology
+   //    2.1. run several transformations. Each time the source_str is modified.
+   //    2.2. remap edges
+   // 3. perform a transformation of vertex labels
+   //    3.1 random shuffle vertex labels
+   // 4. save the total transformation of vertex labels (topology + random shuffle)
+
+   /*
+    * Generates a Dijkstra's algorithm exercise instance.
+    *
+    * Returns:
+    * {
+    *   'graph': {
+    *       vertexLabels: ['A', ..., 'O'],
+    *       edges: [
+    *         [[v, w], ..., [v, w]],
+    *         ...
+    *       ]
+    *    },
+    *   'roleMap': {
+    *     keys letters as in vertexLabels, values integers 0..15 representing
+    *     the role of each vertex in the topology of the template graph
+    *   }
+    * }
+    */
+   function generateInstance() {
+     // 1. generate graph from the preconfigured template
+     const attempts = 100;
+     let g = undefined;
+     for (let i = 0; i < attempts; i++) {
+       let w = determineWeights();
+       if (w !== undefined) {
+         g = graphFromWeights(w);
+         printGraph(g);
+         break;
+       }
+     }
+
+     // 2. perform a transformation of the graph topology.
+     // Preserve the labels and locations of vertices, but rotate or reflect the
+     // 4 x 4 grid on which the edges are placed.
+     const vertexLayout = [ 0,  1,  2,  3,
+                            4,  5,  6,  7,
+                            8,  9, 10, 11,
+                           12, 13, 14, 15]; // original vertex layout
+     let transform = Math.floor(8 * Math.random());
+     let linearMap = linearTransform(transform, vertexLayout);
+
+     // 3. remap edges.
+     // Get a random permutation of *indices*.
+     let newGraph = remapEdges(g, linearMap);
+     let roleMap = inverseMap(linearMap);
+     // Now newGraph has still the alphabetical vertex labeling:
+     // A B C D
+     // E F G H
+     // I J K L
+     // M N O P
+     // However, the *roles* of the vertices have been changed.
+
+     printGraph(newGraph);
+
+     // 4. randomize vertex labels
+     let randomMap = shuffle(vertexLayout);
+     relabelVertices(newGraph, randomMap);
+
+     printGraph(newGraph);
+     let packedRoleMap = {};
+     for (let i = 0; i < newGraph.vertexLabels.length; i++) {
+       packedRoleMap[newGraph.vertexLabels[i]] = roleMap[i];
+     }
+     return { 'graph': newGraph,
+              'roleMap': packedRoleMap }
+   }
+
+   /*
+    * Copies edge and vertex data from a research instance graph into a JSAV
+    * graph.
+    *
+    * Parameters:
+    * riGraph: a research instance graph returned fron generateInstance().
+    * jsavGraph: a JSAV graph object.
+    *
+    */
+   function researchInstanceToJsav(riGraph, jsavGraph) {
+     // Compute coordinates of the vertices in the JSAV exercise
+     const gridStepX = Math.floor(jsavGraph.width / 4);
+     const gridStepY = Math.floor(jsavGraph.width / 4);
+     let vertexCoordinates = [];
+     for (let y = 0; y < 4; y++) {
+       for (let x = 0; x < 4; x++) {
+         vertexCoordinates.push({
+           left: Math.floor((x + 0.5) * gridStepX),
+           top: Math.floor((y + 0.5) * gridStepY)
+         });
+       }
+     }
+     // Add the vertices as JSAV objects
+     for (let i = 0; i < riGraph.edges.length; i++) {
+       let label = riGraph.vertexLabels[i];
+       jsavGraph.addNode(riGraph.vertexLabels[i], vertexCoordinates[i]);
+     }
+     // Add the edges as JSAV objects
+     const gNodes  = jsavGraph.nodes();
+     let options = {};
+     for (let i = 0; i < riGraph.vertices.length; i++) {
+       for (let e of nlGraph.edges[i]) {
+         // i is the index of start node
+         // e[0] is the index of end node
+         // e[1] is the weight
+         options.weight = e[1];
+         jsavGraph.addEdge(gNodes[i], gNodes[e[0]], options);
+       }
+     }
+   }
 
 }(jQuery));
