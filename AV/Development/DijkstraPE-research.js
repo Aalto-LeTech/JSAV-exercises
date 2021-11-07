@@ -13,7 +13,8 @@
       config = ODSA.UTILS.loadConfig(),
       interpret = config.interpreter,
       settings = config.getSettings(),
-      jsav = new JSAV($('.avcontainer'), {settings: settings});
+      jsav = new JSAV($('.avcontainer'), {settings: settings}),
+      exerciseInstance;
 
   jsav.recorded();
 
@@ -30,12 +31,12 @@
     }
     graph = jsav.ds.graph(layoutSettings);
 
-    let researchInstance = generateInstance();
-    researchInstanceToJsav(researchInstance.graph, graph, layoutSettings);
+    exerciseInstance = generateInstance();
+    researchInstanceToJsav(exerciseInstance.graph, graph, layoutSettings);
 
     graph.layout();
 
-    graph.nodes()[researchInstance.startIndex].addClass("marked"); // mark the 'A' node
+    graph.nodes()[exerciseInstance.startIndex].addClass("marked"); // mark the 'A' node
     jsav.displayInit();
     return graph;
   }
@@ -56,6 +57,14 @@
     }
   }
 
+  /*
+   * Creates the model solution of the exercise.
+   * Note: this function is called by the JSAV library.
+   *
+   * Parameters:
+   * modeljsav: a JSAV algorithm visualization template
+   *            (created like: let modeljsav = new JSAV("container"))
+   */
   function model(modeljsav) {
     var i,
         graphNodes = graph.nodes();
@@ -71,12 +80,19 @@
     graphUtils.copy(graph, modelGraph, {weights: true});
     var modelNodes = modelGraph.nodes();
 
+    // Create a distance matrix for the visualization.
+    // - Each row is a node.
+    // - Columns: label of node, distance, previous node
+    // Initially all nodes have infinity distance and no previous node,
+    // except that the distance to the initial node is 0.
     var distanceMatrixValues = [];
     for (i = 0; i < graphNodes.length; i++) {
       distanceMatrixValues.push([graphNodes[i].value(), "∞", "-"]);
     }
-    distanceMatrixValues[0][1] = 0;
+    // Initial node
+    distanceMatrixValues[exerciseInstance.startIndex][1] = 0;
 
+    // Set layout of the distance matrix
     var distances = modeljsav.ds.matrix(distanceMatrixValues, {
       style: "table",
       center: false
@@ -87,8 +103,8 @@
       left: 10
     });
 
-    // Mark the 'A' node
-    modelNodes[0].addClass("marked");
+    // Mark the initial node
+    modelNodes[exerciseInstance.startIndex].addClass("marked");
 
     modeljsav.displayInit();
 
@@ -96,6 +112,7 @@
     dijkstra(modelNodes, distances, modeljsav);
 
     modeljsav.umsg(interpret("av_ms_shortest"));
+
     // hide all edges that are not part of the spanning tree
     var modelEdges = modelGraph.edges();
     for (i = 0; i < modelGraph.edges().length; i++) {
@@ -123,9 +140,15 @@
   /*
    * Dijkstra's algorithm which creates the model solution used in grading
    * the exercise or creating an algorithm animation.
+   *
+   * Parameters:
+   * nodes:     an array of JSAV Nodes
+   * distances: a JSAV Matrix
+   * av:        a JSAV algorithm visualization template
    */
   function dijkstra(nodes, distances, av) {
-    // returns the distance given a node index
+
+    // Helper function: returns the distance given a node index
     function getDistance(index) {
       var dist = parseInt(distances.value(index, 1), 10);
       if (isNaN(dist)) {
@@ -133,18 +156,26 @@
       }
       return dist;
     }
-    // returns the node index given the node's value
+
+    // Helper function: returns the node index given the node's value
     function getIndex(value) {
       return value.charCodeAt(0) - "A".charCodeAt(0);
     }
 
+    // Note: this is a variant of the Dijkstra's algorithm which does *not*
+    // use a priority queue as an auxiliary data structure. Instead, at
+    // every round of the main loop, it scans through all nodes and finds the
+    // one which is not yet visited and has minimal distance.
+
+    alert("Fix the model answer! -Artturi");
+    return;
+
     while (true) {
-      var min = Infinity,
-          node,
-          prev,
-          neighbors,
-          nodeIndex = -1;
       // find node closest to the minimum spanning tree
+      var min = Infinity,
+          node, prev, neighbors,
+          nodeIndex = -1;
+
       for (var i = 0; i < nodes.length; i++) {
         if (!distances.hasClass(i, true, "unused")) {
           var dist = getDistance(i);
