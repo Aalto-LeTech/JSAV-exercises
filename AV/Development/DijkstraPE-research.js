@@ -17,43 +17,25 @@
 
   jsav.recorded();
 
-  function init_old() {
-    // create the graph
-    if (graph) {
-      graph.clear();
-    }
-    graph = jsav.ds.graph({
-      width: 400,
-      height: 400,
-      layout: "automatic",
-      directed: false
-    });
-    graphUtils.generatePlanar(graph, {weighted: true}); // Randomly generate the graph with weights
-    graph.layout();
-    // mark the 'A' node
-    graph.nodes()[0].addClass("marked");
-
-    jsav.displayInit();
-    return graph;
-  }
-
   function init() {
     // Create a JSAV graph instance
     if (graph) {
       graph.clear();
     }
-    graph = jsav.ds.graph({
+    const layoutSettings = {
       width: 500,      // pixels
       height: 400,     // pixels
       layout: "manual",
-      directed: directed
-    });
+      directed: false
+    }
+    graph = jsav.ds.graph(layoutSettings);
 
-    researchGraph = generateInstance();
-    researchInstanceToJsav(researchGraph, graph);
+    let researchInstance = generateInstance();
+    researchInstanceToJsav(researchInstance.graph, graph, layoutSettings);
 
     graph.layout();
-    graph.nodes()[0].addClass("marked"); // mark the 'A' node
+
+    graph.nodes()[researchInstance.startIndex].addClass("marked"); // mark the 'A' node
     jsav.displayInit();
     return graph;
   }
@@ -377,10 +359,10 @@
      const vertexCount = 16;
 
      // Maps from vertex number (0...14) to node label (letters A-O)
-     vertexLabels = ['A', 'B', 'C', 'D', // 0..3
-                     'E', 'F', 'G', 'H', // 4..7
-                     'I', 'J', 'K', 'L', // 8..11
-                     'M', 'N', 'O', 'P'];     // 12..14
+     const vertexLabels = ['A', 'B', 'C', 'D', // 0..3
+                           'E', 'F', 'G', 'H', // 4..7
+                           'I', 'J', 'K', 'L', // 8..11
+                           'M', 'N', 'O', 'P'];     // 12..14
 
      let g = {
        vertexLabels: vertexLabels,
@@ -394,7 +376,7 @@
      // - X is the letter of the source vertex,
      // - Y is the letter of the destination vertex,
      // - z is the letter of the weight variable
-     graphSpec =
+     const graphSpec =
        ['AB:a',
         'BC:b', 'BE:c', 'BF:d',
         'DH:s',
@@ -407,9 +389,9 @@
         'MN:q', 'OP:r'];
 
      for (let e of graphSpec) {
-       v1 = e.charCodeAt(0) - 65;
-       v2 = e.charCodeAt(1) - 65;
-       weight = w[e[3]];
+       let v1 = e.charCodeAt(0) - 65;
+       let v2 = e.charCodeAt(1) - 65;
+       let weight = w[e[3]];
        g.edges[v1].push([v2, weight])
        g.edges[v2].push([v1, weight])
      }
@@ -535,6 +517,13 @@
      return transformedArray;
    }
 
+   // Swaps elements at indices i and j in array A.
+   function swapIndices(A, i, j) {
+     let tmp = A[i];
+     A[i] = A[j];
+     A[j] = tmp;
+   }
+
    /*
     * Randomises the order of the array using the Fisher-Yates shuffle algorithm.
     * https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
@@ -568,9 +557,7 @@
        // (At first round, we have a.length choices, then a.length - 1, etc.)
        k = Math.floor((j + 1) * Math.random());
        // swap elements at indices j and k
-       tmp = shuffled[j];
-       shuffled[j] = shuffled[k];
-       shuffled[k] = tmp;
+       swapIndices(shuffled, j, k);
      }
      return shuffled;
    }
@@ -578,11 +565,8 @@
    // A mock shuffle for test purposes. It shuffles adjacent pairs of elements.
    function mockShuffle(sourceArray) {
      let shuffled = [...sourceArray];
-     let tmp;
      for (j = 1; j < shuffled.length; j += 2) {
-       tmp = shuffled[j - 1];
-       shuffled[j - 1] = shuffled[j];
-       shuffled[j] = tmp;
+       swapIndices(shuffled, j, j - 1);
      }
      return shuffled;
    }
@@ -649,12 +633,11 @@
 
      // Process by source vertex.
      // vertexMap[i] is the old index, i is the new index.
-     let newStart, newEnd, weight;
      for (let i = 0; i < vertexMap.length; i++) {
-       newStart = vertexMap[i];
-       for (e of graph.edges[i]) {
-         newEnd = vertexMap[e[0]];
-         weight = e[1];
+       let newStart = vertexMap[i];
+       for (let e of graph.edges[i]) {
+         let newEnd = vertexMap[e[0]];
+         let weight = e[1];
          newGraph.edges[newStart].push([newEnd, weight]);
        }
      }
@@ -679,7 +662,7 @@
     */
 
    function relabelVertices(graph, vertexMap) {
-     a = [];
+     let a = [];
      for (let i = 0; i < graph.vertexLabels.length; i++) {
        a.push(graph.vertexLabels[vertexMap[i]]);
      }
@@ -706,11 +689,12 @@
     *         [[v, w], ..., [v, w]],
     *         ...
     *       ]
-    *    },
+    *   },
     *   'roleMap': {
     *     keys letters as in vertexLabels, values integers 0..15 representing
     *     the role of each vertex in the topology of the template graph
-    *   }
+    *   },
+    *   'startIndex': index of start node (0..15)
     * }
     */
    function generateInstance() {
@@ -746,11 +730,15 @@
      // I J K L
      // M N O P
      // However, the *roles* of the vertices have been changed.
+     const startIndex = roleMap.indexOf(0); // new index of start node
 
      printGraph(newGraph);
 
-     // 4. randomize vertex labels
+     // 4. randomize vertex labels except A, which is always the start node.
      let randomMap = shuffle(vertexLayout);
+     let indexOfA = randomMap.indexOf(0);
+     swapIndices(randomMap, startIndex, indexOfA);
+
      relabelVertices(newGraph, randomMap);
 
      printGraph(newGraph);
@@ -758,8 +746,10 @@
      for (let i = 0; i < newGraph.vertexLabels.length; i++) {
        packedRoleMap[newGraph.vertexLabels[i]] = roleMap[i];
      }
+
      return { 'graph': newGraph,
-              'roleMap': packedRoleMap }
+              'roleMap': packedRoleMap,
+              'startIndex': startIndex }
    }
 
    /*
@@ -769,18 +759,27 @@
     * Parameters:
     * riGraph: a research instance graph returned fron generateInstance().
     * jsavGraph: a JSAV graph object.
-    *
+    * layoutSettings: Graph layout settings. The JSAV exercise uses this first
+    *                 to create a JSAV graph instance. The same settings are
+    *                 used here to communicate the pixel width and height of
+    *                 the graph layout.
+    *   layoutSettings = {
+    *     width: 500,       // pixels
+    *     height: 400,      // pixels
+    *     layout: "manual", // only for JSAV
+    *     directed: false   // only for JSAV
+    *   }
     */
-   function researchInstanceToJsav(riGraph, jsavGraph) {
+   function researchInstanceToJsav(riGraph, jsavGraph, layoutSettings) {
      // Compute coordinates of the vertices in the JSAV exercise
-     const gridStepX = Math.floor(jsavGraph.width / 4);
-     const gridStepY = Math.floor(jsavGraph.width / 4);
+     const gridStepX = Math.floor(layoutSettings.width / 4);
+     const gridStepY = Math.floor(layoutSettings.height / 4);
      let vertexCoordinates = [];
      for (let y = 0; y < 4; y++) {
        for (let x = 0; x < 4; x++) {
          vertexCoordinates.push({
-           left: Math.floor((x + 0.5) * gridStepX),
-           top: Math.floor((y + 0.5) * gridStepY)
+           left: Math.floor(x * gridStepX),
+           top: Math.floor(y * gridStepY)
          });
        }
      }
@@ -792,8 +791,8 @@
      // Add the edges as JSAV objects
      const gNodes  = jsavGraph.nodes();
      let options = {};
-     for (let i = 0; i < riGraph.vertices.length; i++) {
-       for (let e of nlGraph.edges[i]) {
+     for (let i = 0; i < riGraph.edges.length; i++) {
+       for (let e of riGraph.edges[i]) {
          // i is the index of start node
          // e[0] is the index of end node
          // e[1] is the weight
