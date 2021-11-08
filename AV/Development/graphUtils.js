@@ -95,6 +95,11 @@
     }
   }
 
+  function rnd(x) {
+    // Returns a random integer between -x and x (both inclusive)
+    return Math.floor(Math.random() * (2 * x + 1)) - x;
+  }
+
   /*
    * Generates a grid-based random planar graph in a neighbour list format.
    * Computes a layout for each vertex in pixel coordinates: origo at left-top
@@ -145,8 +150,9 @@
 
     for (let y = 0, i = 0; y < gridHeight; y++) {
       for (let x = 0; x < gridWidth && i < totalVertices; x++, i++) {
-        g.vertices[i] = { x: Math.floor((x + 0.5) * gridStepX),
-          y: Math.floor((y + 0.5) * gridStepY) };
+        g.vertices[i] = {
+          x: Math.floor((x + 0.5) * gridStepX + rnd(10)),
+          y: Math.floor((y + 0.5) * gridStepY + rnd(10)) };
       }
     }
     const nConnectedComponents = nVertices.length;
