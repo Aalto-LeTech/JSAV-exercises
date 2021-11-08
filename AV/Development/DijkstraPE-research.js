@@ -150,12 +150,14 @@
    *
    * Parameters:
    * nodes:     an array of JSAV Nodes
-   * distances: a JSAV Matrix
+   * distances: a JSAV Matrix containing the following columns:
+   *              label of node, distance, previous node.
    * av:        a JSAV algorithm visualization template
    */
   function dijkstra(nodes, distances, av) {
 
-    // Helper function: returns the distance given a node index
+    // Helper function: returns the distance for the given index in the
+    // JSAV distance matrix.
     function getDistance(index) {
       var dist = parseInt(distances.value(index, 1), 10);
       if (isNaN(dist)) {
@@ -164,7 +166,8 @@
       return dist;
     }
 
-    // Helper function: returns the node index given the node's value
+    // Helper function: returns the node index given the node's value in
+    // the JSAV distance matrix.
     function getIndex(value) {
       return value.charCodeAt(0) - "A".charCodeAt(0);
     }
@@ -173,16 +176,13 @@
     // use a priority queue as an auxiliary data structure. Instead, at
     // every round of the main loop, it scans through all nodes and finds the
     // one which is not yet visited and has minimal distance.
-
-    alert("Fix the model answer! -Artturi");
-    return;
-
     while (true) {
       // find node closest to the minimum spanning tree
-      var min = Infinity,
+      var min = Infinity,        // distance of the closest node not yet visited
           node, prev, neighbors,
-          nodeIndex = -1;
+          nodeIndex = -1;        // index of the closest node not yet visited
 
+      logDistanceMatrix(distances);
       for (var i = 0; i < nodes.length; i++) {
         if (!distances.hasClass(i, true, "unused")) {
           var dist = getDistance(i);
@@ -193,6 +193,7 @@
         }
       }
       if (min === Infinity || nodeIndex === -1) {
+        // No reachable nodes left, finish algorithm.
         av.umsg(interpret("av_ms_unreachable"));
         av.step();
         break;
@@ -229,6 +230,25 @@
       av.umsg(interpret("av_ms_update_distances"), {fill: {node: node.value()}});
       av.step();
 
+    }
+  }
+
+  /*
+  * Artturi's debug print.
+  * Parameters:
+  *
+  * distances: a JSAV Matrix containing the following columns:
+  *              label of node, distance, previous node.
+  *
+  * console.log()s the distance matrix values.
+  */
+  function logDistanceMatrix(distances) {
+    console.log("Distance matrix");
+    console.log("Label distance previous unused");
+    for (let i = 0; i < distances._arrays.length; i++) {
+      let row = [...distances._arrays[i]._values];
+      row.push(distances.hasClass(i, true, "unused"))
+      console.log(row.join("  "));
     }
   }
 
