@@ -85,8 +85,10 @@
     // - Columns: label of node, distance, previous node
     // Initially all nodes have infinity distance and no previous node,
     // except that the distance to the initial node is 0.
+
     let labelsAndIndices = []; // List of nodes by [label, index] sorted by
-                               // labels. Example:
+                               // labels. The index is the index of
+                               // modelNodes. Example:
                                // [['A', 3], ['B', 1], ['C', 3]]
     for (i = 0; i < graphNodes.length; i++) {
       labelsAndIndices.push([graphNodes[i].value(), i]);
@@ -116,7 +118,11 @@
     modeljsav.displayInit();
 
     // start the algorithm
-    dijkstra(modelNodes, distances, modeljsav);
+    let indexOfLabel = {};
+    for (let l of labelsAndIndices) {
+      indexOfLabel[l[0]] = l[1];
+    }
+    dijkstra(modelNodes, distances, modeljsav, indexOfLabel);
 
     modeljsav.umsg(interpret("av_ms_shortest"));
 
@@ -153,8 +159,10 @@
    * distances: a JSAV Matrix containing the following columns:
    *              label of node, distance, previous node.
    * av:        a JSAV algorithm visualization template
+   * indexOfLabel: mapping from node labels ("A", "B", "C") to indices of
+   *               array `nodex`.
    */
-  function dijkstra(nodes, distances, av) {
+  function dijkstra(nodes, distances, av, indexOfLabel) {
 
     // Helper function: returns the distance for the given index in the
     // JSAV distance matrix.
@@ -166,22 +174,15 @@
       return dist;
     }
 
-    // Helper function: returns the node index given the node's value in
-    // the JSAV distance matrix.
-    function getIndex(value) {
-      return value.charCodeAt(0) - "A".charCodeAt(0);
-    }
-
     // Note: this is a variant of the Dijkstra's algorithm which does *not*
     // use a priority queue as an auxiliary data structure. Instead, at
     // every round of the main loop, it scans through all nodes and finds the
     // one which is not yet visited and has minimal distance.
-    while (true) {
+    for (let counter = 0; counter < 30; counter++) { // prevent infinite loop
       // find node closest to the minimum spanning tree
       var min = Infinity,        // distance of the closest node not yet visited
-          node, prev, neighbors,
           nodeIndex = -1;        // index of the closest node not yet visited
-
+                                 // in the distance matrix
       logDistanceMatrix(distances);
       for (var i = 0; i < nodes.length; i++) {
         if (!distances.hasClass(i, true, "unused")) {
@@ -193,14 +194,15 @@
         }
       }
       if (min === Infinity || nodeIndex === -1) {
-        // No reachable nodes left, finish algorithm.
+        // No reachable nodes left, finish the algorithm.
         av.umsg(interpret("av_ms_unreachable"));
         av.step();
         break;
       }
-      node = nodes[nodeIndex];
-      if (!node) { break; }
+      let node = nodes[indexOfLabel[String.fromCharCode(65 + nodeIndex)]];
+      if (!node) { break; } // failsafe?
       distances.addClass(nodeIndex, true, "unused");
+      console.log("Dijkstra: select node " + node.value());
       if (nodeIndex === 0) {
         av.umsg(interpret("av_ms_select_a"));
       } else {
@@ -209,21 +211,33 @@
       av.step();
 
       // get previous node if any
-      prev = nodes[getIndex(distances.value(nodeIndex, 2))];
-      if (prev) {
-        av.umsg(interpret("av_ms_add_edge"), {fill: {from: prev.value(), to: node.value()}});
-        markEdge(prev.edgeTo(node), av);
+      let prevLabel = distances.value(nodeIndex, 2);
+      if (prevLabel !== "-") {
+        let prevNode = nodes[indexOfLabel[prevLabel]]
+        av.umsg(interpret("av_ms_add_edge"),
+          { fill: {from: prevNode.value(), to: node.value()}});
+        markEdge(prevNode.edgeTo(node), av);
+        console.log("Add edge: " + prevNode.value() + "-" + node.value());
       }
 
       // update distances for neighbors
-      neighbors = node.neighbors();
+      let neighbors = node.neighbors();
       while (neighbors.hasNext()) {
-        var neighbor = neighbors.next(),
-            neighborIndex = getIndex(neighbor.value()),
-            d = getDistance(neighborIndex),
-            dThroughNode = getDistance(nodeIndex) + node.edgeTo(neighbor).weight();
+        let neighbor = neighbors.next();
+        // neighborIndex: index in the distance matrix
+        let neighborIndex = neighbor.value().charCodeAt(0) - "A".charCodeAt(0);
+        // nodeIndex: index in the distance matrix
+        let nodeIndex = node.value().charCodeAt(0) - "A".charCodeAt(0);
+        let d = getDistance(neighborIndex);
+        let dThroughNode = getDistance(nodeIndex) +
+              node.edgeTo(neighbor).weight();
+        console.log("Neighbor: " + neighbor.value() + " distance: " + d);
+        // Shorter route found?
         if (!distances.hasClass(neighborIndex, true, "unused") && d > dThroughNode) {
+          // update the distance of the neighbour in the distance matrix
           distances.value(neighborIndex, 1, dThroughNode);
+          // update the label previous node of the neighbour in the distance
+          // matrix
           distances.value(neighborIndex, 2, node.value());
         }
       }
@@ -234,7 +248,9 @@
   }
 
   /*
-  * Artturi's debug print.
+  * Artturi's debug print, because inspecting JSAV data structures in a
+  * JavaScript debugger is a pain (too complex).
+  *
   * Parameters:
   *
   * distances: a JSAV Matrix containing the following columns:
@@ -763,7 +779,7 @@
        let w = determineWeights();
        if (w !== undefined) {
          g = graphFromWeights(w);
-         printGraph(g);
+         // printGraph(g);
          break;
        }
      }
@@ -790,7 +806,7 @@
      // However, the *roles* of the vertices have been changed.
      const startIndex = roleMap.indexOf(0); // new index of start node
 
-     printGraph(newGraph);
+     // printGraph(newGraph);
 
      // 4. randomize vertex labels except A, which is always the start node.
      let randomMap = shuffle(vertexLayout);
@@ -799,7 +815,7 @@
 
      relabelVertices(newGraph, randomMap);
 
-     printGraph(newGraph);
+     // printGraph(newGraph);
      let packedRoleMap = {};
      for (let i = 0; i < newGraph.vertexLabels.length; i++) {
        packedRoleMap[newGraph.vertexLabels[i]] = roleMap[i];
