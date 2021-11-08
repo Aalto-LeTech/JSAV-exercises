@@ -85,12 +85,19 @@
     // - Columns: label of node, distance, previous node
     // Initially all nodes have infinity distance and no previous node,
     // except that the distance to the initial node is 0.
+    let labelsAndIndices = []; // List of nodes by [label, index] sorted by
+                               // labels. Example:
+                               // [['A', 3], ['B', 1], ['C', 3]]
+    for (i = 0; i < graphNodes.length; i++) {
+      labelsAndIndices.push([graphNodes[i].value(), i]);
+    }
+    labelsAndIndices.sort();
     var distanceMatrixValues = [];
     for (i = 0; i < graphNodes.length; i++) {
-      distanceMatrixValues.push([graphNodes[i].value(), "∞", "-"]);
+      distanceMatrixValues.push([labelsAndIndices[i][0], "∞", "-"]);
     }
-    // Initial node
-    distanceMatrixValues[exerciseInstance.startIndex][1] = 0;
+    // Initial node is A which is at index 1. Set its distance to 0.
+    distanceMatrixValues[0][1] = 0;
 
     // Set layout of the distance matrix
     var distances = modeljsav.ds.matrix(distanceMatrixValues, {
