@@ -14,7 +14,8 @@
       interpret = config.interpreter,
       settings = config.getSettings(),
       jsav = new JSAV($('.avcontainer'), {settings: settings}),
-      exerciseInstance;
+      exerciseInstance,
+      lastLinearTransform = -1; // for generateInstance()
 
   jsav.recorded();
 
@@ -791,8 +792,15 @@
                             4,  5,  6,  7,
                             8,  9, 10, 11,
                            12, 13, 14, 15]; // original vertex layout
-     let transform = Math.floor(8 * Math.random());
+     // Never use the same transform two times adjacently.
+     // Otherwise the student sees that the graph topology does not change.
+     let transform = lastLinearTransform;
+     while (transform === lastLinearTransform) {
+       transform = Math.floor(8 * Math.random());
+     }
+     lastLinearTransform = transform;
      let linearMap = linearTransform(transform, vertexLayout);
+
 
      // 3. remap edges.
      // Get a random permutation of *indices*.
@@ -848,12 +856,17 @@
      // Compute coordinates of the vertices in the JSAV exercise
      const gridStepX = Math.floor(layoutSettings.width / 4);
      const gridStepY = Math.floor(layoutSettings.height / 4);
+     function rnd(x) {
+       // Returns a random integer between -x and x (both inclusive)
+       return Math.floor(Math.random() * (2 * x + 1)) - x;
+     }
+
      let vertexCoordinates = [];
      for (let y = 0; y < 4; y++) {
        for (let x = 0; x < 4; x++) {
          vertexCoordinates.push({
-           left: Math.floor(x * gridStepX),
-           top: Math.floor(y * gridStepY)
+           left: Math.floor(x * gridStepX + rnd(10)),
+           top: Math.floor(y * gridStepY + rnd(10))
          });
        }
      }
