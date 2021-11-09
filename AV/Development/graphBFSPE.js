@@ -10,7 +10,7 @@
 
   jsav.recorded();
 
-  function init() {
+  function init_old() {
     // create the graph
     if (graph) {
       graph.clear();
@@ -26,6 +26,35 @@
     // mark the "A" node
     graph.nodes()[0].addClass("marked");
 
+    jsav.displayInit();
+    return graph;
+  }
+
+  function init() {
+    // Settings for input
+    const width = 500, height = 400,  // pixels
+          weighted = false,
+          directed = false,
+          nVertices = [11, 3],
+          nEdges = [14, 2];
+
+    // First create a random planar graph instance in neighbour list format
+    let nlGraph = graphUtils.generatePlanarNl(nVertices, nEdges, weighted,
+        directed, width, height);
+
+    // Create a JSAV graph instance
+    if (graph) {
+      graph.clear();
+    }
+    graph = jsav.ds.graph({//    Condition:
+      width: width,
+      height: height,
+      layout: "manual",
+      directed: directed
+    });
+    graphUtils.nlToJsav(nlGraph, graph);
+    graph.layout();
+    graph.nodes()[0].addClass("marked"); // mark the 'A' node
     jsav.displayInit();
     return graph;
   }
