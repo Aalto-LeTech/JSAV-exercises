@@ -35,9 +35,9 @@
 
     exerciseInstance = generateInstance();
     researchInstanceToJsav(exerciseInstance.graph, graph, layoutSettings);
+    window.JSAVrecorder.addMetadata('roleMap', exerciseInstance['roleMap']);
 
     graph.layout();
-
     graph.nodes()[exerciseInstance.startIndex].addClass("marked"); // mark the 'A' node
     jsav.displayInit();
     return graph;
