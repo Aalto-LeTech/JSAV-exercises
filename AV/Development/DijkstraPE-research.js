@@ -15,7 +15,8 @@
       settings = config.getSettings(),
       jsav = new JSAV($('.avcontainer'), {settings: settings}),
       exerciseInstance,
-      lastLinearTransform = -1; // for generateInstance()
+      lastLinearTransform = -1, // for generateInstance()
+      debug = false; // produces debug prints to console
 
   jsav.recorded();
 
@@ -184,7 +185,8 @@
       var min = Infinity,        // distance of the closest node not yet visited
           nodeIndex = -1;        // index of the closest node not yet visited
                                  // in the distance matrix
-      logDistanceMatrix(distances);
+      if (debug)
+        logDistanceMatrix(distances);
       for (var i = 0; i < nodes.length; i++) {
         if (!distances.hasClass(i, true, "unused")) {
           var dist = getDistance(i);
@@ -203,7 +205,9 @@
       let node = nodes[indexOfLabel[String.fromCharCode(65 + nodeIndex)]];
       if (!node) { break; } // failsafe?
       distances.addClass(nodeIndex, true, "unused");
-      console.log("Dijkstra: select node " + node.value());
+      if (debug) {
+        console.log("Dijkstra: select node " + node.value());
+      }
       if (nodeIndex === 0) {
         av.umsg(interpret("av_ms_select_a"));
       } else {
@@ -218,7 +222,9 @@
         av.umsg(interpret("av_ms_add_edge"),
           { fill: {from: prevNode.value(), to: node.value()}});
         markEdge(prevNode.edgeTo(node), av);
-        console.log("Add edge: " + prevNode.value() + "-" + node.value());
+        if (debug) {
+          console.log("Add edge: " + prevNode.value() + "-" + node.value());
+        }
       }
 
       // update distances for neighbors
@@ -232,7 +238,9 @@
         let d = getDistance(neighborIndex);
         let dThroughNode = getDistance(nodeIndex) +
               node.edgeTo(neighbor).weight();
-        console.log("Neighbor: " + neighbor.value() + " distance: " + d);
+        if (debug) {
+          console.log("Neighbor: " + neighbor.value() + " distance: " + d);
+        }
         // Shorter route found?
         if (!distances.hasClass(neighborIndex, true, "unused") && d > dThroughNode) {
           // update the distance of the neighbour in the distance matrix
