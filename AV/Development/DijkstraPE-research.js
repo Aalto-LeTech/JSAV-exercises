@@ -205,6 +205,7 @@
       let node = nodes[indexOfLabel[String.fromCharCode(65 + nodeIndex)]];
       if (!node) { break; } // failsafe?
       distances.addClass(nodeIndex, true, "unused");
+      node.addClass("currentNode");
       if (debug) {
         console.log("Dijkstra: select node " + node.value());
       }
@@ -213,6 +214,7 @@
       } else {
         av.umsg(interpret("av_ms_select_node"), {fill: {node: node.value()}});
       }
+
       av.step();
 
       // get previous node if any
@@ -247,6 +249,8 @@
             neighbor.value()].join(" "));
           av.umsg(interpret("av_ms_update_distance"),
             {fill: {from: node.value(), to: neighbor.value()}});
+          distances.addClass(neighborIndex, true, "modelHighlight");
+          neighbor.addClass("neighborNode");
           av.step();
           // update the distance of the neighbour in the distance matrix
           distances.value(neighborIndex, 1, dThroughNode);
@@ -254,8 +258,11 @@
           // matrix
           distances.value(neighborIndex, 2, node.value());
           av.step();
+          distances.removeClass(neighborIndex, true, "modelHighlight");
+          neighbor.removeClass("neighborNode");
         }
       }
+      node.removeClass("currentNode");
       //av.umsg(interpret("av_ms_update_distances"), {fill: {node: node.value()}});
       // av.step();
 
