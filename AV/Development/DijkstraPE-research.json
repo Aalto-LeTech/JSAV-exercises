@@ -2,7 +2,7 @@
   "translations" :{
     "en": {
       ".avTitle": "Dijkstra's Algorithm Proficiency Exercise",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Artturi Tilanterä",
       ".instructLabel": "Instructions:",
       ".instructions": "Reproduce the behavior of Dijkstra's Algorithm for the given graph below. Click on the <strong>edges</strong> in the order they are traversed by the algorithm. Start with Node A. In case of similar costs, add nodes alphabetically.",
       "av_ms_shortest": "Shortest paths from A.",
@@ -11,12 +11,13 @@
       "av_ms_add_edge": "Add edge ({from}, {to}) to the path tree.",
       "av_ms_unreachable": "The nearest unvisited node is at infinite distance. The algorithm ends.",
       "av_ms_update_distances": "Update {node}'s neighbors distances. For updated nodes, set the parent node to {node}",
+      "av_ms_update_distance": "Node {to} has shorter path through current node {from}. Update the distance and the previous node of node {to}.",
       "#help": "Help",
       "#about": "About"
     },
     "fi": {
       ".avTitle": "Dijkstran algoritmi",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Artturi Tilanterä",
       ".instructLabel": "Ohjeet:",
       ".instructions": "Lisää särmät virityspuuhun Dijkstran algoritmin antamassa järjestyksessä. Aloita läpikäynti solmusta A. Klikkaa <strong>särmiä</strong> lisätäksesi ne virityspuuhun. Jos kahdella särmällä on sama paino, kaari, jonka solmut ovat aakkosjärjestyksessä ensimmäisenä.",
       "av_ms_shortest": "Lyhyin reitti A:sta.",
@@ -25,6 +26,7 @@
       "av_ms_add_edge": "Lisätään särmä ({from}, {to}) virityspuuhun.",
       "av_ms_unreachable": "Etäisyys lähimpään solmuun, jossa ei ole vierailtu, on ääretön. Algoritmi päättyy.",
       "av_ms_update_distances": "Päivitetään etäisyyksiä {node}-solmun naapureihin. Päivitetyille solmuille asetetaan lähin solmu {node}:ksi.",
+      "av_ms_update_distance": "Solmuun {to} on lyhyempi reitti solmun {from} kautta. Päivitä solmun {to} etäisyys ja edeltäjä.",
       "#help": "Ohje",
       "#about": "Lisätietoa"
     }
