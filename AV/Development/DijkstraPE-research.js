@@ -243,15 +243,21 @@
         }
         // Shorter route found?
         if (!distances.hasClass(neighborIndex, true, "unused") && d > dThroughNode) {
+          console.log(["Update distance from" + node.value() + "to" +
+            neighbor.value()].join(" "));
+          av.umsg(interpret("av_ms_update_distance"),
+            {fill: {from: node.value(), to: neighbor.value()}});
+          av.step();
           // update the distance of the neighbour in the distance matrix
           distances.value(neighborIndex, 1, dThroughNode);
           // update the label previous node of the neighbour in the distance
           // matrix
           distances.value(neighborIndex, 2, node.value());
+          av.step();
         }
       }
-      av.umsg(interpret("av_ms_update_distances"), {fill: {node: node.value()}});
-      av.step();
+      //av.umsg(interpret("av_ms_update_distances"), {fill: {node: node.value()}});
+      // av.step();
 
     }
   }
