@@ -35,22 +35,3 @@
   min-width: 45px;
   min-height: 45px;
 }
-/* Highlighting parts of the visualization in the model answer */
-.modelHighlight {
-  background-color: #FFC000;
-  border: 2px dotted black;
-}
-.currentNode {
-  border: 2px solid black;
-  background-color: #FFF050;
-}
-.neighborNode {
-  border: 2px dotted black;
-  background-color: #FFC000;
-}
-span.currentNode {
-  padding: 3px;
-}
-span.neighborNode {
-  padding: 3px;
-}
