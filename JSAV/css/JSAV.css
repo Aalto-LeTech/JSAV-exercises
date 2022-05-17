@@ -147,7 +147,7 @@
 .jsavbararray .jsavnode {
   /* remove shadow from the white bars */
   box-shadow: none;
-} 
+}
 .jsavbararray .jsavindex {
   height: 100%;
   vertical-align: bottom;
@@ -267,8 +267,8 @@
   height:50px;
 }
 .jsavscroll {
-  overflow: auto; 
-  background-color: white; 
+  overflow: auto;
+  background-color: white;
   border: 1px solid black;
   height:220px;
 }
@@ -344,7 +344,7 @@
   background-color: #fff;
   z-index: 1000;
   position: absolute;
-  top: 0; 
+  top: 0;
   left: 0;
   box-shadow: 0 0 15px rgba(0,0,0,0.8);
 }
@@ -471,8 +471,8 @@ a.jsavsettings {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   border-radius: 50%;
-  float:right; 
-  margin-right:10px; 
+  float:right;
+  margin-right:10px;
   display:block;
   white-space: nowrap;
   overflow: hidden;
@@ -586,6 +586,7 @@ a.jsavsettings:hover {
   position: absolute;
   display: inline-block;
   margin: 0;
+  pointer-events: none;
 }
 
 /******** LINKED LIST STRUCTURE ******/
@@ -727,7 +728,7 @@ ul.jsavcode {
   border-top: 1px solid black;
 }
 
-.jsavmatrix.jsavmatrixplain .jsavarray li.jsavnode, 
+.jsavmatrix.jsavmatrixplain .jsavarray li.jsavnode,
 .jsavmatrix.jsavmatrixmatrix .jsavarray li.jsavnode {
   border: none;
   box-shadow: none;
