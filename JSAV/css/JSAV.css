@@ -586,6 +586,7 @@ a.jsavsettings:hover {
   position: absolute;
   display: inline-block;
   margin: 0;
+  pointer-events: none;
 }
 
 /******** LINKED LIST STRUCTURE ******/
