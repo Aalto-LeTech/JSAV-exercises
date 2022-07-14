@@ -482,7 +482,8 @@
       var eventData = {
         "type": action,
         "currentStep": that.currentStep(),
-        "totalSteps": that.totalSteps()
+        "totalSteps": that.totalSteps(), 
+        "gradable": that._undo[that._undo.length - 1].options.grade ?? false,
       };
       that.logEvent(eventData);
     }
