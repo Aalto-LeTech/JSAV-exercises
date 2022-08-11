@@ -302,122 +302,190 @@
     }
   }
 
+  //Shift up an updated node if it is smaller than its parent.
+  function moveUp (node) {
+    var parent = node.parent();
+    if (!parent) {
+      return;
+    }
+    if (extractDistance(node) < extractDistance(parent)) {
+      const temp = node.parent().value();
+      node.parent().value(node.value());
+      node.value(temp);
+      moveUp(node.parent());
+    }
+  }
+
+  /**
+   * @param node node to be queried if it is marked
+   * @returns true when node contains class 'marked', else false
+   */
+  function isMarked (node) {
+    return node.element[0].classList.contains("marked")
+  }
+
+
+  /**
+   * Preorder traversal to get node list of the tree
+   * Since there is no function for this in the JSAV library
+   * @param node the root node to start the traversal at
+   * @param arr array to store the nodes in. Optional parameterl 
+   * an empty array is initialised if none is supplied.
+   * @returns an array containing the nodes of the tree.
+   */
+  function getTreeNodeList (node, arr) {
+    var nodeArr = arr || [];
+
+    if (node) {
+      nodeArr.push(node);
+      nodeArr = getTreeNodeList(node.left(), nodeArr);
+      nodeArr = getTreeNodeList(node.right(), nodeArr);
+    }
+    return nodeArr;
+  }
+
+
+  /**
+   * Calculate the new distance for the node. This is the source distance
+   * if there's none yet, otherwise it's the distance from the source node
+   * to A plus the pathweight from src node to dst node. 
+   * @param srcLabel the source node's label
+   * @param pathWeight the weight of the path between source and destination
+   * @returns the new pathWeight
+   */
+  function getUpdatedDistance (srcLabel, pathWeight) {
+    const srcIndex = findColByNode(srcLabel);
+    const srcDist = Number(table.value(1, srcIndex))
+    return isNaN(srcDist) ? pathWeight : (pathWeight + srcDist)
+  }
+
+  /**
+   * Update the table: dstLabel's distance is set to newDist, 
+   * with parent set to srcLabel
+   * @param srcLabel 
+   * @param dstLabel 
+   * @param newDist 
+   */
+  function updateTable (srcLabel, dstLabel, newDist) {
+    const dstIndex = findColByNode(dstLabel);
+    table.value(1, dstIndex, newDist)
+    table.value(2, dstIndex, srcLabel)
+  }
+
+  /**
+   * Add a node to the priority queue with label dstLabel and distance newDist.
+   * Update the table to indicate the distance newDist and parent srcLabel.
+   * @param event click event, which has the parameters srcLabel, dstLabel,
+   * newDist and popup. 
+   * @param srcLabel the source node label
+   * @param dstLabel the destination node label
+   * @param newDist the new distance from A to destination
+   * @param popup the popup window, used to close the window before returning.
+   */
+  function enqueueClicked (event) {
+    const srcLabel = event.data.srcLabel;
+    const dstLabel = event.data.dstLabel;
+    const newDist = event.data.newDist;
+    const popup = event.data.popup;
+
+    updateTable(srcLabel, dstLabel, newDist);
+    insertMinheap(dstLabel, newDist);
+    popup.close();
+  }
+
+  /**
+   * Update the first instance of the node with label dstLabel. The updated
+   * node is moved up or down the tree as needed.
+   * @param event click event, which has the parameters srcLabel, dstLabel,
+   * newDist and popup. 
+   * @param srcLabel the source node label
+   * @param dstLabel the destination node label
+   * @param newDist the new distance from A to destination
+   * @param popup the popup window, used to close the window before returning.
+   */
+  function updateClicked (event) {
+    const srcLabel = event.data.srcLabel;
+    const dstLabel = event.data.dstLabel;
+    const newDist = event.data.newDist;
+    const popup = event.data.popup;
+    
+    const nodeArr = getTreeNodeList(minheap.root())
+    //Grab first node with the correct destination.
+    const updatedNode = nodeArr.filter(node => 
+            node.value().charAt(node.value().length - 1) === dstLabel)[0];
+    
+    //If no node with the correct label exists, do nothing.
+    if (!updatedNode) { 
+      popup.close();
+      return;
+    }
+
+    updateTable(srcLabel, dstLabel, newDist);
+    const oldDist = updatedNode.value().match(/\d+/)[0];
+    updatedNode.value(newDist + dstLabel);
+
+    (newDist < oldDist) ? moveUp(updatedNode) : minHeapify(updatedNode);
+    popup.close();
+  }
+
+  /**
+   * The edge click listener creates a JSAV pop-up whenever an edge is
+   * clicked. The pop-up has two buttons: enqueue and update.
+   * Enqueue adds a node to the priority queue
+   * Update updates the value of a node in the priority queue. 
+   * The edge click listener determines which edge is clicked, 
+   * what the nodes on either end are, which one is to be updated
+   * into the queue and what the distance from A is. After that, 
+   * the two buttons are created in the pop-up, and the corresponding
+   * event handlers attached.
+   */
+  function edgeClicked () {
+    const edge = $(this).data("edge");
+    const that = $(this);
+    const node1id = that[0].getAttribute("data-startnode");
+    const node2id = that[0].getAttribute("data-endnode");
+    const node1 = $("#" + node1id).data("node");
+    const node2 = $("#" + node2id).data("node");
+
+    const src =  isMarked(node1) ? node1 : node2;
+    const dst = (src === node1) ? node2 : node1;
+    if (!src || !dst) {
+      console.warn("Either start or end is not defined. Start: ",
+                   src, "\tEnd:", dst);
+      return
+    }
+    const srcLabel = src.element[0].getAttribute("data-value");
+    const dstLabel = dst.element[0].getAttribute("data-value");
+    const pathWeight = edge._weight;
+    const newDist = getUpdatedDistance(srcLabel, pathWeight);
+    const label = newDist + dstLabel;
+
+    //Edge is listed in alphabetical order, regardless of which 
+    //node is listed as the src or dst in JSAV.
+    const options = {
+      "title": "Edge " + ((srcLabel < dstLabel) ? (srcLabel + dstLabel) 
+                                                : (dstLabel + srcLabel)),
+      "width": "200px",
+      "dialongRootElement": $(this)
+    }
+
+    const html = "<button type='button' id='enqueueButton'>Enqueue: " +
+                 label + "</button> <br> <button type='button'" +
+                 "id='updateButton'>Update: " + label +"</button>"; 
+    const popup = JSAV.utils.dialog(html, options);
+    
+    // Enqueue and update button event handlers
+    $("#enqueueButton").click({srcLabel, dstLabel, newDist, popup}, enqueueClicked)
+    $("#updateButton").click({srcLabel, dstLabel, newDist, popup}, updateClicked)
+  }
+
   /**
    * Edge click listeners are bound to the graph itself, 
    * so each time the graph is destroyed with reset, it needs
    * to be added again. Therefore they are in a wrapper function.
    */
   function addEdgeClickListeners() {
-    $(".jsavgraph").on("click", ".jsavedge", function () {
-      var edge = $(this).data("edge");
-      const that = $(this);
-      const node1id = that[0].getAttribute("data-startnode");
-      const node2id = that[0].getAttribute("data-endnode");
-      const node1 = $("#" + node1id).data("node");
-      const node2 = $("#" + node2id).data("node");
-
-      const src =  isMarked(node1) ? node1 : node2;
-      const dst = (src === node1) ? node2 : node1;
-      if (!src || !dst) {
-        console.warn("Either start or end is not defined. Start: ",
-                     src, "\tEnd:", dst);
-        return
-      }
-      const srcLabel = src.element[0].getAttribute("data-value");
-      const dstLabel = dst.element[0].getAttribute("data-value");
-      const pathWeight = edge._weight;
-      const newDist = getUpdatedDistance();
-      const label = newDist + dstLabel;
-
-      const options = {
-        "title": "Edge " + ((srcLabel < dstLabel) ? (srcLabel + dstLabel) 
-                                                  : (dstLabel + srcLabel)),
-        "width": "200px",
-        "dialongRootElement": $(this)
-      }
-
-      const html = "<button type='button' id='enqueueButton'>Enqueue: " +
-                   label + "</button> <br> <button type='button'" +
-                   "id='updateButton'>Update: " + label +"</button>"; 
-      const popup = JSAV.utils.dialog(html, options);
-      
-      // Helper functions for the popup 
-
-      //Returns if the node has the class "marked"
-      function isMarked (node) {
-        return node.element[0].classList.contains("marked")
-      }
-
-      //Calculate the new distance for the node
-      //This is the source distance if there's none yet
-      //Else it's the distance from the source node to A 
-      //plus the pathweight from src node to dst node. 
-      function getUpdatedDistance () {
-        const srcIndex = findColByNode(srcLabel);
-        const srcDist = Number(table.value(1, srcIndex))
-        return isNaN(srcDist) ? pathWeight : (pathWeight + srcDist)
-      }
-
-      //Update the distance and parent node in the table.
-      function updateTable () {
-        const dstIndex = findColByNode(dstLabel);
-        table.value(1, dstIndex, newDist)
-        table.value(2, dstIndex, srcLabel)
-      }
-
-      //Preorder traversal to get node list of the tree
-      //Since there is no function for this in the JSAV library
-      function getTreeNodeList (node, arr) {
-        var nodeArr = arr || [];
-
-        if (node) {
-          nodeArr.push(node);
-          nodeArr = getTreeNodeList(node.left(), nodeArr);
-          nodeArr = getTreeNodeList(node.right(), nodeArr);
-        }
-        return nodeArr;
-      }
-
-      //Shift up an updated node if it is smaller than its parent.
-      function moveUp (node) {
-        parent = node.parent();
-        if (!parent) {
-          return;
-        }
-        if (extractDistance(node) < extractDistance(parent)) {
-          const temp = node.parent().value();
-          node.parent().value(node.value());
-          node.value(temp);
-          moveUp(node.parent());
-        }
-      }
-
-      $("#enqueueButton").click(function() {
-        updateTable();
-        insertMinheap(dstLabel, newDist);
-        popup.close();
-      })
-
-      $("#updateButton").click(function() {
-        const nodeArr = getTreeNodeList(minheap.root())
-        //Grab first node with the correct destination.
-        const updatedNode = nodeArr.filter(node => 
-                node.value().charAt(node.value().length - 1) === dstLabel)[0];
-        
-        //If no node with the correct label exists, do nothing.
-        if (!updatedNode) { 
-          popup.close();
-          return;
-        }
-
-        updateTable();
-        const oldDist = updatedNode.value().match(/\d+/)[0];
-        updatedNode.value(newDist + dstLabel);
-
-        (newDist < oldDist) ? moveUp(updatedNode) : minHeapify(updatedNode);
-        popup.close();
-      })
-    });
+    $(".jsavgraph").on("click", ".jsavedge", edgeClicked);
   }
 
   $(".jsavcontainer").on("click", ".jsavnode", function () {
@@ -814,7 +882,8 @@
   }
 
   /*
-  * Remaps the edges of the graph.
+  * Remaps the edges of the graph and expands it from a 4 by 4 to a 
+  * 6 by 4 graph, with 2 columns of unconnected nodes.
   *
   * Parameters:
   * graph = {
@@ -825,8 +894,8 @@
   *   ]
   * }
   * vertexMap: i is the old index, vertexMap[i] is the new index.
-  * left: a boolean to indicate whether the core component is in the 
-  * left or not (right). 
+  * left: a boolean to indicate whether the core component is on the 
+  * left or the right of the 6 by 4 graph. 
   *
   * Returns: a transformed graph instance
   */
@@ -853,6 +922,9 @@
       }
     } 
 
+    //Create a 6 by 4 graph with the extra labels. 
+    //Initialise empty edge array, this will be filled 
+    //with the new edges with the two extra columns as off-set.
     let paddedGraph = {
       vertexLabels: [...graph.vertexLabels, 
                       "Q", "R", "S", "T", "U", "V", "W", "X"],
