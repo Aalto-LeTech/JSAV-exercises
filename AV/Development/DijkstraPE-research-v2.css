@@ -1,6 +1,6 @@
 #container {
   width: 900px;
-  height: 900px;
+  height: 920px;
 }
 .jsavline {
   height: 45px;
@@ -43,6 +43,7 @@
 .jsavtree {
   min-width: 400px;
   min-height: 250px;
+  margin: 0px;
 }
 
 .bintree {  
@@ -53,6 +54,11 @@
   margin: auto;
   background-color: #ffffff;
   border: 1px #000000 solid;
+}
+
+.prioqueue {
+  text-align: center;
+  margin: 0px;
 }
 
 .jsavtree svg {

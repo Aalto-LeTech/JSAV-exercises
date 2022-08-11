@@ -45,7 +45,7 @@
     graph.layout();
     graph.nodes()[exerciseInstance.startIndex].addClass("marked"); // mark the 'A' node
     jsav.displayInit();
-    return graph;
+    return [graph, minheap];
   }
 
   function fixState(modelGraph) {
@@ -145,7 +145,7 @@
 
     modeljsav.step();
 
-    return modelGraph;
+    return [modelGraph, mintree];
   }
 
   function markEdge(edge, av) {
@@ -182,7 +182,7 @@
     while (modelheapsize > 0) {
       const rootVal = deleteRoot();
       const dist = Number(rootVal.match(/\d+/)[0])
-      const label = rootVal.charAt(rootVal.length - 1);
+      const label = rootVal.charAt(rootVal.length - 5);
       const dstNode = nodes[indexOfLabel[label]];
       const dstIndex =  dstNode.value().charCodeAt(0) - "A".charCodeAt(0);
       const srcNode = nodes[indexOfLabel[distances.value(dstIndex, 2)]]
@@ -229,7 +229,7 @@
 
       //Mark table row as "unused" (grey background)
       //Then set selected message, and step the av.
-      const nodeLabel = ret.charAt(ret.length - 1)
+      const nodeLabel = ret.charAt(ret.length - 5)
       distances.addClass(nodeLabel.charCodeAt(0) - "A".charCodeAt(0), true, "unused")
       av.umsg(interpret("av_ms_select_node"), 
               {fill: {node: nodeLabel}});
@@ -262,7 +262,8 @@
       distances.value(dstIndex, 1, edge._weight);
       distances.value(dstIndex, 2, src.value());
       modelheapsize += 1;
-      mintree.root(edge._weight + dst.value())
+      const label = edge._weight + "<br>" + dst.value() + " (" + src.value() + ")";
+      mintree.root(label)
       av.umsg(interpret("av_ms_update_distances"), {fill: {node: src.value()}})
       av.step()
     }
@@ -294,24 +295,21 @@
 
       const distViaSrc = srcDist + edge._weight;
       if (currNeighbourDist === Infinity) {
-        addNode(neighbour.value(), distViaSrc);
+        addNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
         if (debug) {
           console.log("ADD ROUTE WITH DIST:", distViaSrc + neighbour.value());
         }
         av.umsg(interpret("av_ms_visit_neighbor_add"), 
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
-        av.step()
       } else if (distViaSrc < currNeighbourDist) {
-        updateNode(neighbour.value(), distViaSrc);
+        updateNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
         if (debug) {
           console.log("UPDATE DISTANCE TO:", distViaSrc + neighbour.value());
         }
         av.umsg(interpret("av_ms_visit_neighbor_update"), 
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
-        av.step();
-        //step()
       } else {
         if (debug) {
           console.log("KEEP DISTANCE THE SAME:", 
@@ -319,21 +317,22 @@
         }
         av.umsg(interpret("av_ms_visit_neighbor_no_action"), 
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
-        av.step();
       }
-
+      av.step();
     }
 
     /**
      * Helper function to add a new node. 
-     * @param label destination node's label
+     * @param srcLabel label of the source node
+     * @param dstLabel destination node's label
      * @param distance distance to the node
      */
-    function addNode (label, distance) {
+    function addNode (srcLabel, dstLabel, distance) {
       var i = modelheapsize;
       modelheapsize += 1;
       
-      const newNode = mintree.newNode(distance + label);
+      const label = distance + "<br>" + dstLabel + " (" + srcLabel + ")"
+      const newNode = mintree.newNode(label);
       if (i === 0) {
         mintree.root(newNode);
       } else {
@@ -345,7 +344,7 @@
       while (i > 0 && node.parent() && extractDistance(node.parent()) > distance) {
         node.value(node.parent().value());
         i = Math.floor((i-1)/2);
-        node.parent().value(distance + label);
+        node.parent().value(label);
         node = node.parent();
       }
   
@@ -354,14 +353,16 @@
 
     /**
      * Helper function to update a node to its new value. 
-     * @param label destination node's label
+     * @param srcLabel label of the source node
+     * @param dstLabel destination node's label
      * @param distance distance to the node
      */
-    function updateNode(label, distance) {
+    function updateNode(srcLabel, dstLabel, distance) {
+      const label = distance + "<br>" + dstLabel + " (" + srcLabel + ")"
       const nodeArr = getTreeNodeList(mintree.root())
       //Grab first node with the correct destination.
       const updatedNode = nodeArr.filter(node => 
-              node.value().charAt(node.value().length - 1) === label)[0];
+              node.value().charAt(node.value().length - 5) === dstLabel)[0];
       
       //If no node with the correct label exists, do nothing.
       if (!updatedNode) { 
@@ -370,7 +371,7 @@
       if (debug) {
         console.log("UPDATE:", updatedNode.value(), "TO:", distance + label);
       }
-      updatedNode.value(distance + label);
+      updatedNode.value(label);
 
       //Inline while loop to move the value up if needed. 
       //Because if you pass a node along as a parameter, it does not like
@@ -501,7 +502,7 @@
     const popup = event.data.popup;
 
     updateTable(srcLabel, dstLabel, newDist);
-    insertMinheap(dstLabel, newDist);
+    insertMinheap(srcLabel, dstLabel, newDist);
     popup.close();
   }
 
@@ -524,7 +525,7 @@
     const nodeArr = getTreeNodeList(minheap.root())
     //Grab first node with the correct destination.
     const updatedNode = nodeArr.filter(node => 
-            node.value().charAt(node.value().length - 1) === dstLabel)[0];
+            node.value().charAt(node.value().length - 5) === dstLabel)[0];
     
     //If no node with the correct label exists, do nothing.
     if (!updatedNode) { 
@@ -534,7 +535,8 @@
 
     updateTable(srcLabel, dstLabel, newDist);
     const oldDist = updatedNode.value().match(/\d+/)[0];
-    updatedNode.value(newDist + dstLabel);
+    const label = newDist + "<br>" + dstLabel + " (" + srcLabel + ")";
+    updatedNode.value(label);
 
     if (newDist > oldDist) { 
       minHeapify(updatedNode) 
@@ -586,15 +588,18 @@
     //Edge is listed in alphabetical order, regardless of which 
     //node is listed as the src or dst in JSAV.
     const options = {
-      "title": "Edge " + ((srcLabel < dstLabel) ? (srcLabel + dstLabel) 
-                                                : (dstLabel + srcLabel)),
+      "title": interpret("edge") + " " + ((srcLabel < dstLabel) 
+                                          ? (srcLabel + dstLabel) 
+                                          : (dstLabel + srcLabel)),
       "width": "200px",
       "dialongRootElement": $(this)
     }
 
-    const html = "<button type='button' id='enqueueButton'>Enqueue: " +
-                 label + "</button> <br> <button type='button'" +
-                 "id='updateButton'>Update: " + label +"</button>"; 
+    const html = "<button type='button' id='enqueueButton'>" 
+                 + interpret("#enqueue") + ": " + label 
+                 + "</button> <br> <button type='button'" 
+                 + "id='updateButton'>"  + interpret("#update") + ": " 
+                 + label +"</button>"; 
     const popup = JSAV.utils.dialog(html, options);
     
     // Enqueue and update button event handlers
@@ -1121,126 +1126,132 @@
   * @returns the graph with the disconnected edges
   */
   function addDisconnectedEdges(graph, leftSide) {
-  /**
-   * Q -0- R
-   * | \ / |    \ 10
-   * 1  x  2 
-   * | / \ |    / 11
-   * S -3- T
-   * | \ / |    \ 12
-   * 4  x  5
-   * | / \ |    / 13
-   * U -6- V
-   * | \ / |    \ 14
-   * 7  x  8
-   * | / \ |    / 15
-   * W -9- X
-   */
+    /**
+     * Q -0- R
+     * | \ / |    \ 10
+     * 1  x  2 
+     * | / \ |    / 11
+     * S -3- T
+     * | \ / |    \ 12
+     * 4  x  5
+     * | / \ |    / 13
+     * U -6- V
+     * | \ / |    \ 14
+     * 7  x  8
+     * | / \ |    / 15
+     * W -9- X
+     */
 
-  const edgeNodeMap = {
-    0: [0, 1], //QR
-    1: [0, 6], //QS
-    2: [1, 7], //RT
-    3: [6, 7], //ST
-    4: [6, 12], //SU
-    5: [7, 13], //TV
-    6: [12, 13], //UV
-    7: [12, 18], //UW
-    8: [13, 19], //VX
-    9: [18, 19], //WX
-    10: [0, 7], //QT
-    11: [1, 6], //RS
-    12: [6, 13], //SV
-    13: [7, 12], //TU
-    14: [12, 19], //VX
-    15: [13, 18], //UX
-  }
+    // This object maps the egdes with the numbering as above to the node
+    // numbers. This assumes that the component is placed on the right side, 
+    // an off-set of +4 needs to be added to use the nodes on the left side.
+    const edgeNodeMap = {
+      0: [0, 1], //QR
+      1: [0, 6], //QS
+      2: [1, 7], //RT
+      3: [6, 7], //ST
+      4: [6, 12], //SU
+      5: [7, 13], //TV
+      6: [12, 13], //UV
+      7: [12, 18], //UW
+      8: [13, 19], //VX
+      9: [18, 19], //WX
+      10: [0, 7], //QT
+      11: [1, 6], //RS
+      12: [6, 13], //SV
+      13: [7, 12], //TU
+      14: [12, 19], //VX
+      15: [13, 18], //UX
+    }
 
-  let untakenEdges = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
-                      [10,11], [12,13], [14,15]];
-  
-  if (leftSide) {
-    if (lastLinearTransform === 1) {
-      edgeNodeMap[16] = [16, 21] //PV
-      edgeNodeMap[17] = [21, 22] //OP
-      untakenEdges.push(16, 17)
+    //untakenEdges is a list of all the edges that are possible
+    //to be added to the graph without the research component changing. 
+    //We select randomly approximately half of these edges
+    let untakenEdges = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
+                        [10,11], [12,13], [14,15]];
+    
+    if (leftSide) {
+      if (lastLinearTransform === 1) {
+        edgeNodeMap[16] = [16, 21] //PV
+        edgeNodeMap[17] = [21, 22] //OP
+        untakenEdges.push(16, 17)
+      }
+      if (lastLinearTransform === 4) {
+        edgeNodeMap[16] = [10, 15] //LS
+        edgeNodeMap[17] = [15, 16] //LV
+        edgeNodeMap[18] = [15, 22] //LW
+        edgeNodeMap[19] = [16, 21] //PV
+        edgeNodeMap[20] = [21, 22] //PW
+        untakenEdges.push(16, 17, [18, 19], 20);
+      }
+      if (lastLinearTransform === 0) {
+        edgeNodeMap[16] = [3, 4] //DQ
+        edgeNodeMap[17] = [3, 10] //DS
+        edgeNodeMap[18] = [4, 9] //HQ
+        edgeNodeMap[19] = [9, 10] //HS
+        edgeNodeMap[20] = [9, 16] //HU
+        untakenEdges.push(16, [17, 18], 19, 20);
+      }
+      if (lastLinearTransform === 7) {
+        edgeNodeMap[16] = [3, 4] //DQ
+        edgeNodeMap[17] = [3, 10] //DS
+        untakenEdges.push(16, 17)
+      }
+    } else {
+      if (lastLinearTransform === 3) {
+        edgeNodeMap[16] = [1, 2] //AR
+        edgeNodeMap[17] = [2, 7] //AT
+        untakenEdges.push(16, 17)
+      }
+      if (lastLinearTransform === 5) {
+        edgeNodeMap[16] = [1, 2] //AR
+        edgeNodeMap[17] = [1, 8] //ER
+        edgeNodeMap[18] = [2, 7] //AT
+        edgeNodeMap[19] = [7, 8] //ET
+        edgeNodeMap[20] = [8, 13] //EV
+        untakenEdges.push(16, [17, 18], 19, 20);
+      }
+      if (lastLinearTransform === 2) {
+        edgeNodeMap[16] = [7, 14] //IT
+        edgeNodeMap[17] = [13, 14] //IV
+        edgeNodeMap[18] = [13, 20] //MV
+        edgeNodeMap[19] = [14, 19] //IX
+        edgeNodeMap[20] = [19, 20] //MX
+        untakenEdges.push(16, 17, [18, 19], 20);
+      }
+      if (lastLinearTransform === 6) {
+        edgeNodeMap[16] = [13, 20] //MV
+        edgeNodeMap[17] = [19, 20] //MX
+        untakenEdges.push(16, 17)
+      }
     }
-    if (lastLinearTransform === 4) {
-      edgeNodeMap[16] = [10, 15] //LS
-      edgeNodeMap[17] = [15, 16] //LV
-      edgeNodeMap[18] = [15, 22] //LW
-      edgeNodeMap[19] = [16, 21] //PV
-      edgeNodeMap[20] = [21, 22] //PW
-      untakenEdges.push(16, 17, [18, 19], 20);
-    }
-    if (lastLinearTransform === 0) {
-      edgeNodeMap[16] = [3, 4] //DQ
-      edgeNodeMap[17] = [3, 10] //DS
-      edgeNodeMap[18] = [4, 9] //HQ
-      edgeNodeMap[19] = [9, 10] //HS
-      edgeNodeMap[20] = [9, 16] //HU
-      untakenEdges.push(16, [17, 18], 19, 20);
-    }
-    if (lastLinearTransform === 7) {
-      edgeNodeMap[16] = [3, 4] //DQ
-      edgeNodeMap[17] = [3, 10] //DS
-      untakenEdges.push(16, 17)
-    }
-  } else {
-    if (lastLinearTransform === 3) {
-      edgeNodeMap[16] = [1, 2] //AR
-      edgeNodeMap[17] = [2, 7] //AT
-      untakenEdges.push(16, 17)
-    }
-    if (lastLinearTransform === 5) {
-      edgeNodeMap[16] = [1, 2] //AR
-      edgeNodeMap[17] = [1, 8] //ER
-      edgeNodeMap[18] = [2, 7] //AT
-      edgeNodeMap[19] = [7, 8] //ET
-      edgeNodeMap[20] = [8, 13] //EV
-      untakenEdges.push(16, [17, 18], 19, 20);
-    }
-    if (lastLinearTransform === 2) {
-      edgeNodeMap[16] = [7, 14] //IT
-      edgeNodeMap[17] = [13, 14] //IV
-      edgeNodeMap[18] = [13, 20] //MV
-      edgeNodeMap[19] = [14, 19] //IX
-      edgeNodeMap[20] = [19, 20] //MX
-      untakenEdges.push(16, 17, [18, 19], 20);
-    }
-    if (lastLinearTransform === 6) {
-      edgeNodeMap[16] = [13, 20] //MV
-      edgeNodeMap[17] = [19, 20] //MX
-      untakenEdges.push(16, 17)
-    }
-  }
 
-  //Replace cross points with one of the two edges, randomly selected
-  for (let i = 0; i < untakenEdges.length; i++) {
-    if (Array.isArray(untakenEdges[i])) {
-      untakenEdges[i] = untakenEdges[i][Math.round(Math.random())]
+    //Replace cross points with one of the two edges, randomly selected
+    for (let i = 0; i < untakenEdges.length; i++) {
+      if (Array.isArray(untakenEdges[i])) {
+        untakenEdges[i] = untakenEdges[i][Math.round(Math.random())]
+      }
     }
-  }
 
-  //Add half the number of edges that can be added to it. 
-  //This is so that it doesn't look too empty or too full, as the total 
-  //number of edges can be between 13 and 17, depending on how edge DH is. 
-  const numEdges = Math.ceil(untakenEdges.length / 2);
-  const takenEdges = shuffle(untakenEdges).slice(0, numEdges);
+    //Add half the number of edges that can be added to it. 
+    //This is so that it doesn't look too empty or too full, as the total 
+    //number of edges can be between 13 and 17, depending on how edge DH is. 
+    const numEdges = Math.ceil(untakenEdges.length / 2);
+    const takenEdges = shuffle(untakenEdges).slice(0, numEdges);
 
-  for (i = 0; i < takenEdges.length; i++) {
-    const nodes = edgeNodeMap[takenEdges[i]];
-    const weight = Math.round(Math.random()*8) + 1;
-    //offset for the 16 "core" edges
-    const offset = (takenEdges[i] < 16 && leftSide) ? 4 : 0; 
-    const src = nodes[0] + offset; 
-    const dst = nodes[1] + offset;
+    for (i = 0; i < takenEdges.length; i++) {
+      const nodes = edgeNodeMap[takenEdges[i]];
+      const weight = Math.round(Math.random()*8) + 1;
+      //offset for the 16 "core" edges
+      const offset = (takenEdges[i] < 16 && leftSide) ? 4 : 0; 
+      const src = nodes[0] + offset; 
+      const dst = nodes[1] + offset;
 
-    graph.edges[src].push([dst, weight]);
-    graph.edges[dst].push([src, weight]);
-  }
+      graph.edges[src].push([dst, weight]);
+      graph.edges[dst].push([src, weight]);
+    }
 
-  return graph
+    return graph;
   }
 
   // TODO: general algorithm
@@ -1418,11 +1429,11 @@
     if (table) {
       table.clear()
     }
-    const labelArr = ["Node", ...(riGraph.vertexLabels.sort())];
+    const labelArr = [interpret("node"), ...(riGraph.vertexLabels.sort())];
     const distanceArr = Array.from('∞'.repeat(riGraph.vertexLabels.length - 1));
-    distanceArr.unshift("Distance", 0);
+    distanceArr.unshift(interpret("distance"), 0);
     const parentArr = Array.from('-'.repeat(riGraph.vertexLabels.length));
-    parentArr.unshift("Parent");
+    parentArr.unshift(interpret("parent"));
     const width = String((riGraph.vertexLabels.length) * 30 + 90) + "px";
     table = jsav.ds.matrix([labelArr, distanceArr, parentArr], 
                            {style: "table", 
@@ -1447,14 +1458,17 @@
   function addMinheap () {
     if (minheap) {
       minheap.clear();
+      $(".prioqueue").remove();
       $(".bintree").remove();
     }
     heapsize = heapsize.value(0);
-    $(".jsavcanvas").append("<div class='bintree'></div>");
+    $(".jsavcanvas").append("<div class='prioqueue'><strong>" 
+        + interpret("priority_queue") 
+        + "</strong></div><div class='bintree'></div>");
     minheap = jsav.ds.binarytree({relativeTo: $(".bintree"), 
                                   myAnchor: "center center"});
     minheap.layout()
-    const html = "<button type='button' id='removeButton'>Remove</button>";
+    const html = "<button type='button' id='removeButton'>"+ interpret("#dequeue") +"</button>";
     $(".jsavtree").append(html)
     $("#removeButton").css({"float": "right", 
                             "position": "relative", 
@@ -1463,10 +1477,16 @@
     //Add remove button
     $("#removeButton").click(function() {
       const deleted = minheapDelete(0);
-      const nodeLabel = deleted.charAt(deleted.length - 1);
+      if (!deleted) {
+        return;
+      }
+      //Format of node label: "x<br>D (S)", where x is the distance,
+      //D is the destination node label and S is the source node label
+      const nodeLabel = deleted.charAt(deleted.length - 5);
       const node = graph.nodes().filter(node => 
           node.element[0].getAttribute("data-value") === nodeLabel)[0];
       const srcLabel = table.value(2, findColByNode(nodeLabel));
+      // const srcLabel = deleted.charAt(deleted.length - 2);
       const srcNode = graph.nodes().filter(node => 
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
@@ -1481,14 +1501,16 @@
   /**
    * Insert the new node into the minheap according to the 
    * insertMinheap algorithm. 
-   * @param {*} label nodeLabel for the node to be inserted.
-   * @param {*} distance distance to be inserted.
+   * @param srcLabel label of the source node
+   * @param dstLabel label of the destination node
+   * @param distance distance to be inserted.
    */
-  function insertMinheap (label, distance) {
+  function insertMinheap (srcLabel, dstLabel, distance) {
     var i = heapsize.value();
     heapsize.value(heapsize.value() + 1);
 
-    const newNode = minheap.newNode(distance + label);
+    const label = distance + "<br>" + dstLabel + " (" + srcLabel + ")"
+    const newNode = minheap.newNode(label);
     if (i === 0) {
       minheap.root(newNode);
     } else {
@@ -1501,7 +1523,7 @@
     while (i > 0 && extractDistance(node.parent()) > distance) {
       node.value(node.parent().value());
       i = Math.floor((i-1)/2);
-      node.parent().value(distance + label);
+      node.parent().value(label);
       node = node.parent();
     }
 
