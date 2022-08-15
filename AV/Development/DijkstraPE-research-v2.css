@@ -1,6 +1,6 @@
 #container {
-  width: 800px;
-  height: 595px;
+  width: 900px;
+  height: 900px;
 }
 .jsavline {
   height: 45px;
@@ -11,6 +11,10 @@
   text-align: center;
 }
 
+.jsavgraph {
+  margin-top: 0;
+  margin-bottom: 0;
+}
 .jsavgraph svg {
   z-index: 0;
 }
@@ -34,4 +38,19 @@
 .jsavautoresize .jsavnode {
   min-width: 45px;
   min-height: 45px;
+}
+
+.jsavtree {
+  min-width: 400px;
+  min-height: 250px;
+  background-color: #fff;
+  border: 1px black solid !important;
+}
+
+.jsavtree svg {
+  margin: 10px;
+}
+
+.jsavtreenode {
+  margin: 10px;
 }
