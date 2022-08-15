@@ -43,8 +43,16 @@
 .jsavtree {
   min-width: 400px;
   min-height: 250px;
-  background-color: #fff;
-  border: 1px black solid !important;
+}
+
+.bintree {  
+  min-width: 400px;
+  min-height: 250px;
+  max-width: 400px;
+  max-height: 250px;
+  margin: auto;
+  background-color: #ffffff;
+  border: 1px #000000 solid;
 }
 
 .jsavtree svg {
