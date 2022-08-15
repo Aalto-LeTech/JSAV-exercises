@@ -11,6 +11,9 @@
       "av_ms_add_edge": "Add edge ({from}, {to}) to the path tree.",
       "av_ms_unreachable": "The nearest unvisited node is at infinite distance. The algorithm ends.",
       "av_ms_update_distances": "Update {node}'s neighbors distances. For updated nodes, set the parent node to {node}",
+      "av_ms_visit_neighbor_add": "Update {node}'s neighbors distances. Visit {neighbor}:<br>Current distance for {neighbor} is infinite, add {neighbor} to the priority queue and table. Set parent to {node}.", 
+      "av_ms_visit_neighbor_update": "Update {node}'s neighbors distances. Visit {neighbor}:<br>Current distance for {neighbor} is longer than distance via {node}. Update the distance in the priority queue and table. Set parent to {node}.",
+      "av_ms_visit_neighbor_no_action": "Update {node}'s neighbors distances. Visit {neighbor}:<br>Current distance for {neighbor} is shorter than the distance via {node}. Do nothing.",
       "#help": "Help",
       "#about": "About"
     },
@@ -25,6 +28,9 @@
       "av_ms_add_edge": "Lisätään särmä ({from}, {to}) virityspuuhun.",
       "av_ms_unreachable": "Etäisyys lähimpään solmuun, jossa ei ole vierailtu, on ääretön. Algoritmi päättyy.",
       "av_ms_update_distances": "Päivitetään etäisyyksiä {node}-solmun naapureihin. Päivitetyille solmuille asetetaan lähin solmu {node}:ksi.",
+      "av_ms_visit_neighbor_add": "Update {node}'s neighbors distances. Visit {neighbor}:<br>Current distance for {neighbor} is infinite, add {neighbor} to the priority queue and table. Set parent to {node}.", 
+      "av_ms_visit_neighbor_update": "Update {node}'s neighbors distances. Visit {neighbor}:<br>Current distance for {neighbor} is longer than distance via {node}. Update the distance in the priority queue and table. Set parent to {node}.",
+      "av_ms_visit_neighbor_no_action": "Update {node}'s neighbors distances. Visit {neighbor}:<br>Current distance for {neighbor} is shorter than the distance via {node}. Do nothing.",
       "#help": "Ohje",
       "#about": "Lisätietoa"
     }
