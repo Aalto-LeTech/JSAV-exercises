@@ -8,18 +8,33 @@
 /* global ODSA, graphUtils */
 (function ($) {
   "use strict";
-  var exercise,
-      graph,
-      table,
-      minheap,
-      config = ODSA.UTILS.loadConfig(),
+
+  // JSAV Exercise
+  var exercise;
+
+  // JSAV Graph to display the graph visualization.
+  var graph;
+
+  // JSAV Matrix to display the node-distance-parent table
+  var table;
+
+  // JSAV Binary Tree to display the priority queue as a binary heap
+  var minheap;
+
+  // OpenDSA configuration and translation interpreter
+  var config = ODSA.UTILS.loadConfig(),
       interpret = config.interpreter,
-      settings = config.getSettings(),
-      jsav = new JSAV($('.avcontainer'), {settings: settings}),
-      exerciseInstance,
-      heapsize = jsav.variable(0),
-      lastLinearTransform = -1, // for generateInstance()
-      debug = false; // produces debug prints to console
+      settings = config.getSettings();
+
+  // JSAV Visualization
+  var jsav = new JSAV($('.avcontainer'), {settings: settings});
+  var exerciseInstance;
+
+  // Number of elements in the binary heap
+  var heapsize = jsav.variable(0);
+
+  var lastLinearTransform = -1; // for generateInstance()
+  var debug = false; // produces debug prints to console
 
   jsav.recorded();
 
@@ -40,10 +55,13 @@
     researchInstanceToJsav(exerciseInstance.graph, graph, layoutSettings);
     addMinheap();
     addTable(exerciseInstance.graph);
+
+    // For research 
     window.JSAVrecorder.addMetadata('roleMap', exerciseInstance['roleMap']);
 
     graph.layout();
-    graph.nodes()[exerciseInstance.startIndex].addClass("marked"); // mark the 'A' node
+    // mark the 'A' node
+    graph.nodes()[exerciseInstance.startIndex].addClass("marked");
     jsav.displayInit();
     return graph;
   }
@@ -178,7 +196,7 @@
     av.umsg(interpret("av_ms_select_a"));
     av.step();
     aNode.neighbors().forEach(node => initialNode(aNode, node))
-    
+
     while (modelheapsize > 0) {
       const rootVal = deleteRoot();
       const dist = Number(rootVal.match(/\d+/)[0])
@@ -203,8 +221,8 @@
     /**
      * Helper function: returns the distance for the given index in the
      * JSAV distance matrix.
-     * @param {*} index 
-     * @returns 
+     * @param {*} index
+     * @returns
      */
     function getDistance(index) {
       var dist = parseInt(distances.value(index, 1), 10);
@@ -231,14 +249,14 @@
       //Then set selected message, and step the av.
       const nodeLabel = ret.charAt(ret.length - 1)
       distances.addClass(nodeLabel.charCodeAt(0) - "A".charCodeAt(0), true, "unused")
-      av.umsg(interpret("av_ms_select_node"), 
+      av.umsg(interpret("av_ms_select_node"),
               {fill: {node: nodeLabel}});
       av.step();
 
       const parentLast = findParent(modelheapsize, mintree);
       const lastNode = ((modelheapsize)%2 === 1) ? parentLast.left()
                                                  : parentLast.right();
-  
+
       if (lastNode) {
         mintree.root().value(lastNode.value());
         lastNode.value(ret);
@@ -255,7 +273,7 @@
      * Helper function to insert the initial node after A into the heap.
      * @param src source node
      * @param dst destination node
-     */ 
+     */
     function initialNode(src, dst) {
       const edge = src.edgeTo(dst) ?? src.edgeFrom(dst);
       const dstIndex = dst.value().charCodeAt(0) - "A".charCodeAt(0);
@@ -269,7 +287,7 @@
 
     /**
      * Helper function to update the table. Sets dst's distance to distance
-     * via parent src. 
+     * via parent src.
      * @param dst destination node
      * @param src source node
      * @param distance distance to be inserted in the table.
@@ -282,7 +300,7 @@
     }
 
     /**
-     * Helper function to visit a node. 
+     * Helper function to visit a node.
      * @param src source node
      * @param neighbour neighbour node that is visited
      * @param srcDist distance to source
@@ -299,7 +317,7 @@
         if (debug) {
           console.log("ADD ROUTE WITH DIST:", distViaSrc + neighbour.value());
         }
-        av.umsg(interpret("av_ms_visit_neighbor_add"), 
+        av.umsg(interpret("av_ms_visit_neighbor_add"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         av.step()
       } else if (distViaSrc < currNeighbourDist) {
@@ -308,16 +326,16 @@
         if (debug) {
           console.log("UPDATE DISTANCE TO:", distViaSrc + neighbour.value());
         }
-        av.umsg(interpret("av_ms_visit_neighbor_update"), 
+        av.umsg(interpret("av_ms_visit_neighbor_update"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         av.step();
         //step()
       } else {
         if (debug) {
-          console.log("KEEP DISTANCE THE SAME:", 
+          console.log("KEEP DISTANCE THE SAME:",
                         currNeighbourDist + neighbour.value())
         }
-        av.umsg(interpret("av_ms_visit_neighbor_no_action"), 
+        av.umsg(interpret("av_ms_visit_neighbor_no_action"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         av.step();
       }
@@ -325,14 +343,14 @@
     }
 
     /**
-     * Helper function to add a new node. 
+     * Helper function to add a new node.
      * @param label destination node's label
      * @param distance distance to the node
      */
     function addNode (label, distance) {
       var i = modelheapsize;
       modelheapsize += 1;
-      
+
       const newNode = mintree.newNode(distance + label);
       if (i === 0) {
         mintree.root(newNode);
@@ -340,31 +358,31 @@
         const parent = findParent(i, mintree);
         (i % 2 === 1) ? parent.left(newNode) : parent.right(newNode);
       }
-  
-      var node = newNode;      
+
+      var node = newNode;
       while (i > 0 && node.parent() && extractDistance(node.parent()) > distance) {
         node.value(node.parent().value());
         i = Math.floor((i-1)/2);
         node.parent().value(distance + label);
         node = node.parent();
       }
-  
+
       mintree.layout();
     }
 
     /**
-     * Helper function to update a node to its new value. 
+     * Helper function to update a node to its new value.
      * @param label destination node's label
      * @param distance distance to the node
      */
     function updateNode(label, distance) {
       const nodeArr = getTreeNodeList(mintree.root())
       //Grab first node with the correct destination.
-      const updatedNode = nodeArr.filter(node => 
+      const updatedNode = nodeArr.filter(node =>
               node.value().charAt(node.value().length - 1) === label)[0];
-      
+
       //If no node with the correct label exists, do nothing.
-      if (!updatedNode) { 
+      if (!updatedNode) {
         return;
       }
       if (debug) {
@@ -372,11 +390,11 @@
       }
       updatedNode.value(distance + label);
 
-      //Inline while loop to move the value up if needed. 
+      //Inline while loop to move the value up if needed.
       //Because if you pass a node along as a parameter, it does not like
       //being asked about its parent... Grading will break in ODSA part.
       var node = updatedNode;
-      while (node != mintree.root() && 
+      while (node != mintree.root() &&
              extractDistance(node) < extractDistance(node.parent())) {
         const temp = node.parent().value();
         node.parent().value(node.value());
@@ -441,7 +459,7 @@
    * Preorder traversal to get node list of the tree
    * Since there is no function for this in the JSAV library
    * @param node the root node to start the traversal at
-   * @param arr array to store the nodes in. Optional parameterl 
+   * @param arr array to store the nodes in. Optional parameterl
    * an empty array is initialised if none is supplied.
    * @returns an array containing the nodes of the tree.
    */
@@ -460,7 +478,7 @@
   /**
    * Calculate the new distance for the node. This is the source distance
    * if there's none yet, otherwise it's the distance from the source node
-   * to A plus the pathweight from src node to dst node. 
+   * to A plus the pathweight from src node to dst node.
    * @param srcLabel the source node's label
    * @param pathWeight the weight of the path between source and destination
    * @returns the new pathWeight
@@ -472,11 +490,11 @@
   }
 
   /**
-   * Update the table: dstLabel's distance is set to newDist, 
+   * Update the table: dstLabel's distance is set to newDist,
    * with parent set to srcLabel
-   * @param srcLabel 
-   * @param dstLabel 
-   * @param newDist 
+   * @param srcLabel
+   * @param dstLabel
+   * @param newDist
    */
   function updateTable (srcLabel, dstLabel, newDist) {
     const dstIndex = findColByNode(dstLabel);
@@ -488,7 +506,7 @@
    * Add a node to the priority queue with label dstLabel and distance newDist.
    * Update the table to indicate the distance newDist and parent srcLabel.
    * @param event click event, which has the parameters srcLabel, dstLabel,
-   * newDist and popup. 
+   * newDist and popup.
    * @param srcLabel the source node label
    * @param dstLabel the destination node label
    * @param newDist the new distance from A to destination
@@ -509,7 +527,7 @@
    * Update the first instance of the node with label dstLabel. The updated
    * node is moved up or down the tree as needed.
    * @param event click event, which has the parameters srcLabel, dstLabel,
-   * newDist and popup. 
+   * newDist and popup.
    * @param srcLabel the source node label
    * @param dstLabel the destination node label
    * @param newDist the new distance from A to destination
@@ -520,14 +538,14 @@
     const dstLabel = event.data.dstLabel;
     const newDist = event.data.newDist;
     const popup = event.data.popup;
-    
+
     const nodeArr = getTreeNodeList(minheap.root())
     //Grab first node with the correct destination.
-    const updatedNode = nodeArr.filter(node => 
+    const updatedNode = nodeArr.filter(node =>
             node.value().charAt(node.value().length - 1) === dstLabel)[0];
-    
+
     //If no node with the correct label exists, do nothing.
-    if (!updatedNode) { 
+    if (!updatedNode) {
       popup.close();
       return;
     }
@@ -536,11 +554,11 @@
     const oldDist = updatedNode.value().match(/\d+/)[0];
     updatedNode.value(newDist + dstLabel);
 
-    if (newDist > oldDist) { 
-      minHeapify(updatedNode) 
+    if (newDist > oldDist) {
+      minHeapify(updatedNode)
     } else {
       var node = updatedNode;
-      while (node != minheap.root() && 
+      while (node != minheap.root() &&
              extractDistance(node) < extractDistance(node.parent())) {
         const temp = node.parent().value();
         node.parent().value(node.value());
@@ -555,10 +573,10 @@
    * The edge click listener creates a JSAV pop-up whenever an edge is
    * clicked. The pop-up has two buttons: enqueue and update.
    * Enqueue adds a node to the priority queue
-   * Update updates the value of a node in the priority queue. 
-   * The edge click listener determines which edge is clicked, 
+   * Update updates the value of a node in the priority queue.
+   * The edge click listener determines which edge is clicked,
    * what the nodes on either end are, which one is to be updated
-   * into the queue and what the distance from A is. After that, 
+   * into the queue and what the distance from A is. After that,
    * the two buttons are created in the pop-up, and the corresponding
    * event handlers attached.
    */
@@ -583,10 +601,10 @@
     const newDist = getUpdatedDistance(srcLabel, pathWeight);
     const label = newDist + dstLabel;
 
-    //Edge is listed in alphabetical order, regardless of which 
+    //Edge is listed in alphabetical order, regardless of which
     //node is listed as the src or dst in JSAV.
     const options = {
-      "title": "Edge " + ((srcLabel < dstLabel) ? (srcLabel + dstLabel) 
+      "title": "Edge " + ((srcLabel < dstLabel) ? (srcLabel + dstLabel)
                                                 : (dstLabel + srcLabel)),
       "width": "200px",
       "dialongRootElement": $(this)
@@ -594,16 +612,16 @@
 
     const html = "<button type='button' id='enqueueButton'>Enqueue: " +
                  label + "</button> <br> <button type='button'" +
-                 "id='updateButton'>Update: " + label +"</button>"; 
+                 "id='updateButton'>Update: " + label +"</button>";
     const popup = JSAV.utils.dialog(html, options);
-    
+
     // Enqueue and update button event handlers
     $("#enqueueButton").click({srcLabel, dstLabel, newDist, popup}, enqueueClicked)
     $("#updateButton").click({srcLabel, dstLabel, newDist, popup}, updateClicked)
   }
 
   /**
-   * Edge click listeners are bound to the graph itself, 
+   * Edge click listeners are bound to the graph itself,
    * so each time the graph is destroyed with reset, it needs
    * to be added again. Therefore they are in a wrapper function.
    */
@@ -1005,7 +1023,7 @@
   }
 
   /*
-  * Remaps the edges of the graph and expands it from a 4 by 4 to a 
+  * Remaps the edges of the graph and expands it from a 4 by 4 to a
   * 6 by 4 graph, with 2 columns of unconnected nodes.
   *
   * Parameters:
@@ -1017,8 +1035,8 @@
   *   ]
   * }
   * vertexMap: i is the old index, vertexMap[i] is the new index.
-  * left: a boolean to indicate whether the core component is on the 
-  * left or the right of the 6 by 4 graph. 
+  * left: a boolean to indicate whether the core component is on the
+  * left or the right of the 6 by 4 graph.
   *
   * Returns: a transformed graph instance
   */
@@ -1043,13 +1061,13 @@
         let weight = e[1];
         newGraph.edges[newStart].push([newEnd, weight]);
       }
-    } 
+    }
 
-    //Create a 6 by 4 graph with the extra labels. 
-    //Initialise empty edge array, this will be filled 
+    //Create a 6 by 4 graph with the extra labels.
+    //Initialise empty edge array, this will be filled
     //with the new edges with the two extra columns as off-set.
     let paddedGraph = {
-      vertexLabels: [...graph.vertexLabels, 
+      vertexLabels: [...graph.vertexLabels,
                       "Q", "R", "S", "T", "U", "V", "W", "X"],
       edges: new Array(24)
     }
@@ -1083,7 +1101,7 @@
         }
       }
     }
-    
+
     return paddedGraph;
   }
 
@@ -1114,17 +1132,17 @@
 
   /**
   * Function to add edges that are disconnected from the core component
-  * @param graph the graph as it is created thus far. 6 by 4, with 
-  * the core component on the left or the right side. 
+  * @param graph the graph as it is created thus far. 6 by 4, with
+  * the core component on the left or the right side.
   * @param leftSide Boolean indicating whether the core component is on
-  * the left side or not.  
+  * the left side or not.
   * @returns the graph with the disconnected edges
   */
   function addDisconnectedEdges(graph, leftSide) {
   /**
    * Q -0- R
    * | \ / |    \ 10
-   * 1  x  2 
+   * 1  x  2
    * | / \ |    / 11
    * S -3- T
    * | \ / |    \ 12
@@ -1156,9 +1174,9 @@
     15: [13, 18], //UX
   }
 
-  let untakenEdges = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
+  let untakenEdges = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                       [10,11], [12,13], [14,15]];
-  
+
   if (leftSide) {
     if (lastLinearTransform === 1) {
       edgeNodeMap[16] = [16, 21] //PV
@@ -1222,9 +1240,9 @@
     }
   }
 
-  //Add half the number of edges that can be added to it. 
-  //This is so that it doesn't look too empty or too full, as the total 
-  //number of edges can be between 13 and 17, depending on how edge DH is. 
+  //Add half the number of edges that can be added to it.
+  //This is so that it doesn't look too empty or too full, as the total
+  //number of edges can be between 13 and 17, depending on how edge DH is.
   const numEdges = Math.ceil(untakenEdges.length / 2);
   const takenEdges = shuffle(untakenEdges).slice(0, numEdges);
 
@@ -1232,8 +1250,8 @@
     const nodes = edgeNodeMap[takenEdges[i]];
     const weight = Math.round(Math.random()*8) + 1;
     //offset for the 16 "core" edges
-    const offset = (takenEdges[i] < 16 && leftSide) ? 4 : 0; 
-    const src = nodes[0] + offset; 
+    const offset = (takenEdges[i] < 16 && leftSide) ? 4 : 0;
+    const src = nodes[0] + offset;
     const dst = nodes[1] + offset;
 
     graph.edges[src].push([dst, weight]);
@@ -1303,7 +1321,7 @@
 
     // 3. remap edges.
     // Get a random permutation of *indices*.
-    // Randomly decide to place the core component on the left 
+    // Randomly decide to place the core component on the left
     // or the right, 50% chance for each.
     let left = Math.random() < 0.5;
     let newGraph = remapEdges(g, linearMap, left);
@@ -1314,19 +1332,19 @@
     // I J K L
     // M N O P
     // However, the *roles* of the vertices have been changed.
-    //The two possible layouts now are this: 
+    //The two possible layouts now are this:
     //with core component (0...15) either on the left or right
     const leftLayout = [0, 1, 2, 3, 16, 17,
-                        4, 5, 6, 7, 18, 19, 
-                        8, 9, 10, 11, 20, 21, 
+                        4, 5, 6, 7, 18, 19,
+                        8, 9, 10, 11, 20, 21,
                         12, 13, 14, 15, 22, 23]
-    const rightLayout = [16, 17, 0, 1, 2, 3, 
-                        18, 19, 4, 5, 6, 7, 
-                        20, 21, 8, 9, 10, 11, 
+    const rightLayout = [16, 17, 0, 1, 2, 3,
+                        18, 19, 4, 5, 6, 7,
+                        20, 21, 8, 9, 10, 11,
                         22, 23, 12, 13, 14, 15]
     // new index of start node
-    const startIndex = (left) ? leftLayout.indexOf(roleMap.indexOf(0)) 
-                              : rightLayout.indexOf(roleMap.indexOf(0)) 
+    const startIndex = (left) ? leftLayout.indexOf(roleMap.indexOf(0))
+                              : rightLayout.indexOf(roleMap.indexOf(0))
 
     // printGraph(newGraph);
 
@@ -1343,7 +1361,7 @@
     for (let i = 0; i < newGraph.vertexLabels.length; i++) {
       packedRoleMap[newGraph.vertexLabels[i]] = roleMap[i];
     }
-    
+
     console.log("Role map:\n", packedRoleMap)
 
     return { 'graph': newGraph,
@@ -1412,7 +1430,7 @@
    * Add the initial distance table to the JSAV.
    * The table has distance for A as 0, '∞' for the rest
    * Parent is '-' for all.
-   * @param riGraph the research instance graph. 
+   * @param riGraph the research instance graph.
    */
   function addTable (riGraph) {
     if (table) {
@@ -1424,14 +1442,14 @@
     const parentArr = Array.from('-'.repeat(riGraph.vertexLabels.length));
     parentArr.unshift("Parent");
     const width = String((riGraph.vertexLabels.length) * 30 + 90) + "px";
-    table = jsav.ds.matrix([labelArr, distanceArr, parentArr], 
-                           {style: "table", 
-                           width: width, 
-                           relativeTo: $(".jsavbinarytree"), 
-                           myAnchor: "center top", 
+    table = jsav.ds.matrix([labelArr, distanceArr, parentArr],
+                           {style: "table",
+                           width: width,
+                           relativeTo: $(".jsavbinarytree"),
+                           myAnchor: "center top",
                            top: "150px"});
 
-    //Assert that width is properly set for each row. 
+    //Assert that width is properly set for each row.
     //Increase the width of the label column
     for (var i = 0; i < 3; i++) {
       table.css(i, {width: width})
@@ -1440,9 +1458,9 @@
   }
 
   /**
-   * Add the minheap to the JSAV instance. 
+   * Add the minheap to the JSAV instance.
    * The function adds a dummy div with class 'bintree' to center the minheap.
-   * 
+   *
    */
   function addMinheap () {
     if (minheap) {
@@ -1451,26 +1469,26 @@
     }
     heapsize = heapsize.value(0);
     $(".jsavcanvas").append("<div class='bintree'></div>");
-    minheap = jsav.ds.binarytree({relativeTo: $(".bintree"), 
+    minheap = jsav.ds.binarytree({relativeTo: $(".bintree"),
                                   myAnchor: "center center"});
     minheap.layout()
     const html = "<button type='button' id='removeButton'>Remove</button>";
     $(".jsavtree").append(html)
-    $("#removeButton").css({"float": "right", 
-                            "position": "relative", 
+    $("#removeButton").css({"float": "right",
+                            "position": "relative",
                             "margin": "1em"});
-    
+
     //Add remove button
     $("#removeButton").click(function() {
       const deleted = minheapDelete(0);
       const nodeLabel = deleted.charAt(deleted.length - 1);
-      const node = graph.nodes().filter(node => 
+      const node = graph.nodes().filter(node =>
           node.element[0].getAttribute("data-value") === nodeLabel)[0];
       const srcLabel = table.value(2, findColByNode(nodeLabel));
-      const srcNode = graph.nodes().filter(node => 
+      const srcNode = graph.nodes().filter(node =>
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
-      
+
       if (!edge.hasClass("marked")) {
         markEdge(edge);
       }
@@ -1479,13 +1497,16 @@
   }
 
   /**
-   * Insert the new node into the minheap according to the 
-   * insertMinheap algorithm. 
+   * Insert the new node into the minheap according to the
+   * insertMinheap algorithm.
    * @param {*} label nodeLabel for the node to be inserted.
    * @param {*} distance distance to be inserted.
    */
   function insertMinheap (label, distance) {
+    // Index of the new node in the heap array: last in the array or
+    // rightmost-bottom at the binary tree representation.
     var i = heapsize.value();
+
     heapsize.value(heapsize.value() + 1);
 
     const newNode = minheap.newNode(distance + label);
@@ -1496,8 +1517,8 @@
       (i % 2 === 1) ? parent.left(newNode) : parent.right(newNode);
     }
 
+    // Heapify up
     var node = newNode;
-    
     while (i > 0 && extractDistance(node.parent()) > distance) {
       node.value(node.parent().value());
       i = Math.floor((i-1)/2);
@@ -1509,21 +1530,21 @@
   }
 
   /**
-   * Return the parent node of node at index. 
+   * Return the parent node of node at index.
    * @param {*} index the index of the node whose parent we want.
-   * @returns parent of node at index. 
+   * @returns parent of node at index.
    */
   function findParent (index, heap) {
     const chain = [];
     while (index > 0) {
       index = Math.floor((index - 1) / 2);
       chain.unshift(index);
-    } 
+    }
     var parent_node = heap.root();
     for (var i = 1; i < chain.length; i++) {
       var prev_index = chain[i-1];
       var curr_index = chain[i];
-      if (prev_index * 2 + 1 === curr_index) { 
+      if (prev_index * 2 + 1 === curr_index) {
         parent_node = parent_node.left();
       } else {
         parent_node = parent_node.right();
@@ -1534,9 +1555,9 @@
   }
 
   /**
-   * minheapDelete function, delete node at index. 
+   * minheapDelete function, delete node at index.
    * @param {*} index index of node to be deleted
-   * @returns value of the deleted node. 
+   * @returns value of the deleted node.
    */
   function minheapDelete(index) {
     if (heapsize.value() === 0) {
@@ -1549,8 +1570,8 @@
     const ret = (index === 0) ? minheap.root().value() : minheap.root().value();
 
     const parentLast = findParent(heapsize.value(), minheap);
-    const lastNode = ((heapsize.value())%2 === 1) ? parentLast.left() 
-                                                  : parentLast.right(); 
+    const lastNode = ((heapsize.value())%2 === 1) ? parentLast.left()
+                                                  : parentLast.right();
 
     if (lastNode) {
       minheap.root().value(lastNode.value());
@@ -1565,7 +1586,7 @@
   }
 
   /**
-   * minHeapify algorithm from a node. 
+   * minHeapify algorithm from a node.
    * @param {*} root The node from which to min-heapify.
    */
   function minHeapify(root) {
