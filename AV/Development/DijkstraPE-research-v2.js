@@ -56,7 +56,7 @@
     addMinheap();
     addTable(exerciseInstance.graph);
 
-    // For research 
+    // For research
     window.JSAVrecorder.addMetadata('roleMap', exerciseInstance['roleMap']);
 
     graph.layout();
@@ -1139,126 +1139,126 @@
   * @returns the graph with the disconnected edges
   */
   function addDisconnectedEdges(graph, leftSide) {
-  /**
-   * Q -0- R
-   * | \ / |    \ 10
-   * 1  x  2
-   * | / \ |    / 11
-   * S -3- T
-   * | \ / |    \ 12
-   * 4  x  5
-   * | / \ |    / 13
-   * U -6- V
-   * | \ / |    \ 14
-   * 7  x  8
-   * | / \ |    / 15
-   * W -9- X
-   */
+    /**
+     * Q -0- R
+     * | \ / |    \ 10
+     * 1  x  2
+     * | / \ |    / 11
+     * S -3- T
+     * | \ / |    \ 12
+     * 4  x  5
+     * | / \ |    / 13
+     * U -6- V
+     * | \ / |    \ 14
+     * 7  x  8
+     * | / \ |    / 15
+     * W -9- X
+     */
 
-  const edgeNodeMap = {
-    0: [0, 1], //QR
-    1: [0, 6], //QS
-    2: [1, 7], //RT
-    3: [6, 7], //ST
-    4: [6, 12], //SU
-    5: [7, 13], //TV
-    6: [12, 13], //UV
-    7: [12, 18], //UW
-    8: [13, 19], //VX
-    9: [18, 19], //WX
-    10: [0, 7], //QT
-    11: [1, 6], //RS
-    12: [6, 13], //SV
-    13: [7, 12], //TU
-    14: [12, 19], //VX
-    15: [13, 18], //UX
-  }
+    const edgeNodeMap = {
+      0: [0, 1], //QR
+      1: [0, 6], //QS
+      2: [1, 7], //RT
+      3: [6, 7], //ST
+      4: [6, 12], //SU
+      5: [7, 13], //TV
+      6: [12, 13], //UV
+      7: [12, 18], //UW
+      8: [13, 19], //VX
+      9: [18, 19], //WX
+      10: [0, 7], //QT
+      11: [1, 6], //RS
+      12: [6, 13], //SV
+      13: [7, 12], //TU
+      14: [12, 19], //VX
+      15: [13, 18], //UX
+    }
 
-  let untakenEdges = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-                      [10,11], [12,13], [14,15]];
+    let untakenEdges = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                        [10,11], [12,13], [14,15]];
 
-  if (leftSide) {
-    if (lastLinearTransform === 1) {
-      edgeNodeMap[16] = [16, 21] //PV
-      edgeNodeMap[17] = [21, 22] //OP
-      untakenEdges.push(16, 17)
+    if (leftSide) {
+      if (lastLinearTransform === 1) {
+        edgeNodeMap[16] = [16, 21] //PV
+        edgeNodeMap[17] = [21, 22] //OP
+        untakenEdges.push(16, 17)
+      }
+      if (lastLinearTransform === 4) {
+        edgeNodeMap[16] = [10, 15] //LS
+        edgeNodeMap[17] = [15, 16] //LV
+        edgeNodeMap[18] = [15, 22] //LW
+        edgeNodeMap[19] = [16, 21] //PV
+        edgeNodeMap[20] = [21, 22] //PW
+        untakenEdges.push(16, 17, [18, 19], 20);
+      }
+      if (lastLinearTransform === 0) {
+        edgeNodeMap[16] = [3, 4] //DQ
+        edgeNodeMap[17] = [3, 10] //DS
+        edgeNodeMap[18] = [4, 9] //HQ
+        edgeNodeMap[19] = [9, 10] //HS
+        edgeNodeMap[20] = [9, 16] //HU
+        untakenEdges.push(16, [17, 18], 19, 20);
+      }
+      if (lastLinearTransform === 7) {
+        edgeNodeMap[16] = [3, 4] //DQ
+        edgeNodeMap[17] = [3, 10] //DS
+        untakenEdges.push(16, 17)
+      }
+    } else {
+      if (lastLinearTransform === 3) {
+        edgeNodeMap[16] = [1, 2] //AR
+        edgeNodeMap[17] = [2, 7] //AT
+        untakenEdges.push(16, 17)
+      }
+      if (lastLinearTransform === 5) {
+        edgeNodeMap[16] = [1, 2] //AR
+        edgeNodeMap[17] = [1, 8] //ER
+        edgeNodeMap[18] = [2, 7] //AT
+        edgeNodeMap[19] = [7, 8] //ET
+        edgeNodeMap[20] = [8, 13] //EV
+        untakenEdges.push(16, [17, 18], 19, 20);
+      }
+      if (lastLinearTransform === 2) {
+        edgeNodeMap[16] = [7, 14] //IT
+        edgeNodeMap[17] = [13, 14] //IV
+        edgeNodeMap[18] = [13, 20] //MV
+        edgeNodeMap[19] = [14, 19] //IX
+        edgeNodeMap[20] = [19, 20] //MX
+        untakenEdges.push(16, 17, [18, 19], 20);
+      }
+      if (lastLinearTransform === 6) {
+        edgeNodeMap[16] = [13, 20] //MV
+        edgeNodeMap[17] = [19, 20] //MX
+        untakenEdges.push(16, 17)
+      }
     }
-    if (lastLinearTransform === 4) {
-      edgeNodeMap[16] = [10, 15] //LS
-      edgeNodeMap[17] = [15, 16] //LV
-      edgeNodeMap[18] = [15, 22] //LW
-      edgeNodeMap[19] = [16, 21] //PV
-      edgeNodeMap[20] = [21, 22] //PW
-      untakenEdges.push(16, 17, [18, 19], 20);
-    }
-    if (lastLinearTransform === 0) {
-      edgeNodeMap[16] = [3, 4] //DQ
-      edgeNodeMap[17] = [3, 10] //DS
-      edgeNodeMap[18] = [4, 9] //HQ
-      edgeNodeMap[19] = [9, 10] //HS
-      edgeNodeMap[20] = [9, 16] //HU
-      untakenEdges.push(16, [17, 18], 19, 20);
-    }
-    if (lastLinearTransform === 7) {
-      edgeNodeMap[16] = [3, 4] //DQ
-      edgeNodeMap[17] = [3, 10] //DS
-      untakenEdges.push(16, 17)
-    }
-  } else {
-    if (lastLinearTransform === 3) {
-      edgeNodeMap[16] = [1, 2] //AR
-      edgeNodeMap[17] = [2, 7] //AT
-      untakenEdges.push(16, 17)
-    }
-    if (lastLinearTransform === 5) {
-      edgeNodeMap[16] = [1, 2] //AR
-      edgeNodeMap[17] = [1, 8] //ER
-      edgeNodeMap[18] = [2, 7] //AT
-      edgeNodeMap[19] = [7, 8] //ET
-      edgeNodeMap[20] = [8, 13] //EV
-      untakenEdges.push(16, [17, 18], 19, 20);
-    }
-    if (lastLinearTransform === 2) {
-      edgeNodeMap[16] = [7, 14] //IT
-      edgeNodeMap[17] = [13, 14] //IV
-      edgeNodeMap[18] = [13, 20] //MV
-      edgeNodeMap[19] = [14, 19] //IX
-      edgeNodeMap[20] = [19, 20] //MX
-      untakenEdges.push(16, 17, [18, 19], 20);
-    }
-    if (lastLinearTransform === 6) {
-      edgeNodeMap[16] = [13, 20] //MV
-      edgeNodeMap[17] = [19, 20] //MX
-      untakenEdges.push(16, 17)
-    }
-  }
 
-  //Replace cross points with one of the two edges, randomly selected
-  for (let i = 0; i < untakenEdges.length; i++) {
-    if (Array.isArray(untakenEdges[i])) {
-      untakenEdges[i] = untakenEdges[i][Math.round(Math.random())]
+    //Replace cross points with one of the two edges, randomly selected
+    for (let i = 0; i < untakenEdges.length; i++) {
+      if (Array.isArray(untakenEdges[i])) {
+        untakenEdges[i] = untakenEdges[i][Math.round(Math.random())]
+      }
     }
-  }
 
-  //Add half the number of edges that can be added to it.
-  //This is so that it doesn't look too empty or too full, as the total
-  //number of edges can be between 13 and 17, depending on how edge DH is.
-  const numEdges = Math.ceil(untakenEdges.length / 2);
-  const takenEdges = shuffle(untakenEdges).slice(0, numEdges);
+    //Add half the number of edges that can be added to it.
+    //This is so that it doesn't look too empty or too full, as the total
+    //number of edges can be between 13 and 17, depending on how edge DH is.
+    const numEdges = Math.ceil(untakenEdges.length / 2);
+    const takenEdges = shuffle(untakenEdges).slice(0, numEdges);
 
-  for (i = 0; i < takenEdges.length; i++) {
-    const nodes = edgeNodeMap[takenEdges[i]];
-    const weight = Math.round(Math.random()*8) + 1;
-    //offset for the 16 "core" edges
-    const offset = (takenEdges[i] < 16 && leftSide) ? 4 : 0;
-    const src = nodes[0] + offset;
-    const dst = nodes[1] + offset;
+    for (i = 0; i < takenEdges.length; i++) {
+      const nodes = edgeNodeMap[takenEdges[i]];
+      const weight = Math.round(Math.random()*8) + 1;
+      //offset for the 16 "core" edges
+      const offset = (takenEdges[i] < 16 && leftSide) ? 4 : 0;
+      const src = nodes[0] + offset;
+      const dst = nodes[1] + offset;
 
-    graph.edges[src].push([dst, weight]);
-    graph.edges[dst].push([src, weight]);
-  }
+      graph.edges[src].push([dst, weight]);
+      graph.edges[dst].push([src, weight]);
+    }
 
-  return graph
+    return graph
   }
 
   // TODO: general algorithm
