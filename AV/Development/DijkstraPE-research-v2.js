@@ -189,6 +189,7 @@
       const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode);
       av.umsg(interpret("av_ms_add_edge"),
               {fill: {from: srcNode.value(), to: dstNode.value()}});
+      edge.removeClass("queued");
       if (!edge.hasClass("marked")) {
         markEdge(edge, av);
       }
@@ -258,6 +259,7 @@
      */ 
     function initialNode(src, dst) {
       const edge = src.edgeTo(dst) ?? src.edgeFrom(dst);
+      edge.addClass("queued")
       const dstIndex = dst.value().charCodeAt(0) - "A".charCodeAt(0);
       distances.value(dstIndex, 1, edge._weight);
       distances.value(dstIndex, 2, src.value());
@@ -347,6 +349,14 @@
         node.parent().value(label);
         node = node.parent();
       }
+
+      //Add queued class to the edge
+      const srcNode = nodes.filter(node => 
+          node.element[0].getAttribute("data-value") === srcLabel)[0];
+      const dstNode = nodes.filter(node => 
+          node.element[0].getAttribute("data-value") === dstLabel)[0];
+      const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode);
+      edge.addClass("queued")
   
       mintree.layout();
     }
@@ -371,8 +381,22 @@
       if (debug) {
         console.log("UPDATE:", updatedNode.value(), "TO:", distance + label);
       }
-      updatedNode.value(label);
 
+      //Add queued class to the edge
+      const srcNode = nodes.filter(node => 
+          node.element[0].getAttribute("data-value") === srcLabel)[0];
+      const dstNode = nodes.filter(node => 
+          node.element[0].getAttribute("data-value") === dstLabel)[0];
+      const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode)
+      edge.addClass("queued")
+      //Remove queued class from the old edge
+      const oldLabel = updatedNode.value();
+      const oldSrcLabel = oldLabel.charAt(oldLabel.length - 2);
+      const oldSrcNode = nodes.filter(node => 
+          node.element[0].getAttribute("data-value") === oldSrcLabel)[0];
+      const oldEdge = dstNode.edgeFrom(oldSrcNode) ?? dstNode.edgeTo(oldSrcNode)
+      oldEdge.removeClass("queued");
+      updatedNode.value(label);
       //Inline while loop to move the value up if needed. 
       //Because if you pass a node along as a parameter, it does not like
       //being asked about its parent... Grading will break in ODSA part.
@@ -500,6 +524,8 @@
     const dstLabel = event.data.dstLabel;
     const newDist = event.data.newDist;
     const popup = event.data.popup;
+    console.log(event.data.edge)
+    event.data.edge.addClass("queued")
 
     updateTable(srcLabel, dstLabel, newDist);
     insertMinheap(srcLabel, dstLabel, newDist);
@@ -534,7 +560,24 @@
     }
 
     updateTable(srcLabel, dstLabel, newDist);
-    const oldDist = updatedNode.value().match(/\d+/)[0];
+    //Add class to the new edge
+    event.data.edge.addClass("queued")
+    //remove class from the old edge
+    //Have old label, find previous source node label
+    const oldLabel = updatedNode.value();
+    const oldSrcLabel = oldLabel.charAt(oldLabel.length - 2);
+    //Find node objects to grab the egde
+    const oldNode = graph.nodes().filter(node => 
+        node.element[0].getAttribute("data-value") === oldSrcLabel)[0];
+    const dstNode = graph.nodes().filter(node => 
+        node.element[0].getAttribute("data-value") === dstLabel)[0];
+    const oldEdge = graph.getEdge(oldNode, dstNode) 
+              ?? graph.getEdge(dstNode, oldNode);
+    //Remove the queued class.
+    oldEdge.removeClass("queued")
+
+
+    const oldDist = oldLabel.match(/\d+/)[0];
     const label = newDist + "<br>" + dstLabel + " (" + srcLabel + ")";
     updatedNode.value(label);
 
@@ -603,8 +646,10 @@
     const popup = JSAV.utils.dialog(html, options);
     
     // Enqueue and update button event handlers
-    $("#enqueueButton").click({srcLabel, dstLabel, newDist, popup}, enqueueClicked)
-    $("#updateButton").click({srcLabel, dstLabel, newDist, popup}, updateClicked)
+    $("#enqueueButton").click({srcLabel, dstLabel, newDist, popup, edge: that},
+                              enqueueClicked);
+    $("#updateButton").click({srcLabel, dstLabel, newDist, popup, edge: that},
+                              updateClicked);
   }
 
   /**
@@ -1490,7 +1535,7 @@
       const srcNode = graph.nodes().filter(node => 
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
-      
+      edge.removeClass("queued")
       if (!edge.hasClass("marked")) {
         markEdge(edge);
       }
