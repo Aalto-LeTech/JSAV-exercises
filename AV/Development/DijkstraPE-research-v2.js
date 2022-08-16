@@ -1572,14 +1572,20 @@
     //PLACEHOLDER: be able to remove other than min
     const ret = (index === 0) ? minheap.root().value() : minheap.root().value();
 
+    // Parent of the last node in the heap
     const parentLast = findParent(heapsize.value(), minheap);
-    const lastNode = ((heapsize.value())%2 === 1) ? parentLast.left()
+
+    // The last node in the heap (the one to be deleted)
+    const lastNode = (heapsize.value() % 2 === 1) ? parentLast.left()
                                                   : parentLast.right();
 
     if (lastNode) {
+      // Swap the values of the root and the last node
       minheap.root().value(lastNode.value());
       lastNode.value(ret);
+
       lastNode.remove();
+      lastNode.css({"opacity": "0"});
 
       minHeapify(minheap.root());
     } else {
@@ -1608,7 +1614,7 @@
       root.value(temp);
       minHeapify(smallest);
     }
-    // minheap.layout();
+
   }
 
   /**
