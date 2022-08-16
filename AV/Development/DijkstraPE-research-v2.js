@@ -1608,7 +1608,7 @@
       root.value(temp);
       minHeapify(smallest);
     }
-    minheap.layout();
+    // minheap.layout();
   }
 
   /**
