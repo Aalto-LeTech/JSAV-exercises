@@ -24,12 +24,17 @@
 }
 .jsavgraph .jsavedge {
   stroke-width: 10;
-  stroke: #d59f0d;
+  stroke: #d1c39d;
 }
 .jsavgraph .jsavedge.marked {
   stroke-width: 16;
   stroke: #ffe000;;
 }
+.jsavgraph .jsavedge.queued {
+  stroke-width: 10;
+  stroke: #d59f0d;
+}
+
 .jsavgraph .jsavedgelabel {
   font-size: 16px;
   background-color: transparent;
