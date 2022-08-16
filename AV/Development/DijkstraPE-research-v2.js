@@ -1472,8 +1472,8 @@
     }
     heapsize = heapsize.value(0);
     $(".jsavcanvas").append("<div class='bintree'></div>");
-    minheap = jsav.ds.binarytree({relativeTo: $(".bintree"),
-                                  myAnchor: "center center"});
+    minheap = jsav.ds.binarytree({relativeTo: $(".bintree")});
+
     minheap.layout()
     const html = "<button type='button' id='removeButton'>Remove</button>";
     $(".jsavtree").append(html)
@@ -1583,7 +1583,7 @@
       // Swap the values of the root and the last node
       minheap.root().value(lastNode.value());
       lastNode.value(ret);
-            
+
       lastNode.remove();
 
       minHeapify(minheap.root());
