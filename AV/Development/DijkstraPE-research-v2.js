@@ -1583,9 +1583,8 @@
       // Swap the values of the root and the last node
       minheap.root().value(lastNode.value());
       lastNode.value(ret);
-
+            
       lastNode.remove();
-      lastNode.css({"opacity": "0"});
 
       minHeapify(minheap.root());
     } else {
