@@ -253,7 +253,10 @@
               {fill: {node: nodeLabel}});
       av.step();
 
+      // Parent node of last node in the heap
       const parentLast = findParent(modelheapsize, mintree);
+
+      // Last node in the heap
       const lastNode = ((modelheapsize)%2 === 1) ? parentLast.left()
                                                  : parentLast.right();
 
