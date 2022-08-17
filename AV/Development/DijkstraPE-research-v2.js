@@ -1,21 +1,24 @@
 /*
  * Research version of Dijkstra's algorithm JSAV exercise
- * Artturi Tilanterä
+ * Johanna Sänger, Artturi Tilanterä
+ * johanna.sanger@kantisto.nl
  * artturi.tilantera@aalto.fi
- * 5 November 2021
+ * 17 August 2022
  */
 
 /* global ODSA, graphUtils */
 (function ($) {
   "use strict";
 
-  // JSAV Graph to display the graph visualization.
+  // JSAV Graph instance for the student's solution.
   var graph;
 
-  // JSAV Matrix to display the node-distance-parent table
+  // JSAV Matrix for the student's solution, to display the node-distance
+  // -parent table
   var table;
 
-  // JSAV Binary Tree to display the priority queue as a binary heap
+  // JSAV Binary Tree  for the student's solution, to display the priority
+  // queue as a binary heap
   var minheap;
 
   // OpenDSA configuration and translation interpreter
@@ -81,6 +84,16 @@
     return [graph, minheap];
   }
 
+  /**
+   * From JSAV API: http://jsav.io/exercises/exercise/
+   *
+   * "A function that will fix the student’s solution to match the current step
+   * in model solution. Before this function is called, the previous incorrect
+   * step in student’s solution is undone. The function gets the model
+   * structures as a parameter."
+   *
+   * The exercise currently has fix button disabled.
+   */
   function fixState(modelGraph) {
     var graphEdges = graph.edges(),
         modelEdges = modelGraph.edges();
