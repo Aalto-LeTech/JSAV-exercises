@@ -34,7 +34,7 @@
   var heapsize = jsav.variable(0);
 
   var lastLinearTransform = -1; // for generateInstance()
-  var debug = false; // produces debug prints to console
+  var debug = true; // produces debug prints to console
 
   jsav.recorded();
 
@@ -205,8 +205,16 @@
     edge.start().addClass("marked");
     edge.end().addClass("marked");
     if (av) {
+      if (debug) {
+        console.log("Model solution gradeable step: mark edge " +
+         edge.start().value() + "-" + edge.end().value());
+       }
       av.gradeableStep();
     } else {
+      if (debug) {
+        console.log("Exercise gradeable step: mark edge " +
+         edge.start().value() + "-" + edge.end().value());
+      }
       exercise.gradeableStep();
     }
   }
@@ -229,7 +237,8 @@
     const aNode = nodes[indexOfLabel["A"]];
     av.umsg(interpret("av_ms_select_a"));
     av.step();
-    aNode.neighbors().forEach(node => initialNode(aNode, node))
+    // aNode.neighbors().forEach(node => initialNode(aNode, node))
+    aNode.neighbors().forEach(node => visitNeighbour(aNode, node, 0));
 
     while (modelheapsize > 0) {
       const rootVal = deleteRoot();
@@ -356,7 +365,7 @@
         addNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
         if (debug) {
-          console.log("ADD ROUTE WITH DIST:", distViaSrc + neighbour.value());
+          console.log("Model solution gradeable step: ADD ROUTE WITH DIST:", distViaSrc + neighbour.value());
         }
         av.umsg(interpret("av_ms_visit_neighbor_add"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
@@ -365,7 +374,7 @@
         updateNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
         if (debug) {
-          console.log("UPDATE DISTANCE TO:", distViaSrc + neighbour.value());
+          console.log("Model solution gradeable step:  UPDATE DISTANCE TO:", distViaSrc + neighbour.value());
         }
         av.umsg(interpret("av_ms_visit_neighbor_update"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
@@ -579,6 +588,10 @@
 
     updateTable(srcLabel, dstLabel, newDist);
     insertMinheap(srcLabel, dstLabel, newDist);
+    if (debug) {
+      console.log("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
+        dstLabel + " distance " + newDist);
+    }
     exercise.gradeableStep();
     popup.close();
   }
@@ -643,6 +656,10 @@
         node.value(temp);
         node = node.parent();
       }
+    }
+    if (debug) {
+      console.log("Exercise gradeable step: update edge " + srcLabel + "-" +
+        dstLabel + " distance " + newDist);
     }
     exercise.gradeableStep();
     popup.close();
