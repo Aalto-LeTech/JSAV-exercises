@@ -9,9 +9,6 @@
 (function ($) {
   "use strict";
 
-  // JSAV Exercise
-  var exercise;
-
   // JSAV Graph to display the graph visualization.
   var graph;
 
@@ -37,6 +34,24 @@
   var debug = false; // produces debug prints to console
 
   jsav.recorded();
+
+  // JSAV Exercise
+  var exercise = jsav.exercise(model, init, {
+    compare: { class: "marked" },
+    controls: $('.jsavexercisecontrols'),
+    fix: fixState
+  });
+  exercise.reset();
+
+  /*
+   * Exercise initializer function.
+   *
+   * Returns:
+   * [modelGraph, mintree]: JSAV data structures created in modeljsav that
+   * should be used in the grading. These are compared against the data
+   * structures in student's solution. JSAV saves snapshots of the data
+   * structures automatically.
+   */
 
   function init() {
     // Create a JSAV graph instance
@@ -89,6 +104,12 @@
    * Parameters:
    * modeljsav: a JSAV algorithm visualization template
    *            (created like: let modeljsav = new JSAV("container"))
+   *
+   * Returns:
+   * [modelGraph, mintree]: JSAV data structures created in modeljsav that
+   * should be used in the grading. These are compared against the data
+   * structures in student's solution. JSAV saves snapshots of the data
+   * structures automatically.
    */
   function model(modeljsav) {
     var i,
@@ -344,7 +365,7 @@
         av.umsg(interpret("av_ms_visit_neighbor_no_action"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         av.step();
-      }      
+      }
     }
 
     /**
@@ -460,13 +481,6 @@
   function about() {
     window.alert(ODSA.AV.aboutstring(interpret(".avTitle"), interpret("av_Authors")));
   }
-
-  exercise = jsav.exercise(model, init, {
-    compare: { class: "marked" },
-    controls: $('.jsavexercisecontrols'),
-    fix: fixState
-  });
-  exercise.reset();
 
   function findColByNode (nodeLabel) {
     for (var i = 1; i < 25; i++) {
