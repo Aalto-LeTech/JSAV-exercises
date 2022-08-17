@@ -211,7 +211,8 @@
       if (!edge.hasClass("marked")) {
         markEdge(edge, av);
       }
-      const neighbours = dstNode.neighbors().filter(node => !node.hasClass("marked"));
+      const neighbours = dstNode.neighbors().filter(node =>
+        !node.hasClass("marked"));
       neighbours.sort((a, b) => a.value() > b.value());
       neighbours.forEach(node => visitNeighbour(dstNode, node, dist))
     }
@@ -306,7 +307,7 @@
     }
 
     /**
-     * Helper function to visit a node.
+     * Helper function to visit a node in the model solution.
      * @param src source node
      * @param neighbour neighbour node that is visited
      * @param srcDist distance to source
@@ -325,6 +326,7 @@
         }
         av.umsg(interpret("av_ms_visit_neighbor_add"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
+        av.gradeableStep();
       } else if (distViaSrc < currNeighbourDist) {
         updateNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
@@ -333,6 +335,7 @@
         }
         av.umsg(interpret("av_ms_visit_neighbor_update"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
+        av.gradeableStep();
       } else {
         if (debug) {
           console.log("KEEP DISTANCE THE SAME:",
@@ -340,8 +343,8 @@
         }
         av.umsg(interpret("av_ms_visit_neighbor_no_action"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
-      }
-      av.step();
+        av.step();
+      }      
     }
 
     /**
@@ -549,6 +552,7 @@
 
     updateTable(srcLabel, dstLabel, newDist);
     insertMinheap(srcLabel, dstLabel, newDist);
+    exercise.gradeableStep();
     popup.close();
   }
 
@@ -613,6 +617,7 @@
         node = node.parent();
       }
     }
+    exercise.gradeableStep();
     popup.close();
   }
 
