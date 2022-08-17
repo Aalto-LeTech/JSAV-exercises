@@ -34,7 +34,7 @@
   var heapsize = jsav.variable(0);
 
   var lastLinearTransform = -1; // for generateInstance()
-  var debug = true; // produces debug prints to console
+  var debug = false; // produces debug prints to console
 
   jsav.recorded();
 
