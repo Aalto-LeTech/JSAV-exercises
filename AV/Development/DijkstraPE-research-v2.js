@@ -262,7 +262,37 @@
     av.umsg(interpret("av_ms_unreachable"));
     av.step();
 
+    function highlight(edge, node) {
+      //Mark current edge as highlighted
+      edge.addClass("highlighted");
+      //Mark current node being visited as highlighted
+      node.addClass("highlighted");
+      //Mark current node being visited in the table
+      distances.addClass(node.value().charCodeAt(0) - "A".charCodeAt(0), 
+                         true, "highlighted");
+      //Mark current node being visited in the mintree
+      const treeNodeList = getTreeNodeList(mintree.root());
+      const treeNode = treeNodeList.filter(treeNode => 
+          treeNode.value().charAt(treeNode.value().length - 5) 
+          === node.value())[0];
+      if (treeNode) {
+        treeNode.addClass("highlighted")
+      }
+    }
 
+    function removeHighlight(edge, node) {
+      edge.removeClass("highlighted");
+      node.removeClass("highlighted");
+      distances.removeClass(node.value().charCodeAt(0) - "A".charCodeAt(0), 
+                         true, "highlighted")
+      const treeNodeList = getTreeNodeList(mintree.root());
+      const treeNode = treeNodeList.filter(treeNode => 
+        treeNode.value().charAt(treeNode.value().length - 5) 
+        === node.value())[0];
+      if (treeNode) {
+        treeNode.removeClass("highlighted")
+      }
+    }
     /**
      * Helper function: returns the distance for the given index in the
      * JSAV distance matrix.
@@ -369,6 +399,7 @@
         }
         av.umsg(interpret("av_ms_visit_neighbor_add"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
+        highlight(edge, neighbour);
         av.gradeableStep();
       } else if (distViaSrc < currNeighbourDist) {
         updateNode(src.value(), neighbour.value(), distViaSrc);
@@ -378,6 +409,7 @@
         }
         av.umsg(interpret("av_ms_visit_neighbor_update"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
+        highlight(edge, neighbour);
         av.gradeableStep();
       } else {
         if (debug) {
@@ -386,8 +418,10 @@
         }
         av.umsg(interpret("av_ms_visit_neighbor_no_action"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
+                highlight(edge, neighbour);
         av.step();
       }
+      removeHighlight(edge, neighbour);
     }
 
     /**
@@ -1549,7 +1583,7 @@
     distanceArr.unshift(interpret("distance"), 0);
     const parentArr = Array.from('-'.repeat(riGraph.vertexLabels.length));
     parentArr.unshift(interpret("parent"));
-    const width = String((riGraph.vertexLabels.length) * 30 + 90) + "px";
+    const width = String((riGraph.vertexLabels.length) * 30 + 100) + "px";
     table = jsav.ds.matrix([labelArr, distanceArr, parentArr],
                            {style: "table",
                            width: width,
@@ -1561,7 +1595,7 @@
     //Increase the width of the label column
     for (var i = 0; i < 3; i++) {
       table.css(i, {width: width})
-      table.css(i, 0, {width: "60px"})
+      table.css(i, 0, {width: "70px"})
     }
   }
 
