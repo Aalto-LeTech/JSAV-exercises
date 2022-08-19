@@ -34,6 +34,21 @@
   stroke-width: 10;
   stroke: #d59f0d;
 }
+.jsavgraph .jsavedge.highlighted {
+  stroke: #89e681;
+  stroke-width: 10;
+}
+.jsavgraph .jsavnode.highlighted {
+  background-color: #89e681;
+}
+
+.jsavindex.highlighted {
+  background-color: #89e681;
+}
+
+.jsavtree .jsavnode.highlighted {
+  background-color: #89e681;
+}
 
 .jsavgraph .jsavedgelabel {
   font-size: 16px;
