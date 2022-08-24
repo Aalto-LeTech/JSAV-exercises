@@ -1,0 +1,58 @@
+{
+  "translations" :{
+    "en": {
+      ".avTitle": "Dijkstra's Algorithm Proficiency Exercise",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström",
+      ".instructLabel": "Instructions:",
+      ".instructions": "Reproduce the behavior of Dijkstra's Algorithm for the given graph below. Click on the <strong>edges</strong> in the order they are traversed by the algorithm. Start with Node A. For each node, process its neighbors in alphabetic order.",
+      "av_ms_shortest": "Shortest paths from A.",
+      "av_ms_select_a": "Start by selecting node A.",
+      "av_ms_select_node": "Select {node}, since it has the shortest distance from A.",
+      "av_ms_add_edge": "Add edge ({from}, {to}) to the path tree.",
+      "av_ms_unreachable": "The nearest unvisited node is at infinite distance. The algorithm ends.",
+      "av_ms_update_distances": "Update {node}'s neighbors' distances. For updated nodes set the parent node to {node}.",
+      "av_ms_visit_neighbor_add": "Update {node}'s neighbors' distances. Visit {neighbor}:<br>The current distance to {neighbor} is infinite. Add {neighbor} to the priority queue and the distance table. Set {neighbor}'s parent to {node}.",
+      "av_ms_visit_neighbor_update": "Update {node}'s neighbors' distances. Visit {neighbor}:<br>The distance to {neighbor} through {node} is shorter than the one previously discovered. Update the distance in the priority queue and the table. Set {neighbor}'s parent to {node}.",
+      "av_ms_visit_neighbor_no_action": "Update {node}'s neighbors' distances. Visit {neighbor}:<br>The distance to {neighbor} through {node} is longer or equal than the one previously discovered. Do not update the distance.",
+      "#help": "Help",
+      "#about": "About",
+      "#enqueue": "Enqueue",
+      "#update": "Update",
+      "#dequeue": "Dequeue",
+      "priority_queue": "Priority Queue",
+      "node": "Node",
+      "distance": "Distance",
+      "parent": "Parent",
+      "edge": "Edge"
+    },
+    "fi": {
+      ".avTitle": "Dijkstran algoritmi",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström",
+      ".instructLabel": "Ohjeet:",
+      ".instructions": "Lisää särmät virityspuuhun Dijkstran algoritmin antamassa järjestyksessä. Aloita läpikäynti solmusta A. Klikkaa <strong>särmiä</strong> lisätäksesi ne virityspuuhun. Käy kunkin solmun naapurit läpi aakkosjärjestyksessä.",
+      "av_ms_shortest": "Lyhyimmät reitit A:sta.",
+      "av_ms_select_a": "Aloitetaan valitsemalla solmu A.",
+      "av_ms_select_node": "Valitaan {node}, koska sillä on lyhyin etäisyys A:han.",
+      "av_ms_add_edge": "Lisätään särmä ({from}, {to}) virityspuuhun.",
+      "av_ms_unreachable": "Etäisyys lähimpään solmuun, jossa ei ole vierailtu, on ääretön. Algoritmi päättyy.",
+      "av_ms_update_distances": "Päivitetään etäisyyksiä {node}-solmun naapureihin. Päivitetyille solmuille asetetaan lähin solmu {node}:ksi.",
+      "av_ms_visit_neighbor_add": "Päivitetään {node}:n naapurien etäisyydet. Vieraile solmussa {neighbor}:<br>Aiempi etäisyys {neighbor}:lle on ääretön. Lisää {neighbor} prioriteettijonoon ja taulukkoon, ja aseta sen vanhemmaksi {node}.",
+      "av_ms_visit_neighbor_update": "Päivitetään etäisyyksiä {node}-solmun naapureihin. Vieraile solmussa {neighbor}:<br>etäisyys solmuun {neighbor} solmun {node} kautta on lyhyempi kuin aiemmin havaittu. Päivitä etäisyys prioriteettijonossa ja taulukossa. Aseta {neighbor}:n vanhemmaksi {node}.",
+      "av_ms_visit_neighbor_no_action": "Päivitetään etäisyyksiä {node}-solmun naapureihin. Vieraile solmussa {neighbor}:<br>etäisyys solmuun {neighbor} solmun {node} kautta on yhtä suuri tai pidempi kuin aiemmin havaittu. Älä päivitä etäisyystietoa.",
+      "#help": "Ohje",
+      "#about": "Lisätietoa",
+      "#enqueue": "Lisää",
+      "#update": "Päivitä",
+      "#dequeue": "Poista",
+      "priority_queue": "Prioriteettijono",
+      "node": "Solmu",
+      "distance": "Etäisyys",
+      "parent": "Vanhempi",
+      "edge": "Särmä"
+    }
+  },
+  "params": {
+    "JXOP-feedback": "continuous",
+    "JXOP-fixmode": "fix"
+  }
+}
