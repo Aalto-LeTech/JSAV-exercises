@@ -66,7 +66,7 @@
   margin: 0px;
 }
 
-.bintree {  
+.bintree {
   min-width: 400px;
   min-height: 250px;
   max-width: 400px;
@@ -87,4 +87,9 @@
 
 .jsavtreenode {
   margin: 10px;
+}
+
+.avcontainer .jsavhorizontalarray > li:first-child {
+  max-width: none !important;
+  min-width: 70px !important;
 }
