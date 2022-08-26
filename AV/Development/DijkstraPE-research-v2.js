@@ -268,12 +268,12 @@
       //Mark current node being visited as highlighted
       node.addClass("highlighted");
       //Mark current node being visited in the table
-      distances.addClass(node.value().charCodeAt(0) - "A".charCodeAt(0), 
+      distances.addClass(node.value().charCodeAt(0) - "A".charCodeAt(0),
                          true, "highlighted");
       //Mark current node being visited in the mintree
       const treeNodeList = getTreeNodeList(mintree.root());
-      const treeNode = treeNodeList.filter(treeNode => 
-          treeNode.value().charAt(treeNode.value().length - 5) 
+      const treeNode = treeNodeList.filter(treeNode =>
+          treeNode.value().charAt(treeNode.value().length - 5)
           === node.value())[0];
       if (treeNode) {
         treeNode.addClass("highlighted")
@@ -283,11 +283,11 @@
     function removeHighlight(edge, node) {
       edge.removeClass("highlighted");
       node.removeClass("highlighted");
-      distances.removeClass(node.value().charCodeAt(0) - "A".charCodeAt(0), 
+      distances.removeClass(node.value().charCodeAt(0) - "A".charCodeAt(0),
                          true, "highlighted")
       const treeNodeList = getTreeNodeList(mintree.root());
-      const treeNode = treeNodeList.filter(treeNode => 
-        treeNode.value().charAt(treeNode.value().length - 5) 
+      const treeNode = treeNodeList.filter(treeNode =>
+        treeNode.value().charAt(treeNode.value().length - 5)
         === node.value())[0];
       if (treeNode) {
         treeNode.removeClass("highlighted")
@@ -1590,13 +1590,6 @@
                            relativeTo: $(".jsavbinarytree"),
                            myAnchor: "center top",
                            top: "150px"});
-
-    //Assert that width is properly set for each row.
-    //Increase the width of the label column
-    for (var i = 0; i < 3; i++) {
-      table.css(i, {width: width})
-      table.css(i, 0, {width: "70px"})
-    }
   }
 
   /**
