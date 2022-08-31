@@ -185,8 +185,7 @@
       var min = Infinity,        // distance of the closest node not yet visited
           nodeIndex = -1;        // index of the closest node not yet visited
                                  // in the distance matrix
-      if (debug)
-        logDistanceMatrix(distances);
+      logDistanceMatrix(distances);
       for (var i = 0; i < nodes.length; i++) {
         if (!distances.hasClass(i, true, "unused")) {
           var dist = getDistance(i);
@@ -205,9 +204,8 @@
       let node = nodes[indexOfLabel[String.fromCharCode(65 + nodeIndex)]];
       if (!node) { break; } // failsafe?
       distances.addClass(nodeIndex, true, "unused");
-      if (debug) {
-        console.log("Dijkstra: select node " + node.value());
-      }
+      debugPrint("Dijkstra: select node " + node.value());
+
       if (nodeIndex === 0) {
         av.umsg(interpret("av_ms_select_a"));
       } else {
@@ -222,9 +220,7 @@
         av.umsg(interpret("av_ms_add_edge"),
           { fill: {from: prevNode.value(), to: node.value()}});
         markEdge(prevNode.edgeTo(node), av);
-        if (debug) {
-          console.log("Add edge: " + prevNode.value() + "-" + node.value());
-        }
+        debugPrint("Add edge: " + prevNode.value() + "-" + node.value());
       }
 
       // update distances for neighbors
@@ -238,9 +234,8 @@
         let d = getDistance(neighborIndex);
         let dThroughNode = getDistance(nodeIndex) +
               node.edgeTo(neighbor).weight();
-        if (debug) {
-          console.log("Neighbor: " + neighbor.value() + " distance: " + d);
-        }
+        debugPrint("Neighbor: " + neighbor.value() + " distance: " + d);
+
         // Shorter route found?
         if (!distances.hasClass(neighborIndex, true, "unused") && d > dThroughNode) {
           // update the distance of the neighbour in the distance matrix
@@ -265,15 +260,15 @@
   * distances: a JSAV Matrix containing the following columns:
   *              label of node, distance, previous node.
   *
-  * console.log()s the distance matrix values.
+  * debugPrint()s the distance matrix values.
   */
   function logDistanceMatrix(distances) {
-    console.log("Distance matrix");
-    console.log("Label distance previous unused");
+    debugPrint("Distance matrix");
+    debugPrint("Label distance previous unused");
     for (let i = 0; i < distances._arrays.length; i++) {
       let row = [...distances._arrays[i]._values];
       row.push(distances.hasClass(i, true, "unused"))
-      console.log(row.join("  "));
+      debugPrint(row.join("  "));
     }
   }
 
@@ -499,13 +494,13 @@
     * there is edge from v1 to v2 with weight w.
     */
    function printGraph(g) {
-     console.log("Vertex labels: " + g.vertexLabels);
+     debugPrint("Vertex labels: " + g.vertexLabels);
      for (let i = 0; i < g.edges.length; i++) {
        let s = [g.vertexLabels[i], " : "];
        for (let e of g.edges[i]) {
          s.push(g.vertexLabels[e[0]], " ", e[1], ", ");
        }
-       console.log(s.join(""));
+       debugPrint(s.join(""));
      }
    }
 
@@ -894,6 +889,12 @@
          options.weight = e[1];
          jsavGraph.addEdge(gNodes[i], gNodes[e[0]], options);
        }
+     }
+   }
+
+   function debugPrint(x) {
+     if (debug) {
+       debugPrint(x);
      }
    }
 
