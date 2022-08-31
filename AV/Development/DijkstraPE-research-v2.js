@@ -205,16 +205,12 @@
     edge.start().addClass("marked");
     edge.end().addClass("marked");
     if (av) {
-      if (debug) {
-        console.log("Model solution gradeable step: mark edge " +
-         edge.start().value() + "-" + edge.end().value());
-       }
+      debugPrint("Model solution gradeable step: mark edge " +
+       edge.start().value() + "-" + edge.end().value());
       av.gradeableStep();
     } else {
-      if (debug) {
-        console.log("Exercise gradeable step: mark edge " +
-         edge.start().value() + "-" + edge.end().value());
-      }
+      debugPrint("Exercise gradeable step: mark edge " +
+       edge.start().value() + "-" + edge.end().value());
       exercise.gradeableStep();
     }
   }
@@ -374,7 +370,7 @@
      */
     function updateTable (dst, src, distance) {
       const dstIndex = dst.value().charCodeAt(0) - "A".charCodeAt(0);
-      console.log("ADD:", dst.value(), distance, src.value())
+      debugPrint("ADD:", dst.value(), distance, src.value())
       distances.value(dstIndex, 1, distance)
       distances.value(dstIndex, 2, src.value())
     }
@@ -394,9 +390,8 @@
       if (currNeighbourDist === Infinity) {
         addNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
-        if (debug) {
-          console.log("Model solution gradeable step: ADD ROUTE WITH DIST:", distViaSrc + neighbour.value());
-        }
+        debugPrint("Model solution gradeable step: ADD ROUTE WITH DIST:",
+          distViaSrc + neighbour.value());
         av.umsg(interpret("av_ms_visit_neighbor_add"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
@@ -404,18 +399,17 @@
       } else if (distViaSrc < currNeighbourDist) {
         updateNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
-        if (debug) {
-          console.log("Model solution gradeable step:  UPDATE DISTANCE TO:", distViaSrc + neighbour.value());
-        }
+        debugPrint("Model solution gradeable step:  UPDATE DISTANCE TO:",
+         distViaSrc + neighbour.value());
+
         av.umsg(interpret("av_ms_visit_neighbor_update"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
         av.gradeableStep();
       } else {
-        if (debug) {
-          console.log("KEEP DISTANCE THE SAME:",
+        debugPrint("KEEP DISTANCE THE SAME:",
                         currNeighbourDist + neighbour.value())
-        }
+
         av.umsg(interpret("av_ms_visit_neighbor_no_action"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
                 highlight(edge, neighbour);
@@ -478,9 +472,7 @@
       if (!updatedNode) {
         return;
       }
-      if (debug) {
-        console.log("UPDATE:", updatedNode.value(), "TO:", distance + label);
-      }
+      debugPrint("UPDATE:", updatedNode.value(), "TO:", distance + label);
 
       //Add queued class to the edge
       const srcNode = nodes.filter(node =>
@@ -521,15 +513,15 @@
   * distances: a JSAV Matrix containing the following columns:
   *              label of node, distance, previous node.
   *
-  * console.log()s the distance matrix values.
+  * debugPrint()s the distance matrix values.
   */
   function logDistanceMatrix(distances) {
-    console.log("Distance matrix");
-    console.log("Label distance previous unused");
+    debugPrint("Distance matrix");
+    debugPrint("Label distance previous unused");
     for (let i = 0; i < distances._arrays.length; i++) {
       let row = [...distances._arrays[i]._values];
       row.push(distances.hasClass(i, true, "unused"))
-      console.log(row.join("  "));
+      debugPrint(row.join("  "));
     }
   }
 
@@ -617,15 +609,13 @@
     const dstLabel = event.data.dstLabel;
     const newDist = event.data.newDist;
     const popup = event.data.popup;
-    console.log(event.data.edge)
+    debugPrint(event.data.edge)
     event.data.edge.addClass("queued")
 
     updateTable(srcLabel, dstLabel, newDist);
     insertMinheap(srcLabel, dstLabel, newDist);
-    if (debug) {
-      console.log("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
-        dstLabel + " distance " + newDist);
-    }
+    debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
+      dstLabel + " distance " + newDist);
     exercise.gradeableStep();
     popup.close();
   }
@@ -691,10 +681,8 @@
         node = node.parent();
       }
     }
-    if (debug) {
-      console.log("Exercise gradeable step: update edge " + srcLabel + "-" +
-        dstLabel + " distance " + newDist);
-    }
+    debugPrint("Exercise gradeable step: update edge " + srcLabel + "-" +
+      dstLabel + " distance " + newDist);
     exercise.gradeableStep();
     popup.close();
   }
@@ -968,13 +956,13 @@
   * there is edge from v1 to v2 with weight w.
   */
   function printGraph(g) {
-    console.log("Vertex labels: " + g.vertexLabels);
+    debugPrint("Vertex labels: " + g.vertexLabels);
     for (let i = 0; i < g.edges.length; i++) {
       let s = [g.vertexLabels[i], " : "];
       for (let e of g.edges[i]) {
         s.push(g.vertexLabels[e[0]], " ", e[1], ", ");
       }
-      console.log(s.join(""));
+      debugPrint(s.join(""));
     }
   }
 
@@ -1178,8 +1166,8 @@
   */
 
   function remapEdges(graph, vertexMap, left) {
-    console.log(graph)
-    console.log(vertexMap)
+    debugPrint(graph)
+    debugPrint(vertexMap)
     let newGraph = {
       vertexLabels: [...graph.vertexLabels],
       edges: new Array(vertexMap.length)
@@ -1504,7 +1492,7 @@
       packedRoleMap[newGraph.vertexLabels[i]] = roleMap[i];
     }
 
-    console.log("Role map:\n", packedRoleMap)
+    debugPrint("Role map:\n", packedRoleMap)
 
     return { 'graph': newGraph,
             'roleMap': packedRoleMap,
@@ -1766,5 +1754,10 @@
     return Number(node.value().match(/\d+/)[0])
   }
 
+  function debugPrint(x) {
+    if (debug) {
+      debugPrint(x);
+    }
+  }
 
 }(jQuery));
