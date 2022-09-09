@@ -40,7 +40,7 @@
 
   // JSAV Exercise
   var exercise = jsav.exercise(model, init, {
-    compare: { class: "marked" },
+    compare: [{ class: ["marked", "queued"] }],
     controls: $('.jsavexercisecontrols'),
     fix: fixState
   });
@@ -738,9 +738,9 @@
     const popup = JSAV.utils.dialog(html, options);
 
     // Enqueue and update button event handlers
-    $("#enqueueButton").click({srcLabel, dstLabel, newDist, popup, edge: that},
+    $("#enqueueButton").click({srcLabel, dstLabel, newDist, popup, edge},
                               enqueueClicked);
-    $("#updateButton").click({srcLabel, dstLabel, newDist, popup, edge: that},
+    $("#updateButton").click({srcLabel, dstLabel, newDist, popup, edge},
                               updateClicked);
   }
 
