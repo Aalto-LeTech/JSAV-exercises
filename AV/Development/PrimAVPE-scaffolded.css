@@ -1,7 +1,8 @@
 #container {
-  width: 800px;
-  height: 595px;
+  width: 900px;
+  height: 920px;
 }
+
 .jsavline {
   height: 45px;
   margin: 0 0 0 20px;
@@ -9,6 +10,11 @@
 
 #procontrols {
   text-align: center;
+}
+
+.jsavgraph {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .jsavgraph svg {
@@ -20,11 +26,30 @@
 }
 .jsavgraph .jsavedge {
   stroke-width: 10;
-  stroke: #d59f0d;
+  stroke: #d1c39d;
 }
 .jsavgraph .jsavedge.marked {
   stroke-width: 16;
-  stroke: #ffe000;
+  stroke: #ffe000;;
+}
+.jsavgraph .jsavedge.queued {
+  stroke-width: 10;
+  stroke: #d59f0d;
+}
+.jsavgraph .jsavedge.highlighted {
+  stroke: #89e681;
+  stroke-width: 10;
+}
+.jsavgraph .jsavnode.highlighted {
+  background-color: #89e681;
+}
+
+.jsavindex.highlighted {
+  background-color: #89e681;
+}
+
+.jsavtree .jsavnode.highlighted {
+  background-color: #89e681;
 }
 .jsavgraph .jsavedgelabel {
   font-size: 16px;
@@ -34,4 +59,38 @@
 .jsavautoresize .jsavnode {
   min-width: 45px;
   min-height: 45px;
+}
+
+.jsavtree {
+  min-width: 400px;
+  min-height: 250px;
+  margin: 0px;
+}
+
+.bintree {
+  min-width: 400px;
+  min-height: 250px;
+  max-width: 400px;
+  max-height: 250px;
+  margin: auto;
+  background-color: #ffffff;
+  border: 1px #000000 solid;
+}
+
+.prioqueue {
+  text-align: center;
+  margin: 0px;
+}
+
+.jsavtree svg {
+  margin: 10px;
+}
+
+.jsavtreenode {
+  margin: 10px;
+}
+
+.avcontainer .jsavhorizontalarray > li:first-child {
+  max-width: none !important;
+  min-width: 70px !important;
 }
