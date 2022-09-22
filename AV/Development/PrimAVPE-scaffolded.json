@@ -11,8 +11,19 @@
       "av_ms_add_edge": "Add edge ({from}, {to}) to the MCST.",
       "av_ms_unreachable": "The nearest unvisited node is at infinite distance. The algorithm ends.",
       "av_ms_update_distances": "Update distance to {node}'s neighbors. For updated nodes, set closest node to {node}",
+      "av_ms_visit_neighbor_add": "Update {node}'s neighbors' distances. Node {neighbor}:<br>The current distance to {neighbor} is infinite. Add {neighbor} to the priority queue and the distance table. Set {neighbor}'s parent to {node}.",
+      "av_ms_visit_neighbor_update": "Update {node}'s neighbors' distances. Node {neighbor}:<br>The distance to {neighbor} from {node} is shorter than the one previously discovered. Update the distance in the priority queue and the table. Set {neighbor}'s parent to {node}.", 
+      "av_ms_visit_neighbor_no_action": "Update {node}'s neighbors' distances. Node {neighbor}:<br>The distance to {neighbor} from {node} is longer or equal than the one previously discovered. Do not update the distance.",
       "#help": "Help",
-      "#about": "About"
+      "#about": "About",
+      "#enqueue": "Enqueue",
+      "#update": "Update",
+      "#dequeue": "Dequeue",
+      "priority_queue": "Priority Queue",
+      "node": "Node",
+      "distance": "Distance",
+      "parent": "Parent",
+      "edge": "Edge"
     },
     "fi": {
       ".avTitle": "Primin algoritmi",
@@ -25,8 +36,19 @@
       "av_ms_add_edge": "Lisätään särmä ({from}, {to}) virityspuuhun.",
       "av_ms_unreachable": "Etäisyys lähimpään solmuun, jossa ei ole vierailtu, on ääretön. Algoritmi päättyy.",
       "av_ms_update_distances": "Päivitetään etäisyyksiä {node}-solmun naapureihin. Päivitetyille solmuille asetetaan lähin solmu {node}:ksi.",
+      "av_ms_visit_neighbor_add": "Update {node}'s neighbors' distances. Node {neighbor}:<br>The current distance to {neighbor} is infinite. Add {neighbor} to the priority queue and the distance table. Set {neighbor}'s parent to {node}.",
+      "av_ms_visit_neighbor_update": "Update {node}'s neighbors' distances. Node {neighbor}:<br>The distance to {neighbor} from {node} is shorter than the one previously discovered. Update the distance in the priority queue and the table. Set {neighbor}'s parent to {node}.", 
+      "av_ms_visit_neighbor_no_action": "Update {node}'s neighbors' distances. Node {neighbor}:<br>The distance to {neighbor} from {node} is longer or equal than the one previously discovered. Do not update the distance.",
       "#help": "Ohje",
-      "#about": "Lisätietoa"
+      "#about": "Lisätietoa",
+      "#enqueue": "Lisää",
+      "#update": "Päivitä",
+      "#dequeue": "Poista",
+      "priority_queue": "Prioriteettijono",
+      "node": "Solmu",
+      "distance": "Etäisyys",
+      "parent": "Vanhempi",
+      "edge": "Särmä"
     }
   },
   "params": {
