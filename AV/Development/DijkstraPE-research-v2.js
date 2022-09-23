@@ -1615,8 +1615,8 @@
       const nodeLabel = deleted.charAt(deleted.length - 5);
       const node = graph.nodes().filter(node =>
           node.element[0].getAttribute("data-value") === nodeLabel)[0];
-      const srcLabel = table.value(2, findColByNode(nodeLabel));
-      // const srcLabel = deleted.charAt(deleted.length - 2);
+      // const srcLabel = table.value(2, findColByNode(nodeLabel));
+      const srcLabel = deleted.charAt(deleted.length - 2);
       const srcNode = graph.nodes().filter(node =>
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
