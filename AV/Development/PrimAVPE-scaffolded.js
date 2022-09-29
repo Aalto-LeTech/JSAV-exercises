@@ -308,7 +308,16 @@
       }
 
       var node = newNode;
-      while (i > 0 && node.parent() && extractDistance(node.parent()) > distance) {
+      while (i > 0 && node.parent() 
+            && extractDistance(node.parent()) >= distance) {
+        //If the distance is the same as the parent, we only want to swap them if
+        //the destination node alphabetically comes first compared to the parent. 
+        //If parent is alphabetically first, 
+        //we break from the while loop.
+        if (extractDistance(node.parent()) === distance 
+            && extractDestination (node.parent()) < extractDestination (node)) {
+          break;
+        }
         node.value(node.parent().value());
         i = Math.floor((i-1)/2);
         node.parent().value(label);
