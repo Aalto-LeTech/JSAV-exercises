@@ -34,7 +34,7 @@
   },
   "code" : {
     "java" : {
-      "url": "../../SourceCode/Java/Searching/bsearch.java",
+      "url": "../../SourceCode/Java/Searching/Bsearch.java",
       "lineNumbers": true,
       "tags": {
         "highlight": 7,
@@ -43,7 +43,7 @@
       }
     },
     "processing" : {
-      "url": "../../SourceCode/Processing/Searching/bsearch.pde",
+      "url": "../../SourceCode/Processing/Searching/Bsearch.pde",
       "lineNumbers": true,
       "tags": {
         "highlight": 7,
