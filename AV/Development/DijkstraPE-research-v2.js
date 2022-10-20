@@ -42,7 +42,7 @@
   var exercise = jsav.exercise(model, init, {
     compare: [{ class: ["marked", "queued"] }],
     controls: $('.jsavexercisecontrols'),
-    modelDialog: {width: "920px"},
+    modelDialog: {width: "960px"},
     fix: fixState
   });
   exercise.reset();
