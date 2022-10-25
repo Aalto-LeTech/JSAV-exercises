@@ -2,6 +2,7 @@
   width: 900px;
   height: 950px;
 }
+
 .jsavline {
   height: 45px;
   margin: 0 0 0 20px;
@@ -15,6 +16,7 @@
   margin-top: 0;
   margin-bottom: 0;
 }
+
 .jsavgraph svg {
   z-index: 0;
 }
@@ -49,7 +51,6 @@
 .jsavtree .jsavnode.highlighted {
   background-color: #89e681;
 }
-
 .jsavgraph .jsavedgelabel {
   font-size: 16px;
   background-color: transparent;
