@@ -758,6 +758,18 @@
     window.alert("Please, click on the edges, not the nodes.");
   });
 
+  /**
+   * Shift down the binary tree and matrix to account for the extra space
+   * taken by the "credit not given for this instance" that is shown after
+   * the model answer has been opened. 
+   */
+  $("input[name='answer']").on("click", function () {
+    console.log("Answer button clicked");
+    $(".jsavbinarytree").css("margin-top", "34px");
+    $(".jsavmatrix").css("margin-top", "34px");
+    $(".jsavcanvas").css("min-height", "910px");
+  })
+
   $("#about").click(about);
 
   /*
