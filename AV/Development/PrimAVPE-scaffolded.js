@@ -16,6 +16,10 @@
   jsav.recorded();
 
   function init() {
+    // Uncomment this to have a fixed exercise instance for demonstration
+    // purpose
+    JSAV.utils.rand.seedrandom("1");
+
     // Settings for input
     const width = 500, height = 400,  // pixels
           weighted = true,
@@ -54,11 +58,12 @@
     }
     nlGraph = bestNlGraph;
 
-    let statsText = "Trials: " + trials + "\n";
-    for (let k of Object.keys(sumStats)) {
-      statsText += k + ": " + sumStats[k] + "\n";
-    }
-    console.log(statsText);
+    // Print statistics of exercise instance generation
+    // let statsText = "Trials: " + trials + "\n";
+    // for (let k of Object.keys(sumStats)) {
+    //   statsText += k + ": " + sumStats[k] + "\n";
+    // }
+    // console.log(statsText);
 
     // Create a JSAV graph instance
     if (graph) {
@@ -70,9 +75,9 @@
       layout: "manual",
       directed: directed
     });
-    
+
     //Shift the x and y of each node 30 left and up.
-    //Otherwise the graph is centered bottom right, now it is centered 
+    //Otherwise the graph is centered bottom right, now it is centered
     //more or less in the middle
     nlGraph.vertices.forEach(vertex => {
       vertex.x = vertex.x - 30;
@@ -172,11 +177,11 @@
   }
 
   /**
-   * 
+   *
    * @param {*} nodes is an array of JSAV nodes
    * @param {*} distances is the JSAV matrix of the distances
    * @param {*} av is the model answer AV
-   * @param mintree is the priority queue. 
+   * @param mintree is the priority queue.
    */
   function prim(nodes, distances, av, mintree) {
     var modelheapsize = 0;
@@ -308,13 +313,13 @@
       }
 
       var node = newNode;
-      while (i > 0 && node.parent() 
+      while (i > 0 && node.parent()
             && extractDistance(node.parent()) >= distance) {
         //If the distance is the same as the parent, we only want to swap them if
-        //the destination node alphabetically comes first compared to the parent. 
-        //If parent is alphabetically first, 
+        //the destination node alphabetically comes first compared to the parent.
+        //If parent is alphabetically first,
         //we break from the while loop.
-        if (extractDistance(node.parent()) === distance 
+        if (extractDistance(node.parent()) === distance
             && extractDestination (node.parent()) < extractDestination (node)) {
           break;
         }
@@ -588,7 +593,7 @@
   /**
    * Shift down the binary tree and matrix to account for the extra space
    * taken by the "credit not given for this instance" that is shown after
-   * the model answer has been opened. 
+   * the model answer has been opened.
    */
   $("input[name='answer']").on("click", function () {
     console.log("Answer button clicked");
@@ -752,9 +757,9 @@
       while (node != minheap.root() &&
              extractDistance(node) <= extractDistance(node.parent())) {
         //If the distance is the same as the parent node, we only want to
-        //swap them around if the node's destination comes earlier in the 
-        //alphabet than its parent's. 
-        if (extractDistance(node) === extractDistance(node.parent()) && 
+        //swap them around if the node's destination comes earlier in the
+        //alphabet than its parent's.
+        if (extractDistance(node) === extractDistance(node.parent()) &&
             extractDestination(node) > extractDestination(node.parent())) {
           //Alphabetically later, so break the while loop.
           break;
@@ -900,8 +905,8 @@
     var node = newNode;
     while (i > 0 && extractDistance(node.parent()) >= distance) {
       //If the distance is the same as the parent, we only want to swap them if
-      //the destination node alphabetically comes first compared to the parent. 
-      //If parent is alphabetically first, 
+      //the destination node alphabetically comes first compared to the parent.
+      //If parent is alphabetically first,
       //we break from the while loop.
       if (extractDistance(node.parent()) === distance && extractDestination (node.parent()) < extractDestination (node)) {
         break;
