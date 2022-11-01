@@ -31,15 +31,15 @@
     }
     for (i = 0; i < nEdges; i++) {
       do {
-        index1 = Math.floor((Math.random() * nNodes));
-        index2 = Math.floor((Math.random() * nNodes));
+        index1 = Math.floor((JSAV.utils.rand.random() * nNodes));
+        index2 = Math.floor((JSAV.utils.rand.random() * nNodes));
       } while (!isEligibleEdge(index1, index2));
       edges[i] = {
         startIndex: index1,
         endIndex: index2
       };
       if (weighted) {
-        edges[i].weight = 1 + Math.floor((Math.random() * 9));
+        edges[i].weight = 1 + Math.floor((JSAV.utils.rand.random() * 9));
       }
       // add the edge to the matrix
       adjacencyMatrix[index1][index2] = 1;
@@ -97,7 +97,7 @@
 
   function rnd(x) {
     // Returns a random integer between -x and x (both inclusive)
-    return Math.floor(Math.random() * (2 * x + 1)) - x;
+    return Math.floor(JSAV.utils.rand.random() * (2 * x + 1)) - x;
   }
 
   /*
@@ -190,7 +190,7 @@
       let v1 = e[0];
       let v2 = e[1];
       if (weighted) {
-        weight = 1 + Math.floor((Math.random() * 9));
+        weight = 1 + Math.floor((JSAV.utils.rand.random() * 9));
       }
       // JSAV implementation
       g.edges[v1].push({v: v2, weight: weight});
@@ -447,7 +447,7 @@
     // portiion.
     for (i = 0; i < end_i; i++) {
       // j = Random choice from range [i, end_i]
-      j = i + Math.floor(Math.random() * (end_i - i));
+      j = i + Math.floor(JSAV.utils.rand.random() * (end_i - i));
       // swap elements at j and i
       tmp = a[j];
       a[j] = a[i];
@@ -468,7 +468,7 @@
    * Chooses randomly an element from array a and returns the element.
    */
   function randomChoice(a) {
-    let i = Math.floor(Math.random() * a.length);
+    let i = Math.floor(JSAV.utils.rand.random() * a.length);
     return a[i];
   }
 
