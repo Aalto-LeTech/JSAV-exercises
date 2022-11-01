@@ -58,6 +58,10 @@
    */
 
   function init() {
+    // Uncomment this to have a fixed exercise instance for demonstration
+    // purpose
+    JSAV.utils.rand.seedrandom("1");
+
     // Create a JSAV graph instance
     if (graph) {
       graph.clear();
@@ -761,7 +765,7 @@
   /**
    * Shift down the binary tree and matrix to account for the extra space
    * taken by the "credit not given for this instance" that is shown after
-   * the model answer has been opened. 
+   * the model answer has been opened.
    */
   $("input[name='answer']").on("click", function () {
     console.log("Answer button clicked");
@@ -799,13 +803,13 @@
 
   function randomInt(a, b) {
     // Returns a random integer between a and b (both inclusive).
-    return Math.floor(Math.random() * (b - a + 1)) + 1
+    return Math.floor(JSAV.utils.rand.random() * (b - a + 1)) + 1
   }
 
   function determineWeights() {
     function rnd(x) {
       // Returns a random integer between 1 and x (both inclusive)
-      return Math.floor(Math.random() * x) + 1;
+      return Math.floor(JSAV.utils.rand.random() * x) + 1;
     }
     // Randomize 1: try to fulfill inequalities for single-source sourcest
     // paths.
@@ -1108,7 +1112,7 @@
       // j is the upper index
       // k is the lower index: a random integer from range [0, j-1]
       // (At first round, we have a.length choices, then a.length - 1, etc.)
-      k = Math.floor((j + 1) * Math.random());
+      k = Math.floor((j + 1) * JSAV.utils.rand.random());
       // swap elements at indices j and k
       swapIndices(shuffled, j, k);
     }
@@ -1379,7 +1383,7 @@
     //Replace cross points with one of the two edges, randomly selected
     for (let i = 0; i < untakenEdges.length; i++) {
       if (Array.isArray(untakenEdges[i])) {
-        untakenEdges[i] = untakenEdges[i][Math.round(Math.random())]
+        untakenEdges[i] = untakenEdges[i][Math.round(JSAV.utils.rand.random())]
       }
     }
 
@@ -1391,7 +1395,7 @@
 
     for (i = 0; i < takenEdges.length; i++) {
       const nodes = edgeNodeMap[takenEdges[i]];
-      const weight = Math.round(Math.random()*8) + 1;
+      const weight = Math.round(JSAV.utils.rand.random()*8) + 1;
       //offset for the 16 "core" edges
       const offset = (takenEdges[i] < 16 && leftSide) ? 4 : 0;
       const src = nodes[0] + offset;
@@ -1456,7 +1460,7 @@
     // Otherwise the student sees that the graph topology does not change.
     let transform = lastLinearTransform;
     while (transform === lastLinearTransform) {
-      transform = Math.floor(8 * Math.random());
+      transform = Math.floor(8 * JSAV.utils.rand.random());
     }
     lastLinearTransform = transform;
     let linearMap = linearTransform(transform, vertexLayout);
@@ -1466,7 +1470,7 @@
     // Get a random permutation of *indices*.
     // Randomly decide to place the core component on the left
     // or the right, 50% chance for each.
-    let left = Math.random() < 0.5;
+    let left = JSAV.utils.rand.random() < 0.5;
     let newGraph = remapEdges(g, linearMap, left);
     let roleMap = inverseMap(linearMap);
     // Now newGraph has still the alphabetical vertex labeling:
@@ -1536,7 +1540,7 @@
     const gridStepY = Math.floor(layoutSettings.height / 4);
     function rnd(x) {
       // Returns a random integer between -x and x (both inclusive)
-      return Math.floor(Math.random() * (2 * x + 1)) //- x;
+      return Math.floor(JSAV.utils.rand.random() * (2 * x + 1)) //- x;
     }
 
     let vertexCoordinates = [];
