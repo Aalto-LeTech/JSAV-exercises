@@ -573,6 +573,7 @@
   exercise = jsav.exercise(model, init, {
     compare: [{ class: "marked" }],
     controls: $('.jsavexercisecontrols'),
+    modelDialog: {width: "960px"},
     fix: fixState
   });
   exercise.reset();
@@ -600,6 +601,7 @@
     $(".jsavbinarytree").css("margin-top", "34px");
     $(".jsavmatrix").css("margin-top", "34px");
     $(".jsavcanvas").css("min-height", "910px");
+    $(".jsavmodelanswer .jsavcanvas").css("min-height", "700px");
   })
 
   $("#about").click(about);
