@@ -34,7 +34,7 @@
   },
   "code" : {
     "java" : {
-      "url": "../../SourceCode/Java/Searching/Bsearch.java",
+      "url": "../../SourceCode/Java/Searching/binarySearch.java",
       "lineNumbers": true,
       "tags": {
         "highlight": 7,
