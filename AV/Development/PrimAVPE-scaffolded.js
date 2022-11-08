@@ -573,6 +573,7 @@
   exercise = jsav.exercise(model, init, {
     compare: [{ class: "marked" }],
     controls: $('.jsavexercisecontrols'),
+    modelDialog: {width: "960px"},
     fix: fixState
   });
   exercise.reset();
@@ -600,6 +601,7 @@
     $(".jsavbinarytree").css("margin-top", "34px");
     $(".jsavmatrix").css("margin-top", "34px");
     $(".jsavcanvas").css("min-height", "910px");
+    $(".jsavmodelanswer .jsavcanvas").css("min-height", "700px");
   })
 
   $("#about").click(about);
@@ -691,7 +693,12 @@
     const dist = event.data.dist;
     const popup = event.data.popup;
     debugPrint(event.data.edge)
-    event.data.edge.addClass("queued")
+    event.data.edge.addClass("queued");
+    window.JSAVrecorder.appendAnimationEventFields(
+      {
+        "pqOperation": "enqueue",
+        "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge, "Edge")
+      });
 
     updateTable(srcLabel, dstLabel, dist);
     insertMinheap(srcLabel, dstLabel, dist);
@@ -743,7 +750,13 @@
     const oldEdge = graph.getEdge(oldNode, dstNode)
               ?? graph.getEdge(dstNode, oldNode);
     //Remove the queued class.
-    oldEdge.removeClass("queued")
+    oldEdge.removeClass("queued");
+    window.JSAVrecorder.appendAnimationEventFields(
+      {
+        "pqOperation": "update",
+        "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge, "Edge"),
+        "pqOut": window.JSAVrecorder.jsavObjectToJaalID(oldEdge, "Edge")
+      });
 
 
     const oldDist = oldLabel.match(/\d+/)[0];
@@ -848,7 +861,12 @@
       const srcNode = graph.nodes().filter(node =>
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
-      edge.removeClass("queued")
+      edge.removeClass("queued");
+      window.JSAVrecorder.appendAnimationEventFields(
+        {
+          "pqOperation": "dequeue",
+          "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
+        });
       if (!edge.hasClass("marked")) {
         markEdge(edge);
       }
