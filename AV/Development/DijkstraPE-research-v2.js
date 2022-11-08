@@ -615,7 +615,12 @@
     const newDist = event.data.newDist;
     const popup = event.data.popup;
     debugPrint(event.data.edge)
-    event.data.edge.addClass("queued")
+    event.data.edge.addClass("queued");
+    window.JSAVrecorder.appendAnimationEventFields(
+      {
+        "pqOperation": "enqueue",
+        "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge, "Edge")
+      });
 
     updateTable(srcLabel, dstLabel, newDist);
     insertMinheap(srcLabel, dstLabel, newDist);
@@ -668,6 +673,12 @@
               ?? graph.getEdge(dstNode, oldNode);
     //Remove the queued class.
     oldEdge.removeClass("queued")
+    window.JSAVrecorder.appendAnimationEventFields(
+      {
+        "pqOperation": "update",
+        "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge, "Edge"),
+        "pqOut": window.JSAVrecorder.jsavObjectToJaalID(oldEdge, "Edge")
+      });
 
 
     const oldDist = oldLabel.match(/\d+/)[0];
@@ -1639,6 +1650,12 @@
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
       edge.removeClass("queued")
+      window.JSAVrecorder.appendAnimationEventFields(
+        {
+          "pqOperation": "dequeue",
+          "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
+        });
+
       if (!edge.hasClass("marked")) {
         markEdge(edge);
       }
