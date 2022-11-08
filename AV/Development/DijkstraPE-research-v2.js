@@ -772,6 +772,7 @@
     $(".jsavbinarytree").css("margin-top", "34px");
     $(".jsavmatrix").css("margin-top", "34px");
     $(".jsavcanvas").css("min-height", "910px");
+    $(".jsavmodelanswer .jsavcanvas").css("min-height", "770px");
   })
 
   $("#about").click(about);
