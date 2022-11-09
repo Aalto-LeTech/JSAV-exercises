@@ -34,7 +34,7 @@
   var heapsize = jsav.variable(0);
 
   var lastLinearTransform = -1; // for generateInstance()
-  var debug = false; // produces debug prints to console
+  var debug = false; // produces debug prints to the console
 
   jsav.recorded();
 
@@ -257,11 +257,36 @@
       }
       const neighbours = dstNode.neighbors().filter(node =>
         !node.hasClass("marked"));
-      neighbours.sort((a, b) => a.value() > b.value());
+      debugPrint("Neighbours of " + dstNode.value() + " before sorting");
+      sortNeighbours(neighbours);
       neighbours.forEach(node => visitNeighbour(dstNode, node, dist))
     }
     av.umsg(interpret("av_ms_unreachable"));
     av.step();
+
+    /* Sorts neighbours of a node by alphabetic order of their node values.
+     * Implementation: selection sort.
+     * This function was implemented because the default
+     * Array.prototype.sort() was not functioning correctly with an array of
+     * JSAV Nodes under Google Chrome. */
+    function sortNeighbours(neighbours) {
+      for (let i = 0; i < neighbours.length - 1; i++) {
+        let minIndex = i;
+        let minVal = neighbours[i].value();
+        for (let j = i + 1; j < neighbours.length; j++) {
+          let newVal = neighbours[j].value();
+          if (newVal < minVal) {
+            minVal = newVal;
+            minIndex = j;
+          }
+        }
+        if (minIndex !== i) {
+          let tmp = neighbours[i];
+          neighbours[i] = neighbours[minIndex];
+          neighbours[minIndex] = tmp;
+        }
+      }
+    }
 
     function highlight(edge, node) {
       //Mark current edge as highlighted
@@ -387,6 +412,8 @@
      * @param srcDist distance to source
      */
     function visitNeighbour (src, neighbour, srcDist) {
+      debugPrint("visitNeighbour: src = " + src.value() + ", neighbour = " +
+        neighbour.value());
       const edge = src.edgeTo(neighbour) ?? src.edgeFrom(neighbour);
       const neighbourIndex = neighbour.value().charCodeAt(0) - "A".charCodeAt(0);
       const currNeighbourDist = getDistance(neighbourIndex);
@@ -1791,7 +1818,7 @@
 
   function debugPrint(x) {
     if (debug) {
-      debugPrint(x);
+      console.log(x);
     }
   }
 
