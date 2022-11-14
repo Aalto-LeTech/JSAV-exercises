@@ -806,7 +806,7 @@
    * the model answer has been opened.
    */
   $("input[name='answer']").on("click", function () {
-    console.log("Answer button clicked");
+    debugPrint("Answer button clicked");
     $(".jsavbinarytree").css("margin-top", "34px");
     $(".jsavmatrix").css("margin-top", "34px");
     $(".jsavcanvas").css("min-height", "910px");

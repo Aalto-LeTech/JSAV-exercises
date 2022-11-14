@@ -894,7 +894,7 @@
 
    function debugPrint(x) {
      if (debug) {
-       debugPrint(x);
+       console.log(x);
      }
    }
 
