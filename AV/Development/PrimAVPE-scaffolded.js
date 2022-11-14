@@ -59,11 +59,11 @@
     nlGraph = bestNlGraph;
 
     // Print statistics of exercise instance generation
-    // let statsText = "Trials: " + trials + "\n";
-    // for (let k of Object.keys(sumStats)) {
-    //   statsText += k + ": " + sumStats[k] + "\n";
-    // }
-    // console.log(statsText);
+    let statsText = "Trials: " + trials + "\n";
+    for (let k of Object.keys(sumStats)) {
+     statsText += k + ": " + sumStats[k] + "\n";
+    }
+    debugPrint(statsText);
 
     // Create a JSAV graph instance
     if (graph) {
@@ -188,7 +188,7 @@
     const aNode = nodes.find(node => node.value() === "A");
 
     aNode.neighbors().forEach(node => visitNeighbour(aNode, node));
-    // console.log(aNode);
+    // debugPrint(aNode);
 
     while (modelheapsize > 0) {
       const rootVal = deleteRoot();
@@ -624,7 +624,7 @@
    * the model answer has been opened.
    */
   $("input[name='answer']").on("click", function () {
-    console.log("Answer button clicked");
+    debugPrint("Answer button clicked");
     $(".jsavbinarytree").css("margin-top", "34px");
     $(".jsavmatrix").css("margin-top", "34px");
     $(".jsavcanvas").css("min-height", "910px");
