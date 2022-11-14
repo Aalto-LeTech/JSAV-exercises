@@ -8,6 +8,8 @@
       settings = config.getSettings(),
       jsav = new JSAV($('.avcontainer'), {settings: settings});
 
+  var debug = false; // produces debug prints to console
+
   jsav.recorded();
 
   function init_old() {
@@ -69,11 +71,12 @@
     }
     nlGraph = bestNlGraph;
 
+    // Print statistics of exercise instance generation
     let statsText = "Trials: " + trials + "\n";
     for (let k of Object.keys(sumStats)) {
       statsText += k + ": " + sumStats[k] + "\n";
     }
-    console.log(statsText);
+    debugPrint(statsText);
 
     // Create a JSAV graph instance
     if (graph) {
@@ -363,6 +366,12 @@
   // Process About button: Pop up a message with an Alert
   function about() {
     window.alert(ODSA.AV.aboutstring(interpret(".avTitle"), interpret("av_Authors")));
+  }
+
+  function debugPrint(x) {
+    if (debug) {
+      console.log(x);
+    }
   }
 
   exercise = jsav.exercise(model, init, {
