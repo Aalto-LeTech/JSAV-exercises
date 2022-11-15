@@ -18,7 +18,7 @@
   function init() {
     // Uncomment this to have a fixed exercise instance for demonstration
     // purpose
-    JSAV.utils.rand.seedrandom("1");
+    //JSAV.utils.rand.seedrandom("1");
 
     // Settings for input
     const width = 500, height = 400,  // pixels
