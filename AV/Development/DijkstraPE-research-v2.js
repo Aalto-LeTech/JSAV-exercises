@@ -60,7 +60,7 @@
   function init() {
     // Uncomment this to have a fixed exercise instance for demonstration
     // purpose
-    JSAV.utils.rand.seedrandom("1");
+    //JSAV.utils.rand.seedrandom("1");
 
     // Create a JSAV graph instance
     if (graph) {
