@@ -20,6 +20,10 @@
       pseudo,
       av = new JSAV($("#jsavcontainer"));
 
+  // These constants are used in the model solutions for the position of the
+  // relevant child nodes in the array. 
+  const LEFT = 0;
+  const RIGHT = 1;
 
   if (code) {
     pseudo = av.code($.extend({after: {element: $(".instructions")}}, code[rotationType]));
@@ -104,16 +108,340 @@
     jsav.umsg(interpret("av_ms_unbalanced"));
     jsav.step();
 
-    // balance the tree
-    console.log("Unbalanced node:", unbalancedNode)
-    unbalancedNode.removeClass("highlighted");
-    unbalancedNode.balance();
-    msTree.layout();
-    jsav.umsg(interpret("av_ms_after_rotation"));
+    // ploc is the location of p relative to f, i.e. whether p is left 
+    // or right child of f.
+    const ploc = unbalancedNode ? 
+              (unbalancedNode.parent().left() === unbalancedNode ? 
+              "left" : "right") 
+              : undefined;
 
+    // determineRotation returns an object with the rotation, type (single or 
+    // double) and the symbol (> or <) for the explanation string. 
+    const rotation = determineRotation(unbalancedNode);
+
+    jsav.umsg(interpret("av_rotation_type"), 
+                        {fill: {
+                          ploc: ploc, 
+                          rotation: rotation.rotation + "-" + rotation.type, 
+                          symbol: rotation.symbol
+                        }}); 
+    
+    jsav.step();
+    console.log(pseudo);
+
+    // balance the tree
+    switch (rotation.rotation) {
+      case "LR":
+        console.log("LR rotation");
+        LRRotation(unbalancedNode, jsav);
+        
+        break;
+      case "RL": 
+        console.log("RL rotation");
+        RLRotation(unbalancedNode, jsav);
+        break;
+      case "R": 
+        console.log("R Rotation");
+        RRotation(unbalancedNode, jsav); 
+        break; 
+      case "L": 
+        console.log("L rotation"); 
+        LRotation(unbalancedNode, jsav);
+        break;
+      default:
+        console.warn("Unknown rotation type: ", rotation);
+
+    }
+    unbalancedNode.removeClass("highlighted");
+    jsav.umsg(interpret("av_ms_after_rotation"));
+    msTree.layout();
     jsav.gradeableStep();
 
     return msTree;
+  }
+
+  /**
+   * This function is based on lines 123-137 from AVLextension.js, where
+   * it determines what kind of rotation should be performed. 
+   * @param node the unbalanced node in the tree 
+   * @returns an object containing the rotation and symbol for the model answer
+   */
+  function determineRotation(node) {
+    var rotation, type, symbol;
+    if (height(node.left()) > height(node.right()) + 1) {
+      if (height(node.left().left()) > height(node.left().right())){
+        rotation = "R";
+        type = "single";
+        symbol = ">";
+      } else {
+        rotation = "LR";
+        type = "double";
+        symbol = ">";
+      }
+    } else if (height(node.right()) > height(node.left()) + 1) {
+      if (height(node.right().left()) > height (node.right().right())) {
+        rotation = "RL";
+        type = "double";
+        symbol = "<";
+      } else {
+        rotation = "L";
+        type = "single";
+        symbol = "<";
+      }
+    }
+    return {rotation, type, symbol};
+  }
+
+  // Determine the height of the node in the tree. 
+  function height(node) {
+    if (node) {
+      return node.height();
+    }
+    return 0;
+  }
+
+  /**
+   * Perform a single Right rotation on the unbalanced node. 
+   * @param node the jsav-object of the unbalanced node. 
+   * @param jsav the jsav instance of the model answer. 
+   */
+  function RRotation(node, jsav) {
+    var parent = node.parent();
+    var lr = parent.left() === node ? LEFT : RIGHT;
+    const lr_text = lr === LEFT ? "left" : "right";
+
+    //first pointer operation
+    parent.child(lr, node.left(), {hide: false}); 
+    parent.pointers[lr].layout();
+    jsav.umsg(interpret("av_rotation"), 
+              {fill: {
+                left: "f->" + lr_text, 
+                right: "p->left"
+              }});
+    jsav.step();
+
+    //Second pointer operation
+    node.left(parent.child(lr).right() ?? null, {hide: false});
+    node.pointers[LEFT].layout();
+    jsav.umsg(interpret("av_rotation"), 
+              {fill: {
+                left: "p->left", 
+                right: "f->" + lr_text + "->right"
+              }});
+    jsav.step();
+
+    //Third pointer operation
+    parent.child(lr).right(node, {hide: false}); 
+    parent.child(lr).pointers[RIGHT].layout();
+    jsav.umsg(interpret("av_rotation"), 
+              {fill: {
+                left: "f->" + lr_text + "->right", 
+                right: "p"
+              }});
+    jsav.step();
+    
+  }
+
+  /**
+   * Perform a single Left rotation on the unbalanced node. 
+   * @param node the jsav-object of the unbalanced node. 
+   * @param jsav the jsav instance of the model answer. 
+   */
+  function LRotation(node, jsav) {
+    var parent = node.parent();
+    var lr = parent.left() === node ? LEFT : RIGHT;
+    const lr_text = lr === LEFT ? "left" : "right";
+
+    //first pointer operation
+    console.log(lr, lr_text);
+    parent.child(lr, node.right(), {hide: false}); 
+    parent.pointers[lr].layout();
+    jsav.umsg(interpret("av_rotation"), 
+              {fill: {
+                left: "f->" + lr_text, 
+                right: "p->right"
+              }});
+    jsav.step();
+
+    //Second pointer operation
+    node.right(parent.child(lr).left() ?? null, {hide: false});
+    node.pointers[RIGHT].layout();
+    jsav.umsg(interpret("av_rotation"), 
+              {fill: {
+                left: "p->right", 
+                right: "f->" + lr_text + "->left"
+              }});
+    jsav.step();
+
+    //Third pointer operation
+    parent.child(lr).left(node, {hide: false}); 
+    parent.child(lr).pointers[LEFT].layout();
+    jsav.umsg(interpret("av_rotation"), 
+              {fill: {
+                left: "f->" + lr_text + "->left", 
+                right: "p"
+              }});
+    jsav.step();
+  }
+
+
+  /**
+   * Perform a left right double rotation from the unbalanced node for the
+   * the model answer.  
+   * @param node the unbalanced node
+   * @param jsav the model answer jsav instance. 
+   */
+  function LRRotation(node, jsav) {
+    var parent = node.parent();
+    var lr = parent.left() === node ? LEFT : RIGHT;
+    const lr_text = lr === LEFT ? "left" : "right";
+
+    //first pointer operation
+    parent.child(lr, node.left().right(), {hide: false});
+    parent.pointers[lr].layout();
+    jsav.umsg(interpret("av_rotation"), 
+              {fill: {
+                left: "f->" + lr_text, 
+                right: "p->left->right"
+              }});
+    jsav.step();
+
+    //second pointer operation
+    node.left().right(parent.child(lr).left() ?? null, {hide: false});
+    node.left().pointers[RIGHT].layout();
+    if (parent.child(lr).left()) {
+      jsav.umsg(interpret("av_rotation"), 
+                {fill: {
+                  left: "p->left->right", 
+                  right: "f->" + lr_text + "->left"
+                }});
+    } else {
+      jsav.umsg(interpret("av_rotation_null"), 
+                {fill: {
+                  left: "p->left->right", 
+                  right: "f->" + lr_text + "->left"
+                }});
+    }
+    jsav.step();
+
+    //Third pointer operation
+    parent.child(lr).left(node.left() ?? null, {hide: false});
+    parent.child(lr).pointers[LEFT].layout();
+    jsav.umsg(interpret("av_rotation"), 
+              {fill: {
+                left: "f->" + lr_text + "->left", 
+                right: "p->left"
+              }});
+  
+    jsav.step();
+
+    //Fourth step
+    node.left(parent.child(lr).right() ?? null, {hide: false});
+    node.pointers[LEFT].layout();
+    if (parent.child(lr).right()) {
+      jsav.umsg(interpret("av_rotation"), 
+                {fill: {
+                  left: "p->left", 
+                  right: "f->" + lr_text + "->right"
+                }});
+    } else {
+      jsav.umsg(interpret("av_rotation_null"), 
+                {fill: {
+                  left: "p->left", 
+                  right: "f->" + lr_text + "->right"
+                }});
+    }
+    jsav.step();
+
+    //Fifth pointer operation
+    parent.child(lr).right(node ?? null, {hide: false});
+    parent.child(lr).pointers[RIGHT].layout();
+    jsav.umsg(interpret("av_rotation"), 
+              {fill: {
+                left: "f->" + lr_text + "->right", 
+                right: "p"
+              }});
+    jsav.step();
+  }
+
+
+  /**
+   * Perform a right left double rotation from the unbalanced node for the
+   * the model answer.  
+   * @param node the unbalanced node
+   * @param jsav the model answer jsav instance. 
+   */
+  function RLRotation (node, jsav) {
+    var parent = node.parent();
+    var lr = parent.left() === node ? LEFT : RIGHT;
+    const lr_text = lr === LEFT ? "left" : "right";
+
+    //first pointer operation
+    parent.child(lr, node.right().left(), {hide: false});
+    parent.pointers[lr].layout();
+    jsav.umsg(interpret("av_rotation"), 
+              {fill: {
+                left: "f->" + lr_text, 
+                right: "p->right->left"
+              }});
+    jsav.step();
+
+    //second pointer operation
+    node.right().left(parent.child(lr).right() ?? null, {hide: false});
+    node.right().pointers[LEFT].layout();
+    if (parent.child(lr).right()) {
+      jsav.umsg(interpret("av_rotation"), 
+                {fill: {
+                  left: "p->right->left", 
+                  right: "f->" + lr_text + "->right"
+                }});
+    } else {
+      jsav.umsg(interpret("av_rotation_null"), 
+                {fill: {
+                  left: "p->right->left", 
+                  right: "f->" + lr_text + "->right"
+                }});
+    }
+    jsav.step();
+
+    //Third pointer operation
+    parent.child(lr).right(node.right() ?? null, {hide: false});
+    parent.child(lr).pointers[RIGHT].layout();
+    jsav.umsg(interpret("av_rotation"), 
+              {fill: {
+                left: "f->" + lr_text + "->right", 
+                right: "p->right"
+              }});
+  
+    jsav.step();
+
+    //Fourth step
+    node.right(parent.child(lr).left() ?? null, {hide: false});
+    node.pointers[RIGHT].layout();
+    if (parent.child(lr).left()) {
+      jsav.umsg(interpret("av_rotation"), 
+                {fill: {
+                  left: "p->right", 
+                  right: "f->" + lr_text + "->left"
+                }});
+    } else {
+      jsav.umsg(interpret("av_rotation_null"), 
+                {fill: {
+                  left: "p->right", 
+                  right: "f->" + lr_text + "->left"
+                }});
+    }
+    jsav.step();
+
+    //Fifth pointer operation
+    parent.child(lr).left(node ?? null, {hide: false});
+    parent.child(lr).pointers[LEFT].layout();
+    jsav.umsg(interpret("av_rotation"), 
+              {fill: {
+                left: "f->" + lr_text + "->left", 
+                right: "p"
+              }});
+    jsav.step();
   }
 
   // generates an array which can be inserted to a tree so that it will be unbalanced tree

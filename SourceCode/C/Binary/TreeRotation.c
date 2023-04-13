@@ -50,18 +50,18 @@ if (f->left == p) {
     f->left->left = p;
   }
 } else { // f->right == p
-  if (height(p.left) < height(p.right) {
-    f->right = p->right->left; // RL-double rotation
-    p->right->left = f->right->right;
-    f->right->right = p->right;
-    p->right = f->right->left;
-    f->right->left = p;
-  } else { // height(p.left) > height(p.right)
+  if (height(p.left) > height(p.right)) {
     f->right = p->left->right; // LR-double rotation
     p->left->right = f->right->left;
     f->right->left = p->left;
     p->left = f->right->right;
     f->right->right = p;  
+  } else { // height(p.left) < height(p.right)   
+    f->right = p->right->left; // RL-double rotation
+    p->right->left = f->right->right;
+    f->right->right = p->right;
+    p->right = f->right->left;
+    f->right->left = p;
   }
 }
 /* *** ODSAendTag: double *** */
