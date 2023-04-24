@@ -127,7 +127,6 @@
                         }}); 
     
     jsav.step();
-    console.log(pseudo);
 
     // balance the tree
     switch (rotation.rotation) {
@@ -218,7 +217,7 @@
                 left: "f->" + lr_text, 
                 right: "p->left"
               }});
-    jsav.step();
+    jsav.gradeableStep();
 
     //Second pointer operation
     node.left(parent.child(lr).right() ?? null, {hide: false});
@@ -228,7 +227,7 @@
                 left: "p->left", 
                 right: "f->" + lr_text + "->right"
               }});
-    jsav.step();
+    jsav.gradeableStep();
 
     //Third pointer operation
     parent.child(lr).right(node, {hide: false}); 
@@ -238,7 +237,7 @@
                 left: "f->" + lr_text + "->right", 
                 right: "p"
               }});
-    jsav.step();
+    jsav.gradeableStep();
     
   }
 
@@ -261,7 +260,7 @@
                 left: "f->" + lr_text, 
                 right: "p->right"
               }});
-    jsav.step();
+    jsav.gradeableStep();
 
     //Second pointer operation
     node.right(parent.child(lr).left() ?? null, {hide: false});
@@ -271,7 +270,7 @@
                 left: "p->right", 
                 right: "f->" + lr_text + "->left"
               }});
-    jsav.step();
+    jsav.gradeableStep();
 
     //Third pointer operation
     parent.child(lr).left(node, {hide: false}); 
@@ -281,7 +280,7 @@
                 left: "f->" + lr_text + "->left", 
                 right: "p"
               }});
-    jsav.step();
+    jsav.gradeableStep();
   }
 
 
@@ -304,7 +303,7 @@
                 left: "f->" + lr_text, 
                 right: "p->left->right"
               }});
-    jsav.step();
+    jsav.gradeableStep();
 
     //second pointer operation
     node.left().right(parent.child(lr).left() ?? null, {hide: false});
@@ -322,7 +321,7 @@
                   right: "f->" + lr_text + "->left"
                 }});
     }
-    jsav.step();
+    jsav.gradeableStep();
 
     //Third pointer operation
     parent.child(lr).left(node.left() ?? null, {hide: false});
@@ -333,7 +332,7 @@
                 right: "p->left"
               }});
   
-    jsav.step();
+    jsav.gradeableStep();
 
     //Fourth step
     node.left(parent.child(lr).right() ?? null, {hide: false});
@@ -351,7 +350,7 @@
                   right: "f->" + lr_text + "->right"
                 }});
     }
-    jsav.step();
+    jsav.gradeableStep();
 
     //Fifth pointer operation
     parent.child(lr).right(node ?? null, {hide: false});
@@ -361,7 +360,7 @@
                 left: "f->" + lr_text + "->right", 
                 right: "p"
               }});
-    jsav.step();
+    jsav.gradeableStep();
   }
 
 
@@ -384,7 +383,7 @@
                 left: "f->" + lr_text, 
                 right: "p->right->left"
               }});
-    jsav.step();
+    jsav.gradeableStep();
 
     //second pointer operation
     node.right().left(parent.child(lr).right() ?? null, {hide: false});
@@ -402,7 +401,7 @@
                   right: "f->" + lr_text + "->right"
                 }});
     }
-    jsav.step();
+    jsav.gradeableStep();
 
     //Third pointer operation
     parent.child(lr).right(node.right() ?? null, {hide: false});
@@ -413,7 +412,7 @@
                 right: "p->right"
               }});
   
-    jsav.step();
+    jsav.gradeableStep();
 
     //Fourth step
     node.right(parent.child(lr).left() ?? null, {hide: false});
@@ -431,7 +430,7 @@
                   right: "f->" + lr_text + "->left"
                 }});
     }
-    jsav.step();
+    jsav.gradeableStep();
 
     //Fifth pointer operation
     parent.child(lr).left(node ?? null, {hide: false});
@@ -441,7 +440,7 @@
                 left: "f->" + lr_text + "->left", 
                 right: "p"
               }});
-    jsav.step();
+    jsav.gradeableStep();
   }
 
   // generates an array which can be inserted to a tree so that it will be unbalanced tree
@@ -611,7 +610,7 @@
       if (this !== selectedNode) {
         selectedNode.child(selectedPointer.value(), this, {hide: false});
         selectedNode.pointers[selectedPointer.value()].layout();
-        av.step();
+        av.gradeableStep();
       }
       selectedNode.removeClass("selected-left");
       selectedNode.removeClass("selected-right");
@@ -660,7 +659,7 @@
   $nullButton.click(function () {
     if (nodeSelected.value()) {
       selectedNode.child(selectedPointer.value(), null, {hide: false});
-      av.step();
+      av.gradeableStep();
       selectedNode.removeClass("selected-left");
       selectedNode.removeClass("selected-right");
       selectedNode = null;
