@@ -26,13 +26,13 @@
   const RIGHT = 1;
 
   if (code) {
-    pseudo = av.code($.extend({after: {element: $(".instructions")}}, code[rotationType]));
+    pseudo = av.code($.extend({after: {element: $(".code")}}, code[rotationType]));
   } else {
     pseudo = av.code();
   }
 
-  if (code && code.struct) {
-    av.code($.extend({after: {element: $(".instructions")}}, code.struct));
+  if (code && code.struct && rotationType === "single") {
+    av.code($.extend({after: {element: $(".code")}}, code.struct));
   }
 
   function initialize() {
