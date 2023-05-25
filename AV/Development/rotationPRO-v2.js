@@ -7,8 +7,8 @@
       nodeSelected,
       selectedNode,
       selectedPointer,
-      // rotationType = PARAMS.rotation || "single",
-      rotationType = PARAMS.rotation || "double",
+      rotationType = PARAMS.rotation || "single",
+      // rotationType = PARAMS.rotation || "double",
       difficulty = PARAMS.diff || "hard",
       $layoutButton = $("#layoutButton"),
       $nullButton = $("#nullButton"),
@@ -18,6 +18,7 @@
       interpret = config.interpreter,
       code = config.code,
       pseudo,
+      linenr = [], //for highlighting the correct lines in model solution
       av = new JSAV($("#jsavcontainer"));
 
   // These constants are used in the model solutions for the position of the
@@ -47,6 +48,7 @@
     if (selectedPointer) {
       selectedPointer.clear();
     }
+    pseudo.unhighlight(linenr);
 
     // create binary pointer tree
     tree = av.ds.binarypointertree({center: true, visible: true, nodegap: 15});
@@ -128,23 +130,33 @@
     
     jsav.step();
 
+    // These are the line numbers that are used in the model answer
+    // They are indexed as "{rotation type}{p's location in f}"
+    const linenrs = {
+      "LRleft" : [4, 5, 6, 7, 8], 
+      "RLleft" : [10, 11, 12, 13, 14], 
+      "LRright" : [18, 19, 20, 21, 22], 
+      "RLright" : [24, 25, 26, 27, 28], 
+      "Rleft": [4, 5, 6], 
+      "Lleft": [8, 9, 10],
+      "Rright": [14, 15, 16], 
+      "Lright": [18, 19, 20]
+    }
+    linenr = linenrs[rotation.rotation + ploc]
+    pseudo.highlight(linenr);
+
     // balance the tree
     switch (rotation.rotation) {
       case "LR":
-        console.log("LR rotation");
         LRRotation(unbalancedNode, jsav);
-        
         break;
       case "RL": 
-        console.log("RL rotation");
         RLRotation(unbalancedNode, jsav);
         break;
       case "R": 
-        console.log("R Rotation");
         RRotation(unbalancedNode, jsav); 
         break; 
       case "L": 
-        console.log("L rotation"); 
         LRotation(unbalancedNode, jsav);
         break;
       default:
@@ -210,33 +222,39 @@
     const lr_text = lr === LEFT ? "left" : "right";
 
     //first pointer operation
-    parent.child(lr, node.left(), {hide: false}); 
-    parent.pointers[lr].layout();
     jsav.umsg(interpret("av_rotation"), 
               {fill: {
+                linenr: linenr[0],
                 left: "f->" + lr_text, 
                 right: "p->left"
               }});
+    jsav.step();
+    parent.child(lr, node.left(), {hide: false}); 
+    parent.pointers[lr].layout();
     jsav.gradeableStep();
 
     //Second pointer operation
-    node.left(parent.child(lr).right() ?? null, {hide: false});
-    node.pointers[LEFT].layout();
     jsav.umsg(interpret("av_rotation"), 
               {fill: {
+                linenr: linenr[1],
                 left: "p->left", 
                 right: "f->" + lr_text + "->right"
               }});
+    jsav.step();
+    node.left(parent.child(lr).right() ?? null, {hide: false});
+    node.pointers[LEFT].layout();
     jsav.gradeableStep();
 
     //Third pointer operation
-    parent.child(lr).right(node, {hide: false}); 
-    parent.child(lr).pointers[RIGHT].layout();
     jsav.umsg(interpret("av_rotation"), 
               {fill: {
+                linenr: linenr[2],
                 left: "f->" + lr_text + "->right", 
                 right: "p"
               }});
+    jsav.step();
+    parent.child(lr).right(node, {hide: false}); 
+    parent.child(lr).pointers[RIGHT].layout();
     jsav.gradeableStep();
     
   }
@@ -252,34 +270,39 @@
     const lr_text = lr === LEFT ? "left" : "right";
 
     //first pointer operation
-    console.log(lr, lr_text);
-    parent.child(lr, node.right(), {hide: false}); 
-    parent.pointers[lr].layout();
     jsav.umsg(interpret("av_rotation"), 
               {fill: {
+                linenr: linenr[0],
                 left: "f->" + lr_text, 
                 right: "p->right"
               }});
+    jsav.step();
+    parent.child(lr, node.right(), {hide: false}); 
+    parent.pointers[lr].layout();
     jsav.gradeableStep();
 
     //Second pointer operation
-    node.right(parent.child(lr).left() ?? null, {hide: false});
-    node.pointers[RIGHT].layout();
     jsav.umsg(interpret("av_rotation"), 
               {fill: {
+                linenr: linenr[1],
                 left: "p->right", 
                 right: "f->" + lr_text + "->left"
               }});
+    jsav.step();
+    node.right(parent.child(lr).left() ?? null, {hide: false});
+    node.pointers[RIGHT].layout();
     jsav.gradeableStep();
 
     //Third pointer operation
-    parent.child(lr).left(node, {hide: false}); 
-    parent.child(lr).pointers[LEFT].layout();
     jsav.umsg(interpret("av_rotation"), 
               {fill: {
+                linenr: linenr[2],
                 left: "f->" + lr_text + "->left", 
                 right: "p"
               }});
+    jsav.step();
+    parent.child(lr).left(node, {hide: false}); 
+    parent.child(lr).pointers[LEFT].layout();
     jsav.gradeableStep();
   }
 
@@ -296,70 +319,81 @@
     const lr_text = lr === LEFT ? "left" : "right";
 
     //first pointer operation
-    parent.child(lr, node.left().right(), {hide: false});
-    parent.pointers[lr].layout();
     jsav.umsg(interpret("av_rotation"), 
               {fill: {
+                linenr: linenr[0],
                 left: "f->" + lr_text, 
                 right: "p->left->right"
               }});
+    jsav.step();
+    parent.child(lr, node.left().right(), {hide: false});
+    parent.pointers[lr].layout();
     jsav.gradeableStep();
 
     //second pointer operation
-    node.left().right(parent.child(lr).left() ?? null, {hide: false});
-    node.left().pointers[RIGHT].layout();
     if (parent.child(lr).left()) {
       jsav.umsg(interpret("av_rotation"), 
                 {fill: {
+                  linenr: linenr[1],
                   left: "p->left->right", 
                   right: "f->" + lr_text + "->left"
                 }});
     } else {
       jsav.umsg(interpret("av_rotation_null"), 
                 {fill: {
+                  linenr: linenr[1],
                   left: "p->left->right", 
                   right: "f->" + lr_text + "->left"
                 }});
     }
+    jsav.step();
+    node.left().right(parent.child(lr).left() ?? null, {hide: false});
+    node.left().pointers[RIGHT].layout();
     jsav.gradeableStep();
 
     //Third pointer operation
-    parent.child(lr).left(node.left() ?? null, {hide: false});
-    parent.child(lr).pointers[LEFT].layout();
     jsav.umsg(interpret("av_rotation"), 
               {fill: {
+                linenr: linenr[2],
                 left: "f->" + lr_text + "->left", 
                 right: "p->left"
               }});
-  
+    jsav.step();
+    parent.child(lr).left(node.left() ?? null, {hide: false});
+    parent.child(lr).pointers[LEFT].layout();
     jsav.gradeableStep();
 
     //Fourth step
-    node.left(parent.child(lr).right() ?? null, {hide: false});
-    node.pointers[LEFT].layout();
     if (parent.child(lr).right()) {
       jsav.umsg(interpret("av_rotation"), 
                 {fill: {
+                  linenr: linenr[3],
                   left: "p->left", 
                   right: "f->" + lr_text + "->right"
                 }});
     } else {
       jsav.umsg(interpret("av_rotation_null"), 
                 {fill: {
+                  linenr: linenr[3],
                   left: "p->left", 
                   right: "f->" + lr_text + "->right"
                 }});
     }
+    jsav.step();
+    node.left(parent.child(lr).right() ?? null, {hide: false});
+    node.pointers[LEFT].layout();
     jsav.gradeableStep();
 
     //Fifth pointer operation
-    parent.child(lr).right(node ?? null, {hide: false});
-    parent.child(lr).pointers[RIGHT].layout();
     jsav.umsg(interpret("av_rotation"), 
               {fill: {
+                linenr: linenr[4],
                 left: "f->" + lr_text + "->right", 
                 right: "p"
               }});
+    jsav.step();
+    parent.child(lr).right(node ?? null, {hide: false});
+    parent.child(lr).pointers[RIGHT].layout();
     jsav.gradeableStep();
   }
 
@@ -376,70 +410,81 @@
     const lr_text = lr === LEFT ? "left" : "right";
 
     //first pointer operation
-    parent.child(lr, node.right().left(), {hide: false});
-    parent.pointers[lr].layout();
     jsav.umsg(interpret("av_rotation"), 
               {fill: {
+                linenr: linenr[0],
                 left: "f->" + lr_text, 
                 right: "p->right->left"
               }});
+    jsav.step();
+    parent.child(lr, node.right().left(), {hide: false});
+    parent.pointers[lr].layout();
     jsav.gradeableStep();
 
     //second pointer operation
-    node.right().left(parent.child(lr).right() ?? null, {hide: false});
-    node.right().pointers[LEFT].layout();
     if (parent.child(lr).right()) {
       jsav.umsg(interpret("av_rotation"), 
                 {fill: {
+                  linenr: linenr[1],
                   left: "p->right->left", 
                   right: "f->" + lr_text + "->right"
                 }});
     } else {
       jsav.umsg(interpret("av_rotation_null"), 
                 {fill: {
+                  linenr: linenr[1],
                   left: "p->right->left", 
                   right: "f->" + lr_text + "->right"
                 }});
     }
+    jsav.step();
+    node.right().left(parent.child(lr).right() ?? null, {hide: false});
+    node.right().pointers[LEFT].layout();
     jsav.gradeableStep();
 
     //Third pointer operation
-    parent.child(lr).right(node.right() ?? null, {hide: false});
-    parent.child(lr).pointers[RIGHT].layout();
     jsav.umsg(interpret("av_rotation"), 
               {fill: {
+                linenr: linenr[2],
                 left: "f->" + lr_text + "->right", 
                 right: "p->right"
               }});
-  
+    jsav.step();
+    parent.child(lr).right(node.right() ?? null, {hide: false});
+    parent.child(lr).pointers[RIGHT].layout();
     jsav.gradeableStep();
 
     //Fourth step
-    node.right(parent.child(lr).left() ?? null, {hide: false});
-    node.pointers[RIGHT].layout();
     if (parent.child(lr).left()) {
       jsav.umsg(interpret("av_rotation"), 
                 {fill: {
+                  linenr: linenr[3],
                   left: "p->right", 
                   right: "f->" + lr_text + "->left"
                 }});
     } else {
       jsav.umsg(interpret("av_rotation_null"), 
                 {fill: {
+                  linenr: linenr[3],
                   left: "p->right", 
                   right: "f->" + lr_text + "->left"
                 }});
     }
+    jsav.step();
+    node.right(parent.child(lr).left() ?? null, {hide: false});
+    node.pointers[RIGHT].layout();
     jsav.gradeableStep();
 
     //Fifth pointer operation
-    parent.child(lr).left(node ?? null, {hide: false});
-    parent.child(lr).pointers[LEFT].layout();
     jsav.umsg(interpret("av_rotation"), 
               {fill: {
+                linenr: linenr[4],
                 left: "f->" + lr_text + "->left", 
                 right: "p"
               }});
+    jsav.step();
+    parent.child(lr).left(node ?? null, {hide: false});
+    parent.child(lr).pointers[LEFT].layout();
     jsav.gradeableStep();
   }
 

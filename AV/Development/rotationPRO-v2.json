@@ -11,11 +11,11 @@
       "av_1_not_part_of_tree": "1 node is not part of the tree.",
       "av_not_part_of_tree": "{num} nodes are not part of the tree.",
       "av_ms_last": "The last inserted node.",
-      "av_ms_unbalanced": "The unbalanced node",
+      "av_ms_unbalanced": "The unbalanced node <strong>p</strong>.<br><strong>f</strong> is the father of <strong>p</strong>.",
       "av_ms_after_rotation": "The tree after the rotation.", 
-      "av_rotation_type": "<strong>f->{ploc} == p</strong> and <strong>height(p.left) {symbol} height(p.right)</strong>. <br>We perform a <strong>{rotation} rotation.</strong>", 
-      "av_rotation": "<strong>{left} = {right}</strong>", 
-      "av_rotation_null": "<strong>{left} = {right} </strong><br><strong>{right}</strong> is a null-pointer, so we set <strong>{left}</strong> to null."
+      "av_rotation_type": "We perform a <strong>{rotation} rotation</strong>, because <br><strong>f->{ploc} == p</strong> and <strong>height(p.left) {symbol} height(p.right)</strong>.", 
+      "av_rotation": "{linenr}. <strong>{left} = {right}</strong>", 
+      "av_rotation_null": "{linenr}. <strong>{left} = {right} </strong><br><strong>{right}</strong> is a null-pointer, so we set <strong>{left}</strong> to null."
     },
     "fi": {
       ".exerciseTitle": "Rotaatio",
@@ -28,11 +28,11 @@
       "av_1_not_part_of_tree": "1 solmu ei kuulu puuhun.",
       "av_not_part_of_tree": "{num} solmua ei kuulu puuhun.",
       "av_ms_last": "Viimeksi lisätty solmu.",
-      "av_ms_unbalanced": "Epätasapainossa oleva solmu.",
+      "av_ms_unbalanced": "Epätasapainossa oleva solmu. The unbalanced node <strong>p</strong>.<br><strong>f</strong> is the father of <strong>p</strong>.",
       "av_ms_after_rotation": "Puu rotaation jälkeen.", 
-      "av_rotation_type": "<strong>f->{ploc} == p</strong> and <strong>height(p.left) {symbol} height(p.right)</strong>. <br>We perform a <strong>{rotation} rotation.</strong>", 
-      "av_rotation": "<strong>{left} = {right}</strong>", 
-      "av_rotation_null": "<strong>{left} = {right} </strong><br><strong>{right}</strong> is a null-pointer, so we set <strong>{left}</strong> to null."
+      "av_rotation_type": "We perform a <strong>{rotation} rotation</strong>, because <br><strong>f->{ploc} == p</strong> and <strong>height(p.left) {symbol} height(p.right)</strong>.", 
+      "av_rotation": "{linenr}. <strong>{left} = {right}</strong>", 
+      "av_rotation_null": "{linenr}. <strong>{left} = {right} </strong><br><strong>{right}</strong> is a null-pointer, so we set <strong>{left}</strong> to null."
     }
   },
   "code" : {

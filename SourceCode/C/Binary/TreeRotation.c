@@ -1,6 +1,6 @@
 /* *** ODSATag: struct *** */
 struct node {
-    char key;
+    int key;
     struct node *left;
     struct node *right;
 };
@@ -21,14 +21,14 @@ if (f->left == p) {
     f->left->left = p;
   }
 } else { // f->right == p
-  if (height(p.left) < height(p.right)) {
+  if (height(p.left) > height(p.right)) {
+    f->right = p->left;  // single rotation right
+    p->left = f->right->right;
+    f->right->right = p; 
+  } else { // height(p.left) < height(p.right)
     f->right = p->right; // single rotation left
     p->right = f->right->left;
     f->right->left = p;
-  } else { // height(p.left) > height(p.right)
-    f->right = p->left;  // single rotation right
-    p->left = f->right->right;
-    f->right->right = p;  
   }
 }
 /* *** ODSAendTag: single *** */
