@@ -195,7 +195,7 @@
 
   var exercise = av.exercise(modelSolution, initialize,
                              { feedback: "atend", grader: "finalStep",
-                               modelDialog: {width: 780}});
+                               modelDialog: {"minWidth": 780, "width": ""}});
   exercise.reset();
 
 }(jQuery));
