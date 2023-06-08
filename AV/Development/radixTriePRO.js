@@ -73,7 +73,7 @@
 
   function initialize() {
 
-    av.container.find(".jsavcanvas").css("min-height", 450);
+    av.container.find(".jsavcanvas").css("min-height", 490);
 
     if (typeof clickHandler === "undefined") {
       clickHandler = new ClickHandler(av, exercise, {
