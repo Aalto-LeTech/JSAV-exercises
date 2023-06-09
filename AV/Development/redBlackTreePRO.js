@@ -12,7 +12,7 @@
       config = ODSA.UTILS.loadConfig({av_container: "jsavcontainer"}),
       interpret = config.interpreter,
       code = config.code,
-      codeOptions = {after: {element: $(".instructions")}, visible: true, lineNumbers: false},
+      codeOptions = {after: {element: $(".code")}, visible: true, lineNumbers: false},
 
       // Create a JSAV instance
       av = new JSAV($("#jsavcontainer"));
