@@ -681,6 +681,7 @@
     //If no node with the correct label exists, do nothing.
     if (!updatedNode) {
       popup.close();
+      window.alert(interpret("av_update_not_possible"));
       return;
     }
 
