@@ -114,7 +114,7 @@
     var i;
     // create the model
     var modelGraph = modeljsav.ds.graph({
-      width: 400,
+      width: 500,
       height: 400,
       layout: "automatic",
       directed: false
