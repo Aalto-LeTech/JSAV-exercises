@@ -9,7 +9,8 @@
       "av_ms_process_edge": "Process edge ({from}, {to}).",
       "av_ms_already_visited": " Node {node} already visited",
       "#help": "Help",
-      "#about": "About"
+      "#about": "About", 
+      "reset": "New Exercise"
     },
     "fi": {
       ".avTitle": "Syvyyssuuntainen haku",
@@ -20,7 +21,8 @@
       "av_ms_process_edge": "Prosessoidaan särmää ({from}, {to}).",
       "av_ms_already_visited": " Solmu {node} on jo läpikäyty",
       "#help": "Ohje",
-      "#about": "Lisätietoa"
+      "#about": "Lisätietoa",
+      "reset": "Uusi Tehtävä"
     }
   },
   "params": {

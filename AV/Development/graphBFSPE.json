@@ -11,7 +11,8 @@
       "av_ms_already_visited": " Node {node} already visited",
       "av_ms_all_neighbors_visited": "All the neighbors of {node} have already been visited.\n",
       "#help": "Help",
-      "#about": "About"
+      "#about": "About", 
+      "reset": "New Exercise"
     },
     "fi": {
       ".avTitle": "Syvyyssuuntainen haku",
@@ -24,7 +25,8 @@
       "av_ms_already_visited": " Solmu {node} on jo läpikäyty",
       "av_ms_all_neighbors_visited": "Kaikki {node}:n naapurit on läpikäyty.\n",
       "#help": "Ohje",
-      "#about": "Lisätietoa"
+      "#about": "Lisätietoa", 
+      "reset": "Uusi Tehtävä"
     }
   },
   "params": {
