@@ -4,7 +4,7 @@
       ".avTitle": "Dijkstra's Algorithm Proficiency Exercise",
       "av_Authors": "Mohammed Fawzi, Kasper Hellström, Ari Korhonen, Johanna Sänger, Artturi Tilanterä",
       ".instructLabel": "Instructions:",
-      ".instructions": "Simulate the behavior of Dijkstra’s Algorithm for the given graph below. Click on an <strong>edge</strong> (parent, node) to enqueue or update a node in the Priority Queue (PQ). Click <strong>Dequeue</strong> to remove the node from PQ, and to add a node to the spanning tree. Start with node A. For each node, process its neighbors in alphabetic order.",
+      ".instructions": "Simulate the behavior of Dijkstra’s Algorithm for the given graph below. Click on an <strong>edge</strong> (parent, node) to enqueue or update a node in the Priority Queue (PQ). Click <strong>Dequeue</strong> to remove the node from PQ, and to add a node to the spanning tree. Start with node A. For each node, process its neighbors in alphabetic order. The table contains the known shortest distance from A to each node alongside its parent node.",
       "av_ms_shortest": "Shortest paths from A.",
       "av_ms_select_a": "Start by selecting node A.",
       "av_ms_select_node": "Select {node}, since it has the shortest distance from A.",
@@ -17,6 +17,7 @@
       "av_update_not_possible": "It is not possible to update a node that does not exist in the priority queue.",
       "#help": "Help",
       "#about": "About",
+      "reset": "New Exercise",
       "#enqueue": "Enqueue",
       "#update": "Update",
       "#dequeue": "Dequeue",
@@ -24,13 +25,18 @@
       "node": "Node",
       "distance": "Distance",
       "parent": "Parent",
-      "edge": "Edge"
+      "edge": "Edge", 
+      "legend": "Legend", 
+      "node_explanation": "<tspan>C has distance 5 from A</tspan><tspan x='90' dy='20'>with parent B</tspan>", 
+      "graph_edge": "Graph edge", 
+      "enqueued_edge": "Enqueued edge", 
+      "spanning_edge": "Spanning tree edge"
     },
     "fi": {
       ".avTitle": "Dijkstran algoritmi",
       "av_Authors": "Mohammed Fawzi, Kasper Hellström, Ari Korhonen, Johanna Sänger, Artturi Tilanterä",
       ".instructLabel": "Ohjeet:",
-      ".instructions": "Simuloi Dijkstran algoritmin toimintaa annetulle verkolle. Klikkaa <strong>särmää</strong> (vanhempi, solmu) lisätäksesi tai päivittääksesi solmun Prioriteettijonoon (PJ). Klikkaa <strong>Poista</strong> poistaaksesi solmun PJ:sta ja lisätäksesi solmun virityspuuhun. Aloita solmusta A. Käy kunkin solmun naapurit läpi aakkosjärjestyksessä.",
+      ".instructions": "Simuloi Dijkstran algoritmin toimintaa annetulle verkolle. Klikkaa <strong>särmää</strong> (vanhempi, solmu) lisätäksesi tai päivittääksesi solmun Prioriteettijonoon (PJ). Klikkaa <strong>Poista</strong> poistaaksesi solmun PJ:sta ja lisätäksesi solmun virityspuuhun. Aloita solmusta A. Käy kunkin solmun naapurit läpi aakkosjärjestyksessä. The table contains the known shortest distance from A to each node alongside its parent node.",
       "av_ms_shortest": "Lyhyimmät reitit A:sta.",
       "av_ms_select_a": "Aloitetaan valitsemalla solmu A.",
       "av_ms_select_node": "Valitaan {node}, koska sillä on lyhyin etäisyys A:han.",
@@ -43,6 +49,7 @@
       "av_update_not_possible": "It is not possible to update a node that does not exist in the priority queue.",
       "#help": "Ohje",
       "#about": "Lisätietoa",
+      "reset": "Uusi Tehtävä",
       "#enqueue": "Lisää",
       "#update": "Päivitä",
       "#dequeue": "Poista",
@@ -50,7 +57,12 @@
       "node": "Solmu",
       "distance": "Etäisyys",
       "parent": "Vanhempi",
-      "edge": "Särmä"
+      "edge": "Särmä", 
+      "legend": "Legend", 
+      "node_explanation": "<tspan>C has distance 5 from A</tspan><tspan x='90' dy='20'>with parent B</tspan>", 
+      "graph_edge": "Graph edge", 
+      "enqueued_edge": "Enqueued edge", 
+      "spanning_edge": "Spanning tree edge"
     }
   },
   "params": {
