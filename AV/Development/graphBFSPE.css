@@ -16,12 +16,12 @@
 }
 
 .jsavnode.marked {
-  background-color: #FFF050;
+  background-color: #ffe100;
 }
 .jsavedge {
   stroke-width: 8;
-  stroke: #7D8879;
+  stroke: #d1c39d;
 }
 .jsavedge.marked {
-  stroke: #F6B611;
+  stroke: #ffe100;
 }

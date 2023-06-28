@@ -42,6 +42,13 @@
     let nlGraph = graphUtils.generatePlanarNl(nVertices, nEdges, weighted,
         directed, width, height);
 
+    // Assure that the random planar graph has A connected to another node
+    // and a sufficiently large spanning tree, i.e. at least 7 edges
+    while (spanning_tree(nlGraph).length < 7) {
+      console.warn("TOO SMALL SPANNING TREE:", spanning_tree(nlGraph).length);
+      nlGraph = graphUtils.generatePlanarNl(nVertices, nEdges, weighted, directed, width, height);
+    }
+
     // Create a JSAV graph instance
     if (graph) {
       graph.clear();
@@ -57,6 +64,34 @@
     graph.nodes()[0].addClass("marked"); // mark the 'A' node
     jsav.displayInit();
     return graph;
+  }
+
+  /**
+   * Calculate the spanning tree for the nlGraph. This is used to ensure
+   * that the spanning tree is sufficiently large and the exercise is not
+   * trivially easy. 
+   * The spanning tree is calculated using the BFS algorithm. 
+   * @param nlGraph as returned by graphUtils.js
+   * @returns spanning tree edge list
+   */
+  function spanning_tree(nlGraph) {
+    let visited = [];
+    let queue = [];
+    let edges = []; //Edges selected in the bfs spanning tree.
+    let node = 0;
+    queue.push(node);
+
+    while (queue.length > 0) {
+      node = queue.shift();
+      visited.push(node);
+      for (const neighbor of nlGraph.edges[node]) {
+        if (!visited.includes(neighbor.v) && !queue.includes(neighbor.v)) {
+          queue.push(neighbor.v);
+          edges.push([node, neighbor.v]);
+        }
+      }
+    }
+    return edges;
   }
 
   function fixState(modelGraph) {
@@ -79,7 +114,7 @@
     var i;
     // create the model
     var modelGraph = modeljsav.ds.graph({
-      width: 400,
+      width: 500,
       height: 400,
       layout: "automatic",
       directed: false
@@ -178,6 +213,7 @@
   exercise = jsav.exercise(model, init, {
     compare: {class: "marked"},
     controls: $(".jsavexercisecontrols"),
+    resetButtonTitle: interpret("reset"),
     fix: fixState
   });
   exercise.reset();
