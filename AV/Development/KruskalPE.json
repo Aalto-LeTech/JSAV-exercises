@@ -10,7 +10,8 @@
       "av_ms_adding": "Adding edge to the MST",
       "av_ms_dismiss": "Dismiss edge",
       "#help": "Help",
-      "#about": "About"
+      "#about": "About",
+      "reset": "New Exercise"
     },
     "fi": {
       ".avTitle": "Kruskalin algoritmi",
@@ -22,7 +23,8 @@
       "av_ms_adding": "Lisätään särmä virityspuuhun",
       "av_ms_dismiss": "Hylätään särmä",
       "#help": "Ohje",
-      "#about": "Lisätietoa"
+      "#about": "Lisätietoa",
+      "reset": "Uusi Tehtävä"
     }
   },
   "params": {
