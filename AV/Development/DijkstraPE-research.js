@@ -280,6 +280,7 @@
   exercise = jsav.exercise(model, init, {
     compare: { class: "marked" },
     controls: $('.jsavexercisecontrols'),
+    modelDialog: {width: "800px"},
     resetButtonTitle: interpret("reset"),
     fix: fixState
   });
