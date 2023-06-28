@@ -89,7 +89,42 @@
   margin: 10px;
 }
 
+.focusnode {
+  border: 2px solid;
+}
+
 .avcontainer .jsavhorizontalarray > li:first-child {
   max-width: none !important;
   min-width: 70px !important;
+}
+
+.legend {
+  height: 250px;
+  width: 250px;
+  border: 1px solid;
+  background-color: #ffffff;
+}
+
+.edge {
+  stroke-width: 10;
+  stroke: #d1c39d;
+}
+
+.edge.spanning {
+  stroke: #ffe000;
+}
+
+.edge.queued {
+  stroke: #d59f0d;
+}
+
+.flex {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+.flex > div {
+  margin-left: 20px;
+  margin-right: 20px;
 }
