@@ -1,0 +1,27 @@
+#container {
+  width: 800px;
+  height: 595px;
+}
+.jsavline {
+  height: 45px;
+  margin: 0 0 0 20px;
+}
+
+#procontrols {
+  text-align: center;
+}
+
+.jsavgraph svg {
+  z-index: 0;
+}
+
+.jsavnode.marked {
+  background-color: #ffe100;
+}
+.jsavedge {
+  stroke-width: 8;
+  stroke: #d1c39d;
+}
+.jsavedge.marked {
+  stroke: #ffe100;
+}
