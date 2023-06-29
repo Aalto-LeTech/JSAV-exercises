@@ -1650,8 +1650,7 @@
   function addMinheap () {
     if (minheap) {
       minheap.clear();
-      $(".prioqueue").remove();
-      $(".bintree").remove();
+      $(".flex").remove();
     }
     heapsize = heapsize.value(0);
     // We generate the priority queue and legend on the fly. 
