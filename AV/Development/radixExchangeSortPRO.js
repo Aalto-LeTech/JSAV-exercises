@@ -17,7 +17,7 @@
 
   av.recorded(); // we are not recording an AV with an algorithm
 
-  pseudo = av.code($.extend({after: {element: $(".instructions")}, visible: true}, code));
+  pseudo = av.code($.extend({after: {element: $(".code")}, visible: true}, code));
 
   function initialize() {
     
