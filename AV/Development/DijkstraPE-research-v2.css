@@ -112,6 +112,7 @@
 
 .edge.spanning {
   stroke: #ffe000;
+  stroke-width: 16px;
 }
 
 .edge.queued {
