@@ -12,7 +12,8 @@
       "av_ms_unreachable": "The nearest unvisited node is at infinite distance. The algorithm ends.",
       "av_ms_update_distances": "Update distance to {node}'s neighbors. For updated nodes, set closest node to {node}",
       "#help": "Help",
-      "#about": "About"
+      "#about": "About",
+      "reset": "New Exercise"
     },
     "fi": {
       ".avTitle": "Primin algoritmi",
@@ -26,7 +27,8 @@
       "av_ms_unreachable": "Etäisyys lähimpään solmuun, jossa ei ole vierailtu, on ääretön. Algoritmi päättyy.",
       "av_ms_update_distances": "Päivitetään etäisyyksiä {node}-solmun naapureihin. Päivitetyille solmuille asetetaan lähin solmu {node}:ksi.",
       "#help": "Ohje",
-      "#about": "Lisätietoa"
+      "#about": "Lisätietoa",
+      "reset": "Uusi Tehtävä"
     }
   },
   "params": {
