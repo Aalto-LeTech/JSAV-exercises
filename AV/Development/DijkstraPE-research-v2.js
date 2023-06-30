@@ -434,7 +434,7 @@
         highlight(edge, neighbour);
         av.gradeableStep();
       } else if (distViaSrc < currNeighbourDist) {
-        updateNode(src.value(), neighbour.value(), distViaSrc);
+        const oldEdge = updateNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
         debugPrint("Model solution gradeable step:  UPDATE DISTANCE TO:",
          distViaSrc + neighbour.value());
@@ -442,6 +442,8 @@
         av.umsg(interpret("av_ms_visit_neighbor_update"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
+        av.step();
+        oldEdge.removeClass("queued")
         av.gradeableStep();
       } else {
         debugPrint("KEEP DISTANCE THE SAME:",
@@ -518,13 +520,14 @@
           node.element[0].getAttribute("data-value") === dstLabel)[0];
       const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode)
       edge.addClass("queued")
-      //Remove queued class from the old edge
+      // We determine what the old edge is so that we can remove the queued
+      // class from it later. 
       const oldLabel = updatedNode.value();
       const oldSrcLabel = oldLabel.charAt(oldLabel.length - 2);
       const oldSrcNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === oldSrcLabel)[0];
       const oldEdge = dstNode.edgeFrom(oldSrcNode) ?? dstNode.edgeTo(oldSrcNode)
-      oldEdge.removeClass("queued");
+      // oldEdge.removeClass("queued");
       updatedNode.value(label);
       //Inline while loop to move the value up if needed.
       //Because if you pass a node along as a parameter, it does not like
@@ -538,6 +541,7 @@
         node = node.parent();
       }
       mintree.layout();
+      return oldEdge
     }
   }
 
