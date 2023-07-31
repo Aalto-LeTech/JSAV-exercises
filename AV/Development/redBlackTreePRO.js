@@ -7,6 +7,7 @@
       stack,
       insertSize = 10,
       clickHandler,
+      highlighted,
 
       // Load the configurations created by odsaAV.js
       config = ODSA.UTILS.loadConfig({av_container: "jsavcontainer"}),
@@ -92,21 +93,130 @@
     for (var i = 0; i < insertSize; i++) {
       //find emptynode where the value will be inserted
       var node = modelTree.insert(insertValues[i]).removeClass("emptynode");
+      node.addClass("highlighted");
       modelTree.addEmptyNodes();
       modelTree.layout();
-      jsav.stepOption("grade", true);
-      jsav.step();
+      jsav.umsg(interpret("av_insert"));
+      jsav.gradeableStep();
       // fix the tree by recoloring nodes and performing rotations
-      if (node.repair() !== false) {
+      if (repair(jsav, node, modelTree) !== false) {
         modelTree.layout();
         if (i === insertSize - 1) {
-          jsav.stepOption("grade", true);
+          jsav.gradeableStep();
+        } else {
+          jsav.step();
         }
-        jsav.step();
+        highlighted.removeClass("highlighted");
       }
+      node.removeClass("highlighted");
     }
 
     return modelTree;
+  }
+
+  /**
+   * This solution of RB-tree insertion is based on the solution in 
+   * OpenDSA/DataStructures/redblacktree.js by Kasper Hellström
+   * @param jsav the model answer jsav instance, needed to call step()
+   * and umsg() on the model answer instance
+   * @param node the node which needs to be repaired to maintain the 
+   * RB-tree property
+   * @param modelTree the model answer rb-tree jsav object. This is 
+   * needed to call an update to the tree lay-out in insert_case5().
+   * @returns true or false
+   */
+  function repair(jsav, node, modelTree) {
+    return insert_case1(jsav, node, modelTree);
+  };
+
+  //Insert cases from Wikipedia:
+  //http://en.wikipedia.org/wiki/Red-black_tree
+  function insert_case1(jsav, node, modelTree) {
+    highlighted = node;
+    node.addClass("highlighted");
+    if (!node.parent()) {
+      jsav.umsg(interpret("av_root_black"));
+      node.colorBlack();
+    } else {
+      return insert_case2(jsav, node, modelTree);
+    }
+  }
+
+  function insert_case2(jsav, node, modelTree) {
+    if (node.parent().isBlack()) {
+      jsav.umsg(interpret("av_parent_black"));
+      return false; //did nothing
+    } else {
+      insert_case3(jsav, node, modelTree);
+    }
+  }
+
+  function insert_case3(jsav, node, modelTree) {
+    var u = node.uncle();
+    if (u && !u.hasClass("emptynode") && u.isRed()) {
+      node.parent().colorBlack();
+      u.colorBlack();
+      var g = node.grandparent();
+      g.colorRed();
+      jsav.umsg(interpret("av_change_colours"));
+      jsav.step();
+      node.removeClass("highlighted");
+      insert_case1(jsav, g, modelTree);
+    } else {
+      insert_case4(jsav, node, modelTree);
+    }
+  }
+
+  function insert_case4(jsav, node, modelTree) {
+    var g = node.grandparent();
+    jsav.umsg(interpret("av_rotation_1"));
+    jsav.step();
+    if (node === node.parent().right() && node.parent() === g.left()) {
+      node.parent().rotateLeft();
+      insert_case5(jsav, node.left(), modelTree, true);
+    } else if (node === node.parent().left() && node.parent() === g.right()) {
+      node.parent().rotateRight();
+      insert_case5(jsav, node.right(), modelTree, true);
+    } else {
+      insert_case5(jsav, node, modelTree);
+    }
+  }
+
+  /**
+   * Case 5 has an extra parameter: double. Double is true if we need to 
+   * perform double rotation. Default is false. This is because double
+   * rotation is two single rotation, one that happens in Case 4, and
+   * one in case 5. 
+   * @param double Boolean indicating wether it is a double rotation or not. 
+   * Default is false. 
+   */
+  function insert_case5(jsav, node, modelTree, double = false) {
+    highlighted.removeClass("highlighted");
+    var g = node.grandparent();
+    g.addClass("highlighted");
+    jsav.umsg(interpret("av_rotation_2"));
+    jsav.step();
+
+    if (node === node.parent().left()) {
+      var message = double ? interpret("av_lr_rotation") 
+                           : interpret("av_r_rotation");
+      jsav.umsg(message);
+      jsav.step();
+      g.rotateRight();
+    } else {
+      var message = double ? interpret("av_rl_rotation") 
+                           : interpret("av_l_rotation");
+      jsav.umsg(message);
+      jsav.step();
+      g.rotateLeft();
+    }
+    
+    modelTree.layout();
+    jsav.step();
+    g.parent().colorBlack();
+    g.colorRed();
+    g.removeClass("highlighted");
+    jsav.umsg(interpret("av_colour_after_rotation"));
   }
 
   // create buttoncontainer if it doesn't exist
