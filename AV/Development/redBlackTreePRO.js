@@ -154,6 +154,8 @@
   function insert_case3(jsav, node, modelTree) {
     var u = node.uncle();
     if (u && !u.hasClass("emptynode") && u.isRed()) {
+      jsav.umsg(interpret("av_rotation"));
+      jsav.step();
       node.parent().colorBlack();
       u.colorBlack();
       var g = node.grandparent();
@@ -169,6 +171,8 @@
 
   function insert_case4(jsav, node, modelTree) {
     var g = node.grandparent();
+    jsav.umsg(interpret("av_rotation"));
+    jsav.step();
     jsav.umsg(interpret("av_rotation_1"));
     jsav.step();
     if (node === node.parent().right() && node.parent() === g.left()) {
