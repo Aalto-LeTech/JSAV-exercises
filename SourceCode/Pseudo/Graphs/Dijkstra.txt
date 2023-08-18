@@ -1,0 +1,14 @@
+Algorithm Dijkstra(G, source)
+    foreach v in V:
+        distance[v] := infinity
+        previous[v] := undefined
+    distance[source] := 0
+    insert source into Q
+    while Q is not empty:
+        u := remove v from Q with smallest distance[]
+        for each (u, v) in E:
+            if (dist := distance[u] + distance(u, v)) < distance[v]:
+                distance[v] := dist
+                previous[v] := u
+                update or insert v into Q
+    return previous[]
