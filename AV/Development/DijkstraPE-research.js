@@ -13,12 +13,21 @@
       config = ODSA.UTILS.loadConfig(),
       interpret = config.interpreter,
       settings = config.getSettings(),
+      code = config.code,
+      pseudo,
       jsav = new JSAV($('.avcontainer'), {settings: settings}),
       exerciseInstance,
       lastLinearTransform = -1, // for generateInstance()
       debug = false; // produces debug prints to console
 
   jsav.recorded();
+
+  if (code) {
+    pseudo = jsav.code($.extend({after: {element: $(".code")}}, code));
+    pseudo.highlight(8)
+  } else {
+    pseudo = jsav.code();
+  }
 
   function init() {
     // Create a JSAV graph instance
@@ -40,6 +49,9 @@
     graph.layout();
     graph.nodes()[exerciseInstance.startIndex].addClass("marked"); // mark the 'A' node
     jsav.displayInit();
+    // Remove the initially calculated min-width to ensure that the graph is 
+    // to the right of the code block. 
+    $(".jsavcanvas").css("min-width", "")
     return graph;
   }
 
