@@ -34,5 +34,10 @@
   "params": {
     "JXOP-feedback": "continuous",
     "JXOP-fixmode": "fix"
+  },
+  "code": {
+    "Pseudo": {
+      "url": "../../SourceCode/Pseudo/Graphs/Prim.txt"
+    }
   }
 }
