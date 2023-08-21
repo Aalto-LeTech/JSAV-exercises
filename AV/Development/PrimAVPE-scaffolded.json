@@ -25,7 +25,12 @@
       "node": "Node",
       "distance": "Distance",
       "parent": "Parent",
-      "edge": "Edge"
+      "edge": "Edge",
+      "legend": "Legend",
+      "node_explanation": "<tspan>C has distance 5 from A</tspan><tspan x='90' dy='20'>with parent B</tspan>",
+      "graph_edge": "Graph edge",
+      "enqueued_edge": "Enqueued edge",
+      "spanning_edge": "Spanning tree edge"
     },
     "fi": {
       ".avTitle": "Primin algoritmi",
@@ -52,7 +57,12 @@
       "node": "Solmu",
       "distance": "Etäisyys",
       "parent": "Vanhempi",
-      "edge": "Särmä"
+      "edge": "Särmä",
+      "legend": "Selite",
+      "node_explanation": "<tspan>C:n etäisyys A:sta on 5</tspan><tspan x='90' dy='20'>vanhemman B kautta</tspan>",
+      "graph_edge": "Verkon särmä",
+      "enqueued_edge": "Jonossa oleva särmä",
+      "spanning_edge": "Virityspuun särmä"
     }
   },
   "params": {
