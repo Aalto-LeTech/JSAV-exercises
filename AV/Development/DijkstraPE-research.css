@@ -1,11 +1,22 @@
 #container {
   /* width: 800px; */
-  height: 595px;
+  min-height: 595px;
 }
 
 .codeblock {
   float: left;
   margin: 1em;
+}
+
+.legend {
+  background-color: #FFFFFF; 
+  /* border: 1px solid; */
+  height: 115px;
+  margin-left: 40px;
+}
+
+.subheading {
+  margin-left: 40px;
 }
 
 .jsavline {
@@ -40,4 +51,14 @@
 .jsavautoresize .jsavnode {
   min-width: 45px;
   min-height: 45px;
+}
+
+.edge {
+  stroke-width: 10;
+  stroke: #d1c39d;
+}
+
+.edge.spanning {
+  stroke: #ffe000;
+  stroke-width: 16px;
 }

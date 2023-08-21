@@ -29,6 +29,21 @@
     pseudo = jsav.code();
   }
 
+   //Add the legend to the exercise
+   const edge = '<path d="M25,30L75,30" class="edge"></path>'
+              +'<text x="90" y="35">' + interpret("graph_edge") + '</text>'
+    const spanningEdge = '<path d="M25,80L75,80" class="edge spanning">' 
+                       + '</path><text x="90" y="85">'
+                       + interpret("spanning_edge") + '</text>'
+    const legend = "<div class='subheading'><center><strong>" 
+                 + interpret("legend")
+                 + "</center></strong></div>" 
+                 + "<div class='legend'>"
+                 + "<svg version='1.1' xmlns='http://www.w3.org/ 2000/svg'> "
+                 + edge + spanningEdge
+                 + " </svg></div>"
+    $(".codeblock").append(legend)
+
   function init() {
     // Create a JSAV graph instance
     if (graph) {
