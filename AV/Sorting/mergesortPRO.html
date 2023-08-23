@@ -29,6 +29,12 @@
   <form class="avcontainer">
     <p class="instructLabel"></p>
     <p class="instructions"></p>
+    <!-- This class of codeblock with child of class code are used to float
+    the pseudocode to the left side of the screen. The inner class code is
+    needed, as JSAV can only append to something, not add inside :) -->
+    <div class="codeblock" style="float: left;">
+      <div class="code"> </div>
+    </div>
     <p><span class="jsavscore"></span></p>
     <div id="arrays" class="jsavcanvas"></div>
   </form>
