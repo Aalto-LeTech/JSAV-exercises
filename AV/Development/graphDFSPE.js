@@ -10,6 +10,15 @@
 
   jsav.recorded();
 
+  var config = ODSA.UTILS.loadConfig({'av_container': 'jsavcontainer'}),
+      code = config.code, 
+      pseudo
+  if (code) {
+    pseudo = jsav.code($.extend({after: {element: $(".code")}}, code));
+  } else {
+    pseudo = jsav.code();
+  }
+
   function init_old() {
     // create the graph
     if (graph) {
@@ -63,6 +72,9 @@
     graph.layout();
     graph.nodes()[0].addClass("marked"); // mark the 'A' node
     jsav.displayInit();
+    // Remove the initially calculated size so that the graph sits next 
+    // to the code. 
+    $(".jsavcanvas").css("min-width", "")
     return graph;
   }
 
