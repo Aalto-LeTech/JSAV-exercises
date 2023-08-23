@@ -7,7 +7,7 @@ $(document).ready(function() {
   var interpret = config.interpreter;
 
   // Variables used by "setPosition()"
-  var canvasWidth = $("#container").width();     // The width of the display
+  var canvasWidth = 785; //$("#container").width();     // The width of the display
   var rowHeight = 70;        // Space required for each row to be displayed
   var blockWidth = 32;       // The width of an array element
 
@@ -25,6 +25,14 @@ $(document).ready(function() {
       userAnswerDepth = [],
       av = new JSAV($(".avcontainer"), {settings: settings}),
       exercise;
+
+  var code = config.code, 
+      pseudo
+  if (code) {
+    pseudo = av.code($.extend({after: {element: $(".code")}}, code));
+  } else {
+    pseudo = av.code();
+  }
 
   // Stores the various JSAV arrays created for the user to enter their solution
   var arrays = {};
@@ -82,6 +90,10 @@ $(document).ready(function() {
 
     av.forward();
     av._undo = [];
+
+    // For some reason this exercise likes to slap a "display: none;" on the
+    // code block. So we need to remove this. 
+    $(".jsavcode").css("display", "")
     return [userAnswerValue, userAnswerDepth];
   }
 
