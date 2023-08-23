@@ -1,0 +1,14 @@
+BFS-VISIT(G, u)
+    Initialize empty queue Q
+    for each u ∈ V[G] do
+        visited[u] ← false
+        finished[u] ← false
+    visited[s] ← true
+    ENQUEUE(Q, s)
+    while Q not empty do
+        u ← DEQUEUE(Q)
+        for each v ∈ Adj[u] do
+            if visited[v] = false then
+                visited[v] ← true
+                ENQUEUE(Q, v)
+        finished[u] = true
