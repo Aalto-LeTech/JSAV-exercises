@@ -12,10 +12,15 @@
       "av_not_part_of_tree": "{num} nodes are not part of the tree.",
       "av_ms_last": "The last inserted node.",
       "av_ms_unbalanced": "The unbalanced node <strong>p</strong> is highlighted.<br><strong>f</strong> is the father of <strong>p</strong>.",
-      "av_ms_after_rotation": "The tree after the rotation.", 
-      "av_rotation_type": "We perform a <strong>{rotation} rotation</strong>, because <br><strong>f->{ploc} == p</strong> and <strong>height(p.left) {symbol} height(p.right)</strong>.", 
-      "av_rotation": "{linenr}. <strong>{left} = {right}</strong>", 
-      "av_rotation_null": "{linenr}. <strong>{left} = {right} </strong><br><strong>{right}</strong> is a null-pointer, so we set <strong>{left}</strong> to null."
+      "av_ms_after_rotation": "The tree after the rotation.",
+      "av_rotation_type": "We perform a <strong>{rotation}</strong>, because <br><code>f->{ploc} == p</code> &ensp;and&ensp;<code>height(p.left) {symbol} height(p.right)</code>.",
+      "av_rotation": "{linenr}. <code>{left} = {right}</code>",
+      "av_rotation_R": "single rotation right",
+      "av_testimauci": "testimauci",
+      "av_rotation_L": "single rotation left",
+      "av_rotation_RL": "right-left double rotation",
+      "av_rotation_LR": "left-right double rotation",
+      "av_rotation_null": "{linenr}. <code>{left} = {right} </code><br><strong>{right}</strong> is a null-pointer, so we set <strong>{left}</strong> to null."
     },
     "fi": {
       ".exerciseTitle": "Rotaatio",
@@ -28,11 +33,15 @@
       "av_1_not_part_of_tree": "1 solmu ei kuulu puuhun.",
       "av_not_part_of_tree": "{num} solmua ei kuulu puuhun.",
       "av_ms_last": "Viimeksi lisätty solmu.",
-      "av_ms_unbalanced": "Epätasapainossa oleva solmu. The unbalanced node <strong>p</strong> is highlighted.<br><strong>f</strong> is the father of <strong>p</strong>.",
-      "av_ms_after_rotation": "Puu rotaation jälkeen.", 
-      "av_rotation_type": "We perform a <strong>{rotation} rotation</strong>, because <br><strong>f->{ploc} == p</strong> and <strong>height(p.left) {symbol} height(p.right)</strong>.", 
-      "av_rotation": "{linenr}. <strong>{left} = {right}</strong>", 
-      "av_rotation_null": "{linenr}. <strong>{left} = {right} </strong><br><strong>{right}</strong> is a null-pointer, so we set <strong>{left}</strong> to null."
+      "av_ms_unbalanced": "Epätasapainossa oleva solmu <strong>p</strong> on korostettu.<br><strong>f</strong> on <strong>p</strong>:n vanhempi.",
+      "av_ms_after_rotation": "Puu rotaation jälkeen.",
+      "av_rotation_type": "Tee <strong>{rotation}</strong>, koska <br><strong>f->{ploc} == p</strong> ja <strong>height(p.left) {symbol} height(p.right)</strong>.",
+      "av_rotation": "{linenr}. <strong>{left} = {right}</strong>",
+      "av_rotation_R": "yksinkertainen rotaatio oikealle",
+      "av_rotation_L": "yksinkertainen rotaatio vasemmalle",
+      "av_rotation_RL": "oikea-vasen-kaksoisrotaatio",
+      "av_rotation_LR": "vasen-oikea-kaksoisrotaatio",
+      "av_rotation_null": "{linenr}. <strong>{left} = {right} </strong><br><strong>{right}</strong> on null-osoitin, joten asetetaan <strong>{left}</strong>:n arvoksi null."
     }
   },
   "code" : {
