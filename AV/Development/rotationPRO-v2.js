@@ -22,7 +22,7 @@
       av = new JSAV($("#jsavcontainer"));
 
   // These constants are used in the model solutions for the position of the
-  // relevant child nodes in the array. 
+  // relevant child nodes in the array.
   const LEFT = 0;
   const RIGHT = 1;
 
@@ -110,36 +110,37 @@
     jsav.umsg(interpret("av_ms_unbalanced"));
     jsav.step();
 
-    // ploc is the location of p relative to f, i.e. whether p is left 
+    // ploc is the location of p relative to f, i.e. whether p is left
     // or right child of f.
-    const ploc = unbalancedNode ? 
-              (unbalancedNode.parent().left() === unbalancedNode ? 
-              "left" : "right") 
+    const ploc = unbalancedNode ?
+              (unbalancedNode.parent().left() === unbalancedNode ?
+              "left" : "right")
               : undefined;
 
-    // determineRotation returns an object with the rotation, type (single or 
-    // double) and the symbol (> or <) for the explanation string. 
+    // determineRotation returns an object with the rotation, type (single or
+    // double) and the symbol (> or <) for the explanation string.
     const rotation = determineRotation(unbalancedNode);
-
-    jsav.umsg(interpret("av_rotation_type"), 
-                        {fill: {
-                          ploc: ploc, 
-                          rotation: rotation.rotation + "-" + rotation.type, 
-                          symbol: rotation.symbol
-                        }}); 
-    
+    const rotationText = interpret("av_rotation_" + rotation.rotation);
+    jsav.umsg(interpret("av_rotation_type"),
+        {
+            fill: {
+                ploc: ploc,
+                rotation: rotationText,
+                symbol: rotation.symbol
+            }
+        });
     jsav.step();
 
     // These are the line numbers that are used in the model answer
     // They are indexed as "{rotation type}{p's location in f}"
     const linenrs = {
-      "LRleft" : [4, 5, 6, 7, 8], 
-      "RLleft" : [10, 11, 12, 13, 14], 
-      "LRright" : [18, 19, 20, 21, 22], 
-      "RLright" : [24, 25, 26, 27, 28], 
-      "Rleft": [4, 5, 6], 
+      "LRleft" : [4, 5, 6, 7, 8],
+      "RLleft" : [10, 11, 12, 13, 14],
+      "LRright" : [18, 19, 20, 21, 22],
+      "RLright" : [24, 25, 26, 27, 28],
+      "Rleft": [4, 5, 6],
       "Lleft": [8, 9, 10],
-      "Rright": [14, 15, 16], 
+      "Rright": [14, 15, 16],
       "Lright": [18, 19, 20]
     }
     linenr = linenrs[rotation.rotation + ploc]
@@ -150,13 +151,13 @@
       case "LR":
         LRRotation(unbalancedNode, jsav);
         break;
-      case "RL": 
+      case "RL":
         RLRotation(unbalancedNode, jsav);
         break;
-      case "R": 
-        RRotation(unbalancedNode, jsav); 
-        break; 
-      case "L": 
+      case "R":
+        RRotation(unbalancedNode, jsav);
+        break;
+      case "L":
         LRotation(unbalancedNode, jsav);
         break;
       default:
@@ -173,8 +174,8 @@
 
   /**
    * This function is based on lines 123-137 from AVLextension.js, where
-   * it determines what kind of rotation should be performed. 
-   * @param node the unbalanced node in the tree 
+   * it determines what kind of rotation should be performed.
+   * @param node the unbalanced node in the tree
    * @returns an object containing the rotation and symbol for the model answer
    */
   function determineRotation(node) {
@@ -203,7 +204,7 @@
     return {rotation, type, symbol};
   }
 
-  // Determine the height of the node in the tree. 
+  // Determine the height of the node in the tree.
   function height(node) {
     if (node) {
       return node.height();
@@ -212,9 +213,9 @@
   }
 
   /**
-   * Perform a single Right rotation on the unbalanced node. 
-   * @param node the jsav-object of the unbalanced node. 
-   * @param jsav the jsav instance of the model answer. 
+   * Perform a single Right rotation on the unbalanced node.
+   * @param node the jsav-object of the unbalanced node.
+   * @param jsav the jsav instance of the model answer.
    */
   function RRotation(node, jsav) {
     var parent = node.parent();
@@ -222,22 +223,22 @@
     const lr_text = lr === LEFT ? "left" : "right";
 
     //first pointer operation
-    jsav.umsg(interpret("av_rotation"), 
+    jsav.umsg(interpret("av_rotation"),
               {fill: {
                 linenr: linenr[0],
-                left: "f->" + lr_text, 
+                left: "f->" + lr_text,
                 right: "p->left"
               }});
     jsav.step();
-    parent.child(lr, node.left(), {hide: false}); 
+    parent.child(lr, node.left(), {hide: false});
     parent.pointers[lr].layout();
     jsav.gradeableStep();
 
     //Second pointer operation
-    jsav.umsg(interpret("av_rotation"), 
+    jsav.umsg(interpret("av_rotation"),
               {fill: {
                 linenr: linenr[1],
-                left: "p->left", 
+                left: "p->left",
                 right: "f->" + lr_text + "->right"
               }});
     jsav.step();
@@ -246,23 +247,23 @@
     jsav.gradeableStep();
 
     //Third pointer operation
-    jsav.umsg(interpret("av_rotation"), 
+    jsav.umsg(interpret("av_rotation"),
               {fill: {
                 linenr: linenr[2],
-                left: "f->" + lr_text + "->right", 
+                left: "f->" + lr_text + "->right",
                 right: "p"
               }});
     jsav.step();
-    parent.child(lr).right(node, {hide: false}); 
+    parent.child(lr).right(node, {hide: false});
     parent.child(lr).pointers[RIGHT].layout();
     jsav.gradeableStep();
-    
+
   }
 
   /**
-   * Perform a single Left rotation on the unbalanced node. 
-   * @param node the jsav-object of the unbalanced node. 
-   * @param jsav the jsav instance of the model answer. 
+   * Perform a single Left rotation on the unbalanced node.
+   * @param node the jsav-object of the unbalanced node.
+   * @param jsav the jsav instance of the model answer.
    */
   function LRotation(node, jsav) {
     var parent = node.parent();
@@ -270,22 +271,22 @@
     const lr_text = lr === LEFT ? "left" : "right";
 
     //first pointer operation
-    jsav.umsg(interpret("av_rotation"), 
+    jsav.umsg(interpret("av_rotation"),
               {fill: {
                 linenr: linenr[0],
-                left: "f->" + lr_text, 
+                left: "f->" + lr_text,
                 right: "p->right"
               }});
     jsav.step();
-    parent.child(lr, node.right(), {hide: false}); 
+    parent.child(lr, node.right(), {hide: false});
     parent.pointers[lr].layout();
     jsav.gradeableStep();
 
     //Second pointer operation
-    jsav.umsg(interpret("av_rotation"), 
+    jsav.umsg(interpret("av_rotation"),
               {fill: {
                 linenr: linenr[1],
-                left: "p->right", 
+                left: "p->right",
                 right: "f->" + lr_text + "->left"
               }});
     jsav.step();
@@ -294,14 +295,14 @@
     jsav.gradeableStep();
 
     //Third pointer operation
-    jsav.umsg(interpret("av_rotation"), 
+    jsav.umsg(interpret("av_rotation"),
               {fill: {
                 linenr: linenr[2],
-                left: "f->" + lr_text + "->left", 
+                left: "f->" + lr_text + "->left",
                 right: "p"
               }});
     jsav.step();
-    parent.child(lr).left(node, {hide: false}); 
+    parent.child(lr).left(node, {hide: false});
     parent.child(lr).pointers[LEFT].layout();
     jsav.gradeableStep();
   }
@@ -309,9 +310,9 @@
 
   /**
    * Perform a left right double rotation from the unbalanced node for the
-   * the model answer.  
+   * the model answer.
    * @param node the unbalanced node
-   * @param jsav the model answer jsav instance. 
+   * @param jsav the model answer jsav instance.
    */
   function LRRotation(node, jsav) {
     var parent = node.parent();
@@ -319,10 +320,10 @@
     const lr_text = lr === LEFT ? "left" : "right";
 
     //first pointer operation
-    jsav.umsg(interpret("av_rotation"), 
+    jsav.umsg(interpret("av_rotation"),
               {fill: {
                 linenr: linenr[0],
-                left: "f->" + lr_text, 
+                left: "f->" + lr_text,
                 right: "p->left->right"
               }});
     jsav.step();
@@ -332,17 +333,17 @@
 
     //second pointer operation
     if (parent.child(lr).left()) {
-      jsav.umsg(interpret("av_rotation"), 
+      jsav.umsg(interpret("av_rotation"),
                 {fill: {
                   linenr: linenr[1],
-                  left: "p->left->right", 
+                  left: "p->left->right",
                   right: "f->" + lr_text + "->left"
                 }});
     } else {
-      jsav.umsg(interpret("av_rotation_null"), 
+      jsav.umsg(interpret("av_rotation_null"),
                 {fill: {
                   linenr: linenr[1],
-                  left: "p->left->right", 
+                  left: "p->left->right",
                   right: "f->" + lr_text + "->left"
                 }});
     }
@@ -352,10 +353,10 @@
     jsav.gradeableStep();
 
     //Third pointer operation
-    jsav.umsg(interpret("av_rotation"), 
+    jsav.umsg(interpret("av_rotation"),
               {fill: {
                 linenr: linenr[2],
-                left: "f->" + lr_text + "->left", 
+                left: "f->" + lr_text + "->left",
                 right: "p->left"
               }});
     jsav.step();
@@ -365,17 +366,17 @@
 
     //Fourth step
     if (parent.child(lr).right()) {
-      jsav.umsg(interpret("av_rotation"), 
+      jsav.umsg(interpret("av_rotation"),
                 {fill: {
                   linenr: linenr[3],
-                  left: "p->left", 
+                  left: "p->left",
                   right: "f->" + lr_text + "->right"
                 }});
     } else {
-      jsav.umsg(interpret("av_rotation_null"), 
+      jsav.umsg(interpret("av_rotation_null"),
                 {fill: {
                   linenr: linenr[3],
-                  left: "p->left", 
+                  left: "p->left",
                   right: "f->" + lr_text + "->right"
                 }});
     }
@@ -385,10 +386,10 @@
     jsav.gradeableStep();
 
     //Fifth pointer operation
-    jsav.umsg(interpret("av_rotation"), 
+    jsav.umsg(interpret("av_rotation"),
               {fill: {
                 linenr: linenr[4],
-                left: "f->" + lr_text + "->right", 
+                left: "f->" + lr_text + "->right",
                 right: "p"
               }});
     jsav.step();
@@ -400,9 +401,9 @@
 
   /**
    * Perform a right left double rotation from the unbalanced node for the
-   * the model answer.  
+   * the model answer.
    * @param node the unbalanced node
-   * @param jsav the model answer jsav instance. 
+   * @param jsav the model answer jsav instance.
    */
   function RLRotation (node, jsav) {
     var parent = node.parent();
@@ -410,10 +411,10 @@
     const lr_text = lr === LEFT ? "left" : "right";
 
     //first pointer operation
-    jsav.umsg(interpret("av_rotation"), 
+    jsav.umsg(interpret("av_rotation"),
               {fill: {
                 linenr: linenr[0],
-                left: "f->" + lr_text, 
+                left: "f->" + lr_text,
                 right: "p->right->left"
               }});
     jsav.step();
@@ -423,17 +424,17 @@
 
     //second pointer operation
     if (parent.child(lr).right()) {
-      jsav.umsg(interpret("av_rotation"), 
+      jsav.umsg(interpret("av_rotation"),
                 {fill: {
                   linenr: linenr[1],
-                  left: "p->right->left", 
+                  left: "p->right->left",
                   right: "f->" + lr_text + "->right"
                 }});
     } else {
-      jsav.umsg(interpret("av_rotation_null"), 
+      jsav.umsg(interpret("av_rotation_null"),
                 {fill: {
                   linenr: linenr[1],
-                  left: "p->right->left", 
+                  left: "p->right->left",
                   right: "f->" + lr_text + "->right"
                 }});
     }
@@ -443,10 +444,10 @@
     jsav.gradeableStep();
 
     //Third pointer operation
-    jsav.umsg(interpret("av_rotation"), 
+    jsav.umsg(interpret("av_rotation"),
               {fill: {
                 linenr: linenr[2],
-                left: "f->" + lr_text + "->right", 
+                left: "f->" + lr_text + "->right",
                 right: "p->right"
               }});
     jsav.step();
@@ -456,17 +457,17 @@
 
     //Fourth step
     if (parent.child(lr).left()) {
-      jsav.umsg(interpret("av_rotation"), 
+      jsav.umsg(interpret("av_rotation"),
                 {fill: {
                   linenr: linenr[3],
-                  left: "p->right", 
+                  left: "p->right",
                   right: "f->" + lr_text + "->left"
                 }});
     } else {
-      jsav.umsg(interpret("av_rotation_null"), 
+      jsav.umsg(interpret("av_rotation_null"),
                 {fill: {
                   linenr: linenr[3],
-                  left: "p->right", 
+                  left: "p->right",
                   right: "f->" + lr_text + "->left"
                 }});
     }
@@ -476,10 +477,10 @@
     jsav.gradeableStep();
 
     //Fifth pointer operation
-    jsav.umsg(interpret("av_rotation"), 
+    jsav.umsg(interpret("av_rotation"),
               {fill: {
                 linenr: linenr[4],
-                left: "f->" + lr_text + "->left", 
+                left: "f->" + lr_text + "->left",
                 right: "p"
               }});
     jsav.step();
