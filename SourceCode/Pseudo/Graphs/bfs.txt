@@ -1,4 +1,4 @@
-BFS-VISIT(G, u)
+BFS-VISIT(G, s)
     Initialize empty queue Q
     for each u ∈ V[G] do
         visited[u] ← false
