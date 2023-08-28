@@ -1,0 +1,25 @@
+#container {
+  /* width: 785px; */
+  min-height: 610px;
+}
+
+.jsavcanvas {
+  overflow: hidden;
+}
+
+.jsavarray {
+  position: absolute;
+}
+
+.jsavcontainer {
+  overflow: visible;
+}
+
+.jsavhighlight {
+  font-size: 110%;
+}
+
+.codeblock {
+  float: left;
+  margin-right: 2em;
+}

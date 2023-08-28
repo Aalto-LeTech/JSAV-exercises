@@ -1,6 +1,6 @@
 #container {
-  width: 800px;
-  height: 595px;
+  /* width: 800px; */
+  min-height: 595px;
 }
 .jsavline {
   height: 45px;
