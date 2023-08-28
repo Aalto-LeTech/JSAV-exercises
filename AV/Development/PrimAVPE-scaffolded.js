@@ -860,11 +860,37 @@
       minheap.clear();
       $(".prioqueue").remove();
       $(".bintree").remove();
+      $(".flex").remove();
     }
     heapsize = heapsize.value(0);
-    $(".jsavcanvas").append("<div class='prioqueue'><strong>"
+    const edge = '<path d="M25,30L75,30" class="edge"></path>'
+               +'<text x="90" y="35">' + interpret("graph_edge") + '</text>'
+    const queuedEdge = '<path d="M25,80L75,80" class="edge queued">'
+                     + '</path><text x="90" y="85">'
+                     + interpret("enqueued_edge") + '</text>'
+    const spanningEdge = '<path d="M25,130L75,130" class="edge spanning">' 
+                       + '</path><text x="90" y="135">'
+                       + interpret("spanning_edge") + '</text>'
+    const node = '<circle cx="50" cy="200" r="22" fill="none" stroke="black" />'
+               + '<text x="45" y="195">5</text>'
+               + '<text x="35" y="213"> C (B)</text>'
+               + '<text x="90" y="190">' + interpret("node_explanation") + '</text>'
+    const legend = "<div><div class='prioqueue'><strong>" 
+                 + interpret("legend")
+                 + "</strong></div>" 
+                 + "<div class='legend'><svg version='1.1' xmlns='http://www.w3.org/2000/svg'> "
+                 + edge + queuedEdge + spanningEdge + node
+                 + " </svg></div></div>"
+    $(".jsavcanvas").append("<div class='flex'>"
+        + "<div class='left'><div class='prioqueue'><strong>"
         + interpret("priority_queue")
-        + "</strong></div><div class='bintree'></div>");
+        + "</strong></div><div class='bintree'></div></div>" 
+        + legend
+        + "</div>");
+
+    // Explicitly set the size of this one, otherwise it defaults to
+    // the size that the graph has. 
+    $(".legend > svg").css({'height': '250px', 'width': '250px'})
     minheap = jsav.ds.binarytree({relativeTo: $(".bintree"),
                                   myAnchor: "center center"});
     minheap.layout()
@@ -922,9 +948,9 @@
     table = jsav.ds.matrix([labelArr, distanceArr, parentArr],
                            {style: "table",
                            width: width,
-                           relativeTo: $(".jsavbinarytree"),
+                           relativeTo: $(".flex"),
                            myAnchor: "center top",
-                           top: "150px"});
+                           top: "150px"}); //Place below the bin tree
   }
 
   /**
