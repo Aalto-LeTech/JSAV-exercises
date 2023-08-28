@@ -13,7 +13,10 @@
       "av_ms_update_distances": "Update distance to {node}'s neighbors. For updated nodes, set closest node to {node}",
       "#help": "Help",
       "#about": "About",
-      "reset": "New Exercise"
+      "reset": "New Exercise",
+      "legend": "Legend",
+      "graph_edge": "Graph edge",
+      "spanning_edge": "Spanning tree edge"
     },
     "fi": {
       ".avTitle": "Primin algoritmi",
@@ -28,11 +31,19 @@
       "av_ms_update_distances": "Päivitetään etäisyyksiä {node}-solmun naapureihin. Päivitetyille solmuille asetetaan lähin solmu {node}:ksi.",
       "#help": "Ohje",
       "#about": "Lisätietoa",
-      "reset": "Uusi Tehtävä"
+      "reset": "Uusi Tehtävä",
+      "legend": "Selite",
+      "graph_edge": "Verkon särmä",
+      "spanning_edge": "Virityspuun särmä"
     }
   },
   "params": {
     "JXOP-feedback": "continuous",
     "JXOP-fixmode": "fix"
+  },
+  "code": {
+    "Pseudo": {
+      "url": "../../SourceCode/Pseudo/Graphs/Prim.txt"
+    }
   }
 }
