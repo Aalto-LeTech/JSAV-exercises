@@ -30,7 +30,7 @@
       clickHandler = new ClickHandler(av, exercise, {selectedClass: "selected", effect: "move"});
     }
     clickHandler.reset();
-    
+
     // generate values
     insertValues = generateValues(insertSize, 10, 100); //No duplicates!
     if (stack) {
@@ -115,13 +115,13 @@
   }
 
   /**
-   * This solution of RB-tree insertion is based on the solution in 
+   * This solution of RB-tree insertion is based on the solution in
    * OpenDSA/DataStructures/redblacktree.js by Kasper Hellström
    * @param jsav the model answer jsav instance, needed to call step()
    * and umsg() on the model answer instance
-   * @param node the node which needs to be repaired to maintain the 
+   * @param node the node which needs to be repaired to maintain the
    * RB-tree property
-   * @param modelTree the model answer rb-tree jsav object. This is 
+   * @param modelTree the model answer rb-tree jsav object. This is
    * needed to call an update to the tree lay-out in insert_case5().
    * @returns true or false
    */
@@ -131,6 +131,7 @@
 
   //Insert cases from Wikipedia:
   //http://en.wikipedia.org/wiki/Red-black_tree
+
   function insert_case1(jsav, node, modelTree) {
     highlighted = node;
     node.addClass("highlighted");
@@ -154,6 +155,10 @@
   function insert_case3(jsav, node, modelTree) {
     var u = node.uncle();
     if (u && !u.hasClass("emptynode") && u.isRed()) {
+      jsav.umsg(interpret("av_rotation"));
+      jsav.step();
+      jsav.umsg(interpret("av_change_colours"));
+      jsav.step();
       node.parent().colorBlack();
       u.colorBlack();
       var g = node.grandparent();
@@ -169,6 +174,8 @@
 
   function insert_case4(jsav, node, modelTree) {
     var g = node.grandparent();
+    jsav.umsg(interpret("av_rotation"));
+    jsav.step();
     jsav.umsg(interpret("av_rotation_1"));
     jsav.step();
     if (node === node.parent().right() && node.parent() === g.left()) {
@@ -183,12 +190,12 @@
   }
 
   /**
-   * Case 5 has an extra parameter: double. Double is true if we need to 
+   * Case 5 has an extra parameter: double. Double is true if we need to
    * perform double rotation. Default is false. This is because double
    * rotation is two single rotation, one that happens in Case 4, and
-   * one in case 5. 
-   * @param double Boolean indicating wether it is a double rotation or not. 
-   * Default is false. 
+   * one in case 5.
+   * @param double Boolean indicating wether it is a double rotation or not.
+   * Default is false.
    */
   function insert_case5(jsav, node, modelTree, double = false) {
     highlighted.removeClass("highlighted");
@@ -198,37 +205,38 @@
     jsav.step();
 
     if (node === node.parent().left()) {
-      var message = double ? interpret("av_lr_rotation") 
+      var message = double ? interpret("av_lr_rotation")
                            : interpret("av_r_rotation");
       jsav.umsg(message);
       jsav.step();
       g.rotateRight();
     } else {
-      var message = double ? interpret("av_rl_rotation") 
+      var message = double ? interpret("av_rl_rotation")
                            : interpret("av_l_rotation");
       jsav.umsg(message);
       jsav.step();
       g.rotateLeft();
     }
-    
+
     modelTree.layout();
     jsav.step();
+    jsav.umsg(interpret("av_colour_after_rotation"));
+    jsav.step()
     g.parent().colorBlack();
     g.colorRed();
     g.removeClass("highlighted");
-    jsav.umsg(interpret("av_colour_after_rotation"));
   }
 
   // create buttoncontainer if it doesn't exist
   if ($("#buttoncontainer").length === 0) {
     $("#jsavcontainer .jsavcanvas").prepend(
       '<div id="buttoncontainer" style="margin: auto; text-align: center; padding: 15px">' +
-      '  <button id="buttonL">Single Rotation Left</button>' +
-      '  <button id="buttonLR">Double Rotation LR</button>' +
-      '  <button id="buttonRL">Double Rotation RL</button>' +
-      '  <button id="buttonR">Single Rotation Right</button>' +
+      '  <button id="buttonL">' + interpret("av_button_l") + '</button>' +
+      '  <button id="buttonLR">' + interpret("av_button_lr") + '</button>' +
+      '  <button id="buttonRL">' + interpret("av_button_rl") + '</button>' +
+      '  <button id="buttonR">' + interpret("av_button_r") + '</button>' +
       '<br>' +
-      '<button id="buttonColor">Toggle Color</button>' +
+      '<button id="buttonColor">' + interpret("av_button_color") + '</button>' +
       '</div>');
   }
 
