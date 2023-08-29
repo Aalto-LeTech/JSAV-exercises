@@ -30,8 +30,8 @@
     "JXOP-fixmode": "fix"
   }, 
   "code" : {
-    "Python": {
-        "url": "../../SourceCode/Python/Sorting/Mergesort.py"
+    "C": {
+        "url": "../../SourceCode/C/Sorting/Mergesort.c"
     }
   }
 }
