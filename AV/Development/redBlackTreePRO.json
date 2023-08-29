@@ -6,10 +6,10 @@
       ".instructLabel": "Instructions:",
       ".instructions": "Move the values from the stack to the tree. Color the nodes and balance the tree using rotations when it becomes necessary.",
       "av_insert": "1 Search (top-down) and insert the new item <strong>u</strong> as in a Binary Search Tree.",
-      "av_root_black": "2.1 If <strong>u</strong> is root, make it black and the algorithm ends.",
-      "av_parent_black": "2.2 If <strong>u</strong>'s parent <strong>t</strong> is black, the algorithm ends.",
+      "av_root_black": "2.1 if <strong>u</strong> is root, make it black and the algorithm ends.",
+      "av_parent_black": "2.2 if <strong>u</strong>'s parent <strong>t</strong> is black, the algorithm ends.",
       "av_change_colours": "2.3.1 [change colors] If <strong>t</strong> and its sibling <strong>v</strong> are red:<br>&emsp; Color <strong>t</strong> and <strong>v</strong> black and their parent <strong>p</strong> red.<br>&emsp; Continue color change with <strong>p</strong> and its siblings, if necessary.",
-      "av_rotation": "2.3 If both <strong>u</strong> and its parent <strong>t</strong> are red, do one of the following operations:",
+      "av_rotation": "2.3 if both <strong>u</strong> and its parent <strong>t</strong> are red, do one of the following operations:",
       "av_rotation_1": " 2.3.2 [rotation] If <strong>t</strong> is red and its sibling <strong>v</strong> is black:<br>&emsp;Perform a rotation at <strong>t</strong>'s parent <strong>p</strong>. <strong>p</strong> and its new parent exchange their colors.",
       "av_rotation_2": " 2.3.2 [rotation] If <strong>t</strong> is red and its sibling <strong>v</strong> is black:<br>&emsp;Perform a rotation at <strong>t</strong>'s parent <strong>p</strong>. <strong>p</strong> and its new parent exchange their colors.<br>&emsp;Unbalanced black node <strong>p</strong> is highlighted.",
       "av_lr_rotation": "ROTATION:<br>&emsp; if (p.left == t) and (p.left.right == u), LR-double rotation in p;",
@@ -26,24 +26,24 @@
       "av_insert": "1 Hae (juuresta lehteen) alkion paikka puussa ja lisää uusi alkio <strong>u</strong>kuten binäärisessä hakupuussa.",
       "av_root_black": "2.1 Jos <strong>u</strong> on juuri, väritä se mustaksi ja lopeta.",
       "av_parent_black": "2.2 Jos <strong>u</strong>:n vanhempi <strong>t</strong> on musta, lopeta.",
-      "av_change_colours": "2.3.1 [värinvaihto] Jos sekä <strong>t</strong> että sen sisarsolmu <strong>v</strong> ovat punaisia,<br>&emsp; väritä <strong>t</strong> ja <strong>v</strong> mustiksi ja niiden vanhempi <strong>p</strong>  punaiseksi. <br>&emsp; Jatka värinvaihtoa <strong>p</strong>:lle ja sen sisarelle, jos se on tarpeellista.",
-      "av_rotation": "2.3 jos sekä <strong>u</strong>:n että sen isä <strong>t</strong> ovat punaisia, tee yksi seuraavista operaatioista:",
-      "av_rotation_1": "2.3.2 [rotaatio] Jos <strong>t</strong> on punainen ja sisarus <strong>v</strong> musta, tee rotaatio.",
-      "av_rotation_2": "2.3.2 [rotaatio] Jos <strong>t</strong> on punainen ja <strong>v</strong> musta, tee rotaatio.<br>Tasapainottamaton musta solmu <strong>p</strong> on korostettu.",
-      "av_lr_rotation": "ROTAATIO:<br>&emsp; Jos (p.left == t) ja (p.left.right == u), tee LR-kaksoisrotaatio p:ssä.",
+      "av_change_colours": "2.3.1 [värinvaihto] Jos sekä <strong>t</strong> että sen sisarsolmu <strong>v</strong> ovat punaisia,<br>&emsp; väritä <strong>t</strong> ja <strong>v</strong> mustiksi ja niiden vanhempi <strong>p</strong> punaiseksi. <br>&emsp; Jatka värinvaihtoa <strong>p</strong>:lle ja sen sisarille, jos se on tarpeellista.",
+      "av_rotation": "2.3 Jos sekä <strong>u</strong> että sen vanhempi <strong>t</strong> ovat punaisia, tee yksi seuraavista operaatioista:",
+      "av_rotation_1": "2.3.2 [rotaatio] Jos <strong>t</strong> on punainen ja sisarus <strong>v</strong> musta:<br>&emsp; Tee rotaatio <strong>t</strong>:n vanhemmassa <strong>p</strong>:ssä. <strong>p<strong> ja sen uusi vanhempi vaihtavat värejä.",
+      "av_rotation_2": "2.3.2 [rotaatio] Jos <strong>t</strong> on punainen ja sen sisarus <strong>v</strong> musta:<br>&emsp;Tee rotaatio <strong>t</strong>:n vanhemmassa <strong>p</strong>:ssä.<br>Tasapainottamaton musta solmu <strong>p</strong> on korostettu.",
+      "av_lr_rotation": "ROTAATIO:<br>&emsp; Jos (p.left == t) ja (p.left.right == u), tee vasen-oikea-kaksoisrotaatio p:ssä.",
       "av_r_rotation": "ROTAATIO:<br>&emsp; Jos (p.left == t) ja (p.left.left == u), tee yksinkertainen rotaatio oikealle p:ssä.",
       "av_l_rotation": "ROTAATIO:<br>&emsp; Jos (p.right == t) ja (p.right.right == u),tee yksinkertainen rotaatio vasemmalle p:ssä.",
-      "av_rl_rotation": "ROTAATIO:<br>&emsp; Jos (p.right == t) ja (p.right.left == u), tee RL-kaksoisrotaatio p:ssä.",
-      "av_colour_after_rotation": "Rotaation jälkeen <strong>p</strong> ja p:n uusi isä vaihtavat värejä."
+      "av_rl_rotation": "ROTAATIO:<br>&emsp; Jos (p.right == t) ja (p.right.left == u), tee oikea-vasen-kaksoisrotaatio p:ssä.",
+      "av_colour_after_rotation": "Rotaation jälkeen <strong>p</strong> ja sen uusi vanhempi vaihtavat värejä."
     }
   },
   "code": {
     "english": [
       "1. Search (top-down) and insert the new item u as in a Binary Search Tree.",
       "2. Return (bottom-up) and",
-      "2.1 If u is root, make it black and the algorithm ends.",
+      "2.1 if u is root, make it black and the algorithm ends.",
       "2.2 if u's parent t is black, the algorithm ends.",
-      "2.3 If both u and its parent t are red, do one of the following operations:",
+      "2.3 if both u and its parent t are red, do one of the following operations:",
       "2.3.1. [change colors] If t and its sibling v are red:",
       "         Color t and v black and their parent p red.",
       "         Continue the algorithm with p and its siblings, if necessary.",
@@ -63,18 +63,17 @@
       "    if (p.right == t) and (p.right.left == u), RL-double rotation in p."
     ],
     "finnish": [
-      "1. Hae (juuresta lehteen) alkion paikka puussa ja lisää alkio",
+      "1. Hae (juuresta lehteen) alkion paikka puussa ja lisää alkio u",
       "   kuten binäärisessä hakupuussa.",
       "2. Palaa (lehdestä juureen päin) ja",
-      "2.1 jos u on juuri, väritetä se mustaksi ja lopeta.",
+      "2.1 jos u on juuri, väritä se mustaksi ja lopeta.",
       "2.2 jos u:n vanhempi t on musta, lopeta.",
       "2.3 jos u:n isä t on punainen, tee yksi seuraavista operaatioista:",
       "2.3.1. [värinvaihto] Jos sekä t että sen sisarsolmu v ovat punaisia,",
-      "       tee värinvaihto: t:n isä p muuttuu punaiseksi, ja",
-      "       t sekä v mustiksi. Jos p:n isä on punainen, jatka tasapainotusta ylempänä puussa.",
-      "2.3.2. [rotaatio] Jos t on punainen ja v musta, tee rotaatio,",
+      "       tee värinvaihto: väritä t ja v mustiksi, ja niiden vanhempi",
+      "       punaiseksi. Jos p:n isä on punainen, jatka tasapainotusta ylempänä puussa.",
+      "2.3.2. [rotaatio] Jos t on punainen ja v musta, tee rotaatio.",
       "       Rotaation jälkeen p ja p:n uusi vanhempi vaihtavat väriä.",
-      "       Rotaation jälkeen punaiset solmut eivät ole enää peräkkäin.",
       "",
       "ROTAATIO:",
       "1 Rekursion palatessa pidä kirjaa",
@@ -87,9 +86,9 @@
       "    jos (p.right == t) ja (p.right.right == u),",
       "        tee yksinkertainen rotaatio vasemmalle p:ssä;",
       "    jos (p.left == t) ja (p.left.right == u),",
-      "        tee LR-kaksoisrotaatio p:ssä; tai",
+      "        tee vasen-oikea-kaksoisrotaatio p:ssä; tai",
       "    jos (p.right == t) ja (p.right.left == u),",
-      "        tee RL-kaksoisrotaatio p:ssä."
+      "        tee oikea-vasen-kaksoisrotaatio p:ssä."
     ]
   }
 }
