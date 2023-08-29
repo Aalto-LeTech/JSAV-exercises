@@ -231,12 +231,12 @@
   if ($("#buttoncontainer").length === 0) {
     $("#jsavcontainer .jsavcanvas").prepend(
       '<div id="buttoncontainer" style="margin: auto; text-align: center; padding: 15px">' +
-      '  <button id="buttonL">Single Rotation Left</button>' +
-      '  <button id="buttonLR">Double Rotation LR</button>' +
-      '  <button id="buttonRL">Double Rotation RL</button>' +
-      '  <button id="buttonR">Single Rotation Right</button>' +
+      '  <button id="buttonL">' + interpret("av_button_l") + '</button>' +
+      '  <button id="buttonLR">' + interpret("av_button_lr") + '</button>' +
+      '  <button id="buttonRL">' + interpret("av_button_rl") + '</button>' +
+      '  <button id="buttonR">' + interpret("av_button_r") + '</button>' +
       '<br>' +
-      '<button id="buttonColor">Toggle Color</button>' +
+      '<button id="buttonColor">' + interpret("av_button_color") + '</button>' +
       '</div>');
   }
 
