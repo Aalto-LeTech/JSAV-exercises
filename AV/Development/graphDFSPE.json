@@ -17,18 +17,19 @@
       "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Artturi Tilanterä",
       ".instructLabel": "Ohjeet:",
       ".instructions": "Käy läpi verkko DFS-järjestyksessä. Aloita läpikäynti solmusta A. Klikkaa <strong>särmiä</strong> samassa järjestyksessä kuin DFS-algoritmi käy ne läpi. Solmun naapurit käydään läpi aakkosjärjestyksessä.",
-      "av_ms_final": "DFS-algoritmin virityspuu",
-      "av_ms_process_edge": "Prosessoidaan särmää ({from}, {to}).",
-      "av_ms_already_visited": " Solmu {node} on jo läpikäyty",
+      "av_ms_final": "Lopullinen syvyyshaun tuottama puu",
+      "av_ms_process_edge": "Käsitellään särmä ({from}, {to}).",
+      "av_ms_already_visited": " Solmussa {node} on jo käyty.",
+      "av_ms_all_neighbors_visited": "Kaikki {node}:n naapurit on käyty läpi.\n",
       "#help": "Ohje",
       "#about": "Lisätietoa",
-      "reset": "Uusi Tehtävä"
+      "reset": "Uusi tehtävä"
     }
   },
   "params": {
     "JXOP-feedback": "continuous",
     "JXOP-fixmode": "fix"
-  }, 
+  },
   "code" : {
     "Pseudo": {
         "url": "../../SourceCode/Pseudo/Graphs/dfs.txt"
