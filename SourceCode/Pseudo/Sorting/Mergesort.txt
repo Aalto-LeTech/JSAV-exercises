@@ -1,0 +1,21 @@
+List mergesort(List inlist) {
+  if (inlist.length() <= 1) return inlist;;
+  List L1 = half of the items from inlist;
+  List L2 = other half of the items from inlist;
+  return merge(mergesort(L1), mergesort(L2));
+}
+
+List merge(List L1, List L2) {
+  List answer = new List();
+  while (L1 != NULL || L2 != NULL) {
+    if (L2 == NULL || (L1 != NULL && L1.value() < L2.value())) {
+      answer.append(L1.value());
+      L1.next();
+    } 
+    else {
+      answer.append(L2.value());
+      L2 = L2.next();
+    }
+  }
+  return answer;
+}
