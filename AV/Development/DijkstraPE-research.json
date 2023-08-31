@@ -2,9 +2,9 @@
   "translations" :{
     "en": {
       ".avTitle": "Dijkstra's Algorithm Proficiency Exercise",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger",
       ".instructLabel": "Instructions:",
-      ".instructions": "Reproduce the behavior of Dijkstra's Algorithm for the given graph below. Click on the <strong>edges</strong> in the order they are traversed by the algorithm. Start with Node A. In case of similar costs, add nodes alphabetically.",
+      ".instructions": "Reproduce the behavior of Dijkstra's Algorithm for the given graph below. Click on the <strong>edges</strong> in the order they are traversed by the algorithm. Start with Node A.",
       "av_ms_shortest": "Shortest paths from A.",
       "av_ms_select_a": "Start by selecting node A",
       "av_ms_select_node": "Select {node}, since it has the shortest distance from A.",
@@ -12,25 +12,38 @@
       "av_ms_unreachable": "The nearest unvisited node is at infinite distance. The algorithm ends.",
       "av_ms_update_distances": "Update {node}'s neighbors distances. For updated nodes, set the parent node to {node}",
       "#help": "Help",
-      "#about": "About"
+      "#about": "About",
+      "reset": "New Exercise",
+      "legend": "Legend",
+      "graph_edge": "Graph edge",
+      "spanning_edge": "Spanning tree edge"
     },
     "fi": {
       ".avTitle": "Dijkstran algoritmi",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger",
       ".instructLabel": "Ohjeet:",
-      ".instructions": "Lisää särmät virityspuuhun Dijkstran algoritmin antamassa järjestyksessä. Aloita läpikäynti solmusta A. Klikkaa <strong>särmiä</strong> lisätäksesi ne virityspuuhun. Jos kahdella särmällä on sama paino, kaari, jonka solmut ovat aakkosjärjestyksessä ensimmäisenä.",
+      ".instructions": "Lisää särmät virityspuuhun Dijkstran algoritmin antamassa järjestyksessä. Aloita läpikäynti solmusta A. Klikkaa <strong>särmiä</strong> lisätäksesi ne virityspuuhun.",
       "av_ms_shortest": "Lyhyin reitti A:sta.",
-      "av_ms_select_a": "Aloitetaan valitsemalla solmu A.",
-      "av_ms_select_node": "Valitaan {node}, koska sillä on lyhin etäisyys A:han.",
-      "av_ms_add_edge": "Lisätään särmä ({from}, {to}) virityspuuhun.",
+      "av_ms_select_a": "Aloita valitsemalla solmu A.",
+      "av_ms_select_node": "Valitse {node}, koska sillä on lyhyin etäisyys A:han.",
+      "av_ms_add_edge": "Lisää särmä ({from}, {to}) virityspuuhun.",
       "av_ms_unreachable": "Etäisyys lähimpään solmuun, jossa ei ole vierailtu, on ääretön. Algoritmi päättyy.",
-      "av_ms_update_distances": "Päivitetään etäisyyksiä {node}-solmun naapureihin. Päivitetyille solmuille asetetaan lähin solmu {node}:ksi.",
+      "av_ms_update_distances": "Päivitä etäisyyksiä {node}-solmun naapureihin. Aseta päivitettyjen solmujen vanhempi {node}:ksi.",
       "#help": "Ohje",
-      "#about": "Lisätietoa"
+      "#about": "Lisätietoa",
+      "reset": "Uusi tehtävä",
+      "legend": "Selite",
+      "graph_edge": "Verkon särmä",
+      "spanning_edge": "Virityspuun särmä"
     }
   },
   "params": {
     "JXOP-feedback": "continuous",
     "JXOP-fixmode": "fix"
+  },
+  "code": {
+    "Pseudo": {
+      "url": "../../SourceCode/Pseudo/Graphs/Dijkstra.txt"
+    }
   }
 }
