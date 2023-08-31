@@ -30,8 +30,8 @@
     "JXOP-fixmode": "fix"
   }, 
   "code" : {
-    "C": {
-        "url": "../../SourceCode/C/Sorting/Mergesort.c"
+    "Pseudo": {
+      "url": "../../SourceCode/Pseudo/Sorting/Mergesort.txt"
     }
   }
 }
