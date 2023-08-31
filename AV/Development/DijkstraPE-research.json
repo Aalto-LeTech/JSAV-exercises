@@ -2,7 +2,7 @@
   "translations" :{
     "en": {
       ".avTitle": "Dijkstra's Algorithm Proficiency Exercise",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger",
       ".instructLabel": "Instructions:",
       ".instructions": "Reproduce the behavior of Dijkstra's Algorithm for the given graph below. Click on the <strong>edges</strong> in the order they are traversed by the algorithm. Start with Node A.",
       "av_ms_shortest": "Shortest paths from A.",
@@ -20,18 +20,18 @@
     },
     "fi": {
       ".avTitle": "Dijkstran algoritmi",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger",
       ".instructLabel": "Ohjeet:",
       ".instructions": "Lisää särmät virityspuuhun Dijkstran algoritmin antamassa järjestyksessä. Aloita läpikäynti solmusta A. Klikkaa <strong>särmiä</strong> lisätäksesi ne virityspuuhun.",
       "av_ms_shortest": "Lyhyin reitti A:sta.",
-      "av_ms_select_a": "Aloitetaan valitsemalla solmu A.",
-      "av_ms_select_node": "Valitaan {node}, koska sillä on lyhin etäisyys A:han.",
-      "av_ms_add_edge": "Lisätään särmä ({from}, {to}) virityspuuhun.",
+      "av_ms_select_a": "Aloita valitsemalla solmu A.",
+      "av_ms_select_node": "Valitse {node}, koska sillä on lyhyin etäisyys A:han.",
+      "av_ms_add_edge": "Lisää särmä ({from}, {to}) virityspuuhun.",
       "av_ms_unreachable": "Etäisyys lähimpään solmuun, jossa ei ole vierailtu, on ääretön. Algoritmi päättyy.",
-      "av_ms_update_distances": "Päivitetään etäisyyksiä {node}-solmun naapureihin. Päivitetyille solmuille asetetaan lähin solmu {node}:ksi.",
+      "av_ms_update_distances": "Päivitä etäisyyksiä {node}-solmun naapureihin. Aseta päivitettyjen solmujen vanhempi {node}:ksi.",
       "#help": "Ohje",
       "#about": "Lisätietoa",
-      "reset": "Uusi Tehtävä",
+      "reset": "Uusi tehtävä",
       "legend": "Selite",
       "graph_edge": "Verkon särmä",
       "spanning_edge": "Virityspuun särmä"
@@ -40,7 +40,7 @@
   "params": {
     "JXOP-feedback": "continuous",
     "JXOP-fixmode": "fix"
-  }, 
+  },
   "code": {
     "Pseudo": {
       "url": "../../SourceCode/Pseudo/Graphs/Dijkstra.txt"
