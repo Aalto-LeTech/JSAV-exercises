@@ -48,6 +48,7 @@
     controls: $('.jsavexercisecontrols'),
     modelDialog: {width: "960px"},
     resetButtonTitle: interpret("reset"),
+    grader: scaffoldedGrader,
     fix: fixState
   });
   exercise.reset();
@@ -92,6 +93,21 @@
     graph.nodes()[exerciseInstance.startIndex].addClass("marked");
     jsav.displayInit();
     return [graph, minheap];
+  }
+
+  /**
+   * Custom grading function for the exercise.
+   */
+  function scaffoldedGrader() {
+    console.log("Why hello! <3");
+    let score = {
+      correct: 1,
+      fix: 2,
+      student: 3,
+      total: 4,
+      undo: 5
+    }
+    this.score = score;
   }
 
   /**
