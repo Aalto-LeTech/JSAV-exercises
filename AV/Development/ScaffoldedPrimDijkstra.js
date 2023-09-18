@@ -30,21 +30,39 @@
 }
 
 /**
- * A list of priority queue operations
+ * A sequence of priority queue operations.
+ * Different instances of this class can be used to store the model
+ * answer operations and student's solution.
  */
-class PqOperationList {
+class PqOperationSequence {
     constructor() {
         this.operations = [];
     }
+    /**
+     * Clears the sequence.
+     * This should be used when the user clicks the Reset button.
+     */
     clear() {
         this.operations = [];
     }
+
+    /**
+     * Removes the last operation from the sequence.
+     * This should be used when the user clicks the Undo button.
+     */
     undo() {
         this.operations.pop();
     }
+
+    /**
+     * Adds new operation to the sequence.
+     * 
+     * @Param {PqOperation} operation
+     */
     push(operation) {
         this.operations.push(operation);
     }
+
     /**
      * Union of two Sets.
      * 
