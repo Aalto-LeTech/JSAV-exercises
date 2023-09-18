@@ -77,13 +77,40 @@ class PqOperationSequence {
         }
         return _union;
     }
+
     /**
      * 
      * @param {PqOperation} modelAnswer 
      */
     gradeAgainst(modelAnswer) {
-        const modelLength = modelAnswer.operations.length;
-        const ownLength = this.operations.length;
-        return 0;
+        let studentGrade = 0;
+        const maxGrade = modelAnswer.operations.length;
+        let modelSeq = modelAnswer.operations;
+        let studSeq = this.operations;
+        let i = 0;
+        let j = 0;
+        let studentOpSet = new Set();
+        let modelOpSet = new Set();
+
+        while (j < maxGrade) {
+            let modelOp = modelSeq[j];
+            if (modelOp.operation === 'dequeue') {
+                if (studSeq[i].operation === 'dequeue' &&
+                    studSeq[i].edge === modelOp.edge) {
+                        i++;
+                        j++;
+                }
+                else {
+                    studentGrade = i;
+                    break;
+                }
+
+            }
+            else {
+                // TODO
+            }
+        }
+        
+        return { 'studentGrade': studentGrade, 'maxGrade': maxGrade };
     }
 }
