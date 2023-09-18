@@ -10,6 +10,37 @@
 (function ($) {
   "use strict";
 
+  /**
+   * A class for a priority queue operation.
+   * operation: one of: 'enqueue', 'dequeue', 'update'
+   * edge: a string of two uppercase letters A-Z
+   */
+  class PqOperation {
+    constructor(operation, edge) {
+      let valid = true;
+      if (operation !== 'enqueue' && operation !== 'dequeue' && operation !== 'update') {
+        valid = false;
+        console.error('PqOperation: invalid operation: ' + operation);
+      }
+      if (typeof(edge) !== 'string' || /^[A-Z]{2}$/.test(edge) === false) {
+        valid = false;
+        console.error('PqOperation: invalid edge: ' + edge);
+      }
+      if (valid) {
+        this.operation = operation;
+        if (edge[0] <= edge[1]) {
+          this.edge = edge;
+        }
+        else {
+          this.edge = edge[1] + edge[0];
+        }        
+      }
+    }
+    equals(x) {
+      return this.operation === x.operation && this.edge === x.edge;
+    }
+  }
+
   // JSAV Graph instance for the student's solution.
   var graph;
 
@@ -51,9 +82,14 @@
     grader: scaffoldedGrader,
     fix: fixState
   });
-  // Set a custom undo function because we also have a custom grader.
+  /* Set custom undo and reset function because we also have a custom
+   * grader. */
   exercise.protoUndo = exercise.undo;
   exercise.undo = scaffoldedUndo;
+  exercise.protoReset = exercise.reset;
+  exercise.reset = scaffoldedReset;
+  exercise.pqOperations = [];
+
   exercise.reset();
 
   /*
@@ -102,27 +138,6 @@
    * Custom grading function for the exercise.
    */
   function scaffoldedGrader() {
-    console.log("Why hello! <3");
-    let score = {
-      correct: 1,
-      fix: 2,
-      student: 3,
-      total: 4,
-      undo: 5
-    }
-    this.score = score;
-  }
-
-  /**
-   * Custom undo function for the exercise.
-   * This is based on JSAV function `exerproto.undo` at
-   * JSAV-min.js#L8215-L8233.
-   */
-  function scaffoldedUndo() {
-    console.log("Yee-haw! A custom undo!");
-    exercise.protoUndo();
-    return;
-
     var oldFx = $.fx.off || false;
     $.fx.off = true;
     // undo last step
@@ -140,7 +155,38 @@
     }
     this.jsav._redo = [];
     $.fx.off = oldFx;
+
+    console.log("Why hello! <3");
+    let score = {
+      correct: 1,
+      fix: 2,
+      student: 3,
+      total: 4,
+      undo: 5
+    }
+    this.score = score;
+  }
+
+  /**
+   * Custom undo function for the exercise.
+   * This is complementary to the function scaffoldedGrader().
+   */
+  function scaffoldedUndo() {
+    console.log("Yee-haw! A custom undo!");
+    exercise.protoUndo();
+    exercise.pqOperations.pop();
+    return;
   };
+
+  /**
+   * Custom reset function for this exercise.
+   * This is complementary to the function scaffoldedGrader().
+   */
+  function scaffoldedReset() {
+    console.log("Yee-ha! A custom reset!");
+    exercise.protoReset();
+    exercise.pqOperations = [];
+  }
 
   /**
    * From JSAV API: http://jsav.io/exercises/exercise/
