@@ -51,6 +51,9 @@
     grader: scaffoldedGrader,
     fix: fixState
   });
+  // Set a custom undo function because we also have a custom grader.
+  exercise.protoUndo = exercise.undo;
+  exercise.undo = scaffoldedUndo;
   exercise.reset();
 
   /*
@@ -109,6 +112,35 @@
     }
     this.score = score;
   }
+
+  /**
+   * Custom undo function for the exercise.
+   * This is based on JSAV function `exerproto.undo` at
+   * JSAV-min.js#L8215-L8233.
+   */
+  function scaffoldedUndo() {
+    console.log("Yee-haw! A custom undo!");
+    exercise.protoUndo();
+    return;
+
+    var oldFx = $.fx.off || false;
+    $.fx.off = true;
+    // undo last step
+    this.jsav.backward(); // the empty new step
+    this.jsav.backward(); // the new graded step
+    // undo until the previous graded step
+    var undoGraders = ["default", "finder", "finalStep"];
+    if ((undoGraders.indexOf(this.options.grader) !== -1 ) && this.jsav.backward(gradeStepFilterFunction)) {
+      // if such step was found, redo it
+      this.jsav.forward();
+      this.jsav.step({updateRelative: false});
+    } else {
+      // ..if not, the first student step was incorrent and we can rewind to beginning
+      this.jsav.begin();
+    }
+    this.jsav._redo = [];
+    $.fx.off = oldFx;
+  };
 
   /**
    * From JSAV API: http://jsav.io/exercises/exercise/
