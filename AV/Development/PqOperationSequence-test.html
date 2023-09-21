@@ -33,6 +33,22 @@
         assert.false(op.equals(op4));
       })
 
+      QUnit.test('toString', function(assert) {
+        let op = new PqOperation('enq', 'AB');
+        assert.equal(op.toString(), 'enqAB');
+
+        let op2 = new PqOperation('deq', 'AC');
+        assert.equal(op2.toString(), 'deqAC');
+
+        // Test a string representation of a sequence of operations.
+        // Use JSON.stringify to compare lists of strings.
+        let arr = [op, op2].map((x) => x.toString(x));
+        assert.equal(
+          JSON.stringify(arr),
+          JSON.stringify(['enqAB', 'deqAC']));
+
+      })      
+
     })
   </script>
 </body>
