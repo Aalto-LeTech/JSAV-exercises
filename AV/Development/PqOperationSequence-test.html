@@ -117,7 +117,81 @@
         assert.equal(s3.toString(), '["b"]');
       })
 
-    })      
+    })
+    
+    QUnit.module('PqOperationSequence', function() {
+
+      QUnit.test('push-undo-toString', function(assert) {
+        let s = new PqOperationSequence();
+        assert.equal(s.toString(), '[]');
+
+        s.push(new PqOperation('enq', 'AB'));
+        assert.equal(s.toString(), '[\"enqAB\"]');
+
+        s.push(new PqOperation('deq', 'EF'));
+        assert.equal(s.toString(), '[\"enqAB\",\"deqEF\"]');
+
+        s.undo();
+        assert.equal(s.toString(), '[\"enqAB\"]');
+
+      })
+
+      QUnit.test('clear-length', function(assert) {
+        let s = new PqOperationSequence();
+        assert.equal(s.toString(), '[]');
+        assert.equal(s.length(), 0)
+        
+        // Clear operation for an empty sequence does nothing
+        s.clear();
+        assert.equal(s.toString(), '[]');
+        assert.equal(s.length(), 0)
+
+        // length() describes the length of the sequence
+        s.push(new PqOperation('enq', 'AB'));
+        assert.equal(s.length(), 1);
+        s.push(new PqOperation('deq', 'EF'));
+        assert.equal(s.length(), 2);
+
+        // Clear operation empties the sequence, resulting length() == 0
+        s.clear();
+        assert.equal(s.toString(), '[]');
+        assert.equal(s.length(), 0)
+
+      })
+
+      QUnit.test('grading-empty', function(assert) {      
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        // Both sequences empty
+        // -> grade 0 / 0
+        assert.equal(student.length(), 0);
+        assert.equal(model.length(), 0);
+        let grade = student.gradeAgainst(model);        
+        assert.equal(grade.studentGrade, 0);
+        assert.equal(grade.maxGrade, 0);
+
+        // Student sequence empty, model has one operation
+        // -> grade 0 / 1
+        model.push(new PqOperation('enq', 'AB'));        
+        assert.equal(student.length(), 0);
+        assert.equal(model.length(), 1);
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 0);
+        assert.equal(grade.maxGrade, 1);
+
+        // Student sequence has one operation, model empty
+        // -> grade 0 / 0
+        model.clear();
+        student.push(new PqOperation('enq', 'AB'));
+        assert.equal(student.length(), 1);
+        assert.equal(model.length(), 0);
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 0);
+        assert.equal(grade.maxGrade, 0);
+      })
+
+    })
   </script>
 </body>
 </html>

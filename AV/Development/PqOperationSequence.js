@@ -142,6 +142,22 @@ class PqOperationSequence {
   }
 
   /**
+   * The length of the sequence.
+   */
+  length() {
+    return this.operations.length;
+  }
+
+  /**
+   * Returns the sequence as a string.
+   * 
+   * @returns {String}
+   */
+  toString() {
+    return JSON.stringify(this.operations.map((x) => x.toString()));
+  }
+
+  /**
    * Grades the sequence against another sequence.
    * Assumes that this sequence is the student's solution and the
    * another sequence is the model solution.
@@ -151,8 +167,8 @@ class PqOperationSequence {
    *       Grade of x / y, x and y are integers.
    */
   gradeAgainst(modelAnswer) {
-    let studentGrade = 0;
-    const modelLength = modelAnswer.operations.length;
+    const modelLength = modelAnswer.length();
+    const studentLength = this.length();
     
     // Student's sequence
     let student = this.operations;
@@ -163,31 +179,34 @@ class PqOperationSequence {
     let i = 0; // index of student
     let j = 0; // index of model
 
-    while (j < maxGrade) {
+    while (i < studentLength && j < modelLength) {
       if (model[j].operation === 'deq') {
         if (student[i].equals(model[j])) {
             i++, j++;
         }
         else {
-            studentGrade = i;
             break;
         }
       }
       else {
-        let studentOps = Set();
-        for (; i < student.length && student[i].operation !== 'deq'; i++) {
+        let studentOps = OperableSet();
+        for (; i < studentLength && student[i].operation !== 'deq'; i++) {
           studentOps.add(student[i].toString())
         }
-        let modelOps = Set();
-        for (; j < model.length && model[j].operation !== 'deq'; j++) {
+        let modelOps = OperableSet();
+        for (; j < modelLength && model[j].operation !== 'deq'; j++) {
           modelOps.add(model[j].toString());
         }
-        let r = this.gradeEnqueueUpdate(student, model, i, j);
-        // TODO
+        let opIntersection = studentOps.intersection(modelOps);
+        let opUnion = studentOps.union(modelOps);
+        i += opIntersection.size();
+        if (opUnion.size() > opIntersection.size()) {
+          break;
+        }
       }
     }
     
-    return { 'studentGrade': studentGrade, 'maxGrade': modelLength };
+    return { studentGrade: i, maxGrade: modelLength };
   }
 
 
