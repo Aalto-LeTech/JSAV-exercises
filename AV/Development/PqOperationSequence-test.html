@@ -228,8 +228,8 @@
         assert.equal(grade.maxGrade, 1);
       })
 
-      QUnit.test('consecutiveDequeue', function(assert) {
-        // Several consecutive dequeue operations
+      QUnit.test('consecutiveDequeuePartial', function(assert) {
+        // Several consecutive dequeue operations, partial match
         let student = new PqOperationSequence();
         let model = new PqOperationSequence();
 
@@ -241,8 +241,37 @@
         assert.equal(grade.maxGrade, 3);
       })
 
+      QUnit.test('consecutiveDequeueMissing', function(assert) {
+        // Several consecutive dequeue operations.
+        // The grading stops at the missing dequeue operation.
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        student.fromString('deq AB deq EB');
+        model.fromString(  'deq AB deq DC deq EB');
+
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 1);
+        assert.equal(grade.maxGrade, 3);
+      })
+
+      QUnit.test('consecutiveDequeueExtra', function(assert) {
+        // Several consecutive dequeue operations.
+        // The grading stops at the extra dequeue operation.
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        student.fromString('deq AB deq DC deq XF deq EB');
+        model.fromString(  'deq AB deq DC deq EB');
+
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 2);
+        assert.equal(grade.maxGrade, 3);
+      })
+
+
       QUnit.test('consecutiveEndUpd', function(assert) {
-        // Several consecutive enqueue & operations in the same order
+        // Several consecutive enqueue operations in the same order
         let student = new PqOperationSequence();
         let model = new PqOperationSequence();
 
@@ -255,7 +284,7 @@
       })
 
       QUnit.test('consecutiveEndUpdOrderAgnostic', function(assert) {
-        // Several consecutive enqueue & operations in a different order
+        // Several consecutive enqueue operations in a different order
         let student = new PqOperationSequence();
         let model = new PqOperationSequence();
 
