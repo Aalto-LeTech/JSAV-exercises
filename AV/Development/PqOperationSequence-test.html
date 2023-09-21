@@ -198,6 +198,36 @@
         assert.equal(opSeq.toString(), x);
       })
 
+      QUnit.test('simpleDequeue', function(assert) { 
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        // Simple case: one dequeue operation, perfect match
+        student.fromString('deq AB');
+        model.fromString('deq AB');
+        let grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 1);
+        assert.equal(grade.maxGrade, 1);
+      })
+
+      QUnit.test('simpleEnqueue', function(assert) {
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        // Another simple case: one enqueue operation, perfect match
+        // Dequeue & update are handled in a different code block in
+        // PqOperationSequence.gradeAgainst(), therefore a separate
+        // unit test.
+        student.fromString('enq AB');
+        model.fromString('enq AB');
+        assert.equal(student.length(), 1);
+        assert.equal(model.length(), 1);
+
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 1);
+        assert.equal(grade.maxGrade, 1);
+      })
+
     })
   </script>
 </body>
