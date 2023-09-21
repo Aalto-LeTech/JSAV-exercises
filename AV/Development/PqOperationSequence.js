@@ -1,28 +1,17 @@
 /**
  * A class for a priority queue operation.
- * operation: one of: 'enqueue', 'dequeue', 'update'
-* edge: a string of two uppercase letters A-Z
-  */
+ * operation: one of: 'enq', 'deq', 'upd'
+ * edge: a string of two uppercase letters A-Z
+ */
 class PqOperation {
   constructor(operation, edge) {
-    let valid = true;
-    if (operation !== 'enqueue' && operation !== 'dequeue' && operation !== 'update') {
-      valid = false;
-      console.error('PqOperation: invalid operation: ' + operation);
+    this.operation = operation;
+    if (edge[0] <= edge[1]) {
+      this.edge = edge;
     }
-    if (typeof(edge) !== 'string' || /^[A-Z]{2}$/.test(edge) === false) {
-      valid = false;
-      console.error('PqOperation: invalid edge: ' + edge);
-    }
-    if (valid) {
-      this.operation = operation;
-      if (edge[0] <= edge[1]) {
-        this.edge = edge;
-      }
-      else {
-        this.edge = edge[1] + edge[0];
-      }        
-    }
+    else {
+      this.edge = edge[1] + edge[0];
+    }    
   }
   equals(x) {
     return this.operation === x.operation && this.edge === x.edge;
