@@ -228,6 +228,85 @@
         assert.equal(grade.maxGrade, 1);
       })
 
+      QUnit.test('consecutiveDequeue', function(assert) {
+        // Several consecutive dequeue operations
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        student.fromString('deq AB deq DC');
+        model.fromString(  'deq AB deq DC deq EB');
+
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 2);
+        assert.equal(grade.maxGrade, 3);
+      })
+
+      QUnit.test('consecutiveEndUpd', function(assert) {
+        // Several consecutive enqueue & operations in the same order
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        student.fromString('enq AB upd DC enq DE');
+        model.fromString(  'enq AB upd DC enq DE');
+
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 3);
+        assert.equal(grade.maxGrade, 3);
+      })
+
+      QUnit.test('consecutiveEndUpdOrderAgnostic', function(assert) {
+        // Several consecutive enqueue & operations in a different order
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        // All permutations of three elements 
+        let testSequences = [
+          'enq AB upd DC enq DE',
+          'enq AB enq DE upd DC',
+          'upd DC enq AB enq DE',
+          'upd DC enq DE enq AB',
+          'enq DE enq AB upd DC',
+          'enq DE upd DC enq AB '
+        ]
+        model.fromString(  'enq AB upd DC enq DE');
+
+        for (const s of testSequences) {
+          student.fromString('enq AB enq DE upd DC');
+          grade = student.gradeAgainst(model);
+          assert.equal(grade.studentGrade, 3);
+          assert.equal(grade.maxGrade, 3);
+        }
+      })
+
+      QUnit.test('consecutiveEndUpdMissing', function(assert) {
+        // Several consecutive enqueue & operations
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        // Missing operation (upd DC)
+        student.fromString('enq AB enq DE');
+        model.fromString(  'enq AB upd DC enq DE');
+
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 2);
+        assert.equal(grade.maxGrade, 3);
+      })
+
+      QUnit.test('consecutiveEndUpdExtra', function(assert) {
+        // Several consecutive enqueue & operations
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        // Extra operation (upd DF)
+        // Note: points are not subtracted for extra operations, but the
+        // grading ends there: the last dequeue operations are not matched.
+        student.fromString('enq AB upd DC upd DF enq DE deq GD');
+        model.fromString(  'enq AB upd DC enq DE deq GD');
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 3);
+        assert.equal(grade.maxGrade, 4);
+      })
+
     })
   </script>
 </body>
