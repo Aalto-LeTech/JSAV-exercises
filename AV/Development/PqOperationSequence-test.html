@@ -26,10 +26,14 @@
         let op3 = new PqOperation('deq', 'AB');
         let op4 = new PqOperation('enq', 'AE');
 
+        // Equality is symmetric
         assert.true(op.equals(op2));
         assert.true(op2.equals(op));
 
+        // Different operation, same edge
         assert.false(op.equals(op3));
+
+        // Same operation, different edge
         assert.false(op.equals(op4));
       })
 
@@ -50,6 +54,70 @@
       })      
 
     })
+
+    QUnit.module('OperableSet', function() {
+
+      QUnit.test('size', function(assert) {
+        let s = new OperableSet();
+        assert.equal(s.size(), 0)
+
+        s.add('a');
+        assert.equal(s.size(), 1);
+
+        s.add('b');
+        assert.equal(s.size(), 2);
+
+        // Adding an element twice has no effect
+        s.add('a');
+        assert.equal(s.size(), 2);
+      })
+
+      QUnit.test('toString', function(assert) {
+        let s = new OperableSet();
+        s.add('a');
+        s.add('b');
+        assert.equal(s.toString(), '["a","b"]');
+      })
+
+      QUnit.test('union', function(assert) {
+        let s1 = new OperableSet();
+        s1.add('a');
+        s1.add('b');
+        assert.equal(s1.toString(), '["a","b"]');
+
+        let s2 = new OperableSet();
+        s2.add('b');
+        s2.add('c');
+        assert.equal(s2.toString(), '["b","c"]');
+
+        let s3 = s1.union(s2);
+        // Intersection does not change the original sets
+        assert.equal(s1.toString(), '["a","b"]');
+        assert.equal(s2.toString(), '["b","c"]');
+        // The result of the union is correct
+        assert.equal(s3.toString(), '["a","b","c"]');
+      })
+
+      QUnit.test('intersection', function(assert) {
+        let s1 = new OperableSet();
+        s1.add('a');
+        s1.add('b');
+        assert.equal(s1.toString(), '["a","b"]');
+
+        let s2 = new OperableSet();
+        s2.add('b');
+        s2.add('c');
+        assert.equal(s2.toString(), '["b","c"]');
+
+        let s3 = s1.intersection(s2);
+        // Intersection does not change the original sets
+        assert.equal(s1.toString(), '["a","b"]');
+        assert.equal(s2.toString(), '["b","c"]');
+        // The result of the intersection is correct
+        assert.equal(s3.toString(), '["b"]');
+      })
+
+    })      
   </script>
 </body>
 </html>
