@@ -30,7 +30,7 @@ class PqOperation {
    * @return a String 
    */
   toString() {
-    return this.operation + this.edge;
+    return this.operation + ' ' + this.edge;
   }
 }
 
@@ -154,7 +154,14 @@ class PqOperationSequence {
    * @returns {String}
    */
   toString() {
-    return JSON.stringify(this.operations.map((x) => x.toString()));
+    let s = ""
+    if (this.length() > 0) {
+      s = this.operations[0].toString();
+    }
+    for (let i = 1; i < this.operations.length; i++) {
+      s += ' ' + this.operations[i].toString();
+    }
+    return s;
   }
 
   /**
@@ -209,6 +216,26 @@ class PqOperationSequence {
     return { studentGrade: i, maxGrade: modelLength };
   }
 
+  /**
+   * Constructs a PqOperationSequence from a string in format
+   * "opr ee opr ee opr ee ... " where each
+   *    opr is one of {'enq', 'deq', 'upd'}
+   *  and each ee is a pair of uppercase alphabets.
+   * This is helper function for generating test data in unit tests.
+   *
+   * E.g. x = "enq AB deq BC deq EF"
+   * PqOperationSequence:
+   *  [ { operation: 'enq', edge: 'AB'},
+   *    { operation: 'deq', }]
+   */
+  fromString(x) {
+    this.clear();
+    for (let i = 0; i < x.length; i += 7) {
+      const operation = x.substring(i, i + 3);
+      const edge = x.substring(i + 4, i + 6);
+      this.operations.push(new PqOperation(operation, edge));
+    }    
+  }
 
   
 

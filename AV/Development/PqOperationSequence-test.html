@@ -39,17 +39,17 @@
 
       QUnit.test('toString', function(assert) {
         let op = new PqOperation('enq', 'AB');
-        assert.equal(op.toString(), 'enqAB');
+        assert.equal(op.toString(), 'enq AB');
 
         let op2 = new PqOperation('deq', 'AC');
-        assert.equal(op2.toString(), 'deqAC');
+        assert.equal(op2.toString(), 'deq AC');
 
         // Test a string representation of a sequence of operations.
         // Use JSON.stringify to compare lists of strings.
         let arr = [op, op2].map((x) => x.toString(x));
         assert.equal(
           JSON.stringify(arr),
-          JSON.stringify(['enqAB', 'deqAC']));
+          JSON.stringify(['enq AB', 'deq AC']));
 
       })      
 
@@ -123,27 +123,27 @@
 
       QUnit.test('push-undo-toString', function(assert) {
         let s = new PqOperationSequence();
-        assert.equal(s.toString(), '[]');
+        assert.equal(s.toString(), '');
 
         s.push(new PqOperation('enq', 'AB'));
-        assert.equal(s.toString(), '[\"enqAB\"]');
+        assert.equal(s.toString(), 'enq AB');
 
         s.push(new PqOperation('deq', 'EF'));
-        assert.equal(s.toString(), '[\"enqAB\",\"deqEF\"]');
+        assert.equal(s.toString(), 'enq AB deq EF');
 
         s.undo();
-        assert.equal(s.toString(), '[\"enqAB\"]');
+        assert.equal(s.toString(), 'enq AB');
 
       })
 
       QUnit.test('clear-length', function(assert) {
         let s = new PqOperationSequence();
-        assert.equal(s.toString(), '[]');
+        assert.equal(s.toString(), '');
         assert.equal(s.length(), 0)
         
         // Clear operation for an empty sequence does nothing
         s.clear();
-        assert.equal(s.toString(), '[]');
+        assert.equal(s.toString(), '');
         assert.equal(s.length(), 0)
 
         // length() describes the length of the sequence
@@ -154,7 +154,7 @@
 
         // Clear operation empties the sequence, resulting length() == 0
         s.clear();
-        assert.equal(s.toString(), '[]');
+        assert.equal(s.toString(), '');
         assert.equal(s.length(), 0)
 
       })
@@ -189,6 +189,13 @@
         grade = student.gradeAgainst(model);
         assert.equal(grade.studentGrade, 0);
         assert.equal(grade.maxGrade, 0);
+      })
+
+      QUnit.test('fromString', function(assert) { 
+        let x = "enq AB deq BC";
+        let opSeq = new PqOperationSequence();
+        opSeq.fromString(x);
+        assert.equal(opSeq.toString(), x);
       })
 
     })
