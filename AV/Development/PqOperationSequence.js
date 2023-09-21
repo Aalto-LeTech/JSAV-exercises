@@ -196,17 +196,19 @@ class PqOperationSequence {
         }
       }
       else {
-        let studentOps = OperableSet();
-        for (; i < studentLength && student[i].operation !== 'deq'; i++) {
-          studentOps.add(student[i].toString())
+        let studentOps = new OperableSet();
+        for (let k = i; k < studentLength && student[k].operation !== 'deq';
+            k++) {
+          studentOps.add(student[k].toString())
         }
-        let modelOps = OperableSet();
-        for (; j < modelLength && model[j].operation !== 'deq'; j++) {
-          modelOps.add(model[j].toString());
+        let modelOps = new OperableSet();
+        for (let k = j; k < modelLength && model[k].operation !== 'deq'; k++) {
+          modelOps.add(model[k].toString());
         }
         let opIntersection = studentOps.intersection(modelOps);
         let opUnion = studentOps.union(modelOps);
         i += opIntersection.size();
+        j += opIntersection.size();
         if (opUnion.size() > opIntersection.size()) {
           break;
         }
