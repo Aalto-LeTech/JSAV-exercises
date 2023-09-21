@@ -13,8 +13,24 @@ class PqOperation {
       this.edge = edge[1] + edge[0];
     }    
   }
+
+  /**
+   * Tests equality to another PqOperation.
+   * 
+   * @param {PqOperation} x a PqOperation
+   * @returns Boolean value
+   */
   equals(x) {
     return this.operation === x.operation && this.edge === x.edge;
+  }
+
+  /**
+   * Produces a string representation of the object.
+   * 
+   * @return a String 
+   */
+  toString() {
+    return this.operation + this.edge;
   }
 }
 
@@ -69,27 +85,30 @@ class PqOperationSequence {
   }
 
   /**
+   * Grades the sequence against another sequence.
+   * Assumes that this sequence is the student's solution and the
+   * another sequence is the model solution.
    * 
-   * @param {PqOperation} modelAnswer 
+   * @param {PqOperation} modelAnswer Model solution
+   * @returns {studentGrade: x, maxGrade: y}
+   *       Grade of x / y, x and y are integers.
    */
   gradeAgainst(modelAnswer) {
     let studentGrade = 0;
     const modelLength = modelAnswer.operations.length;
     
     // Student's sequence
-    let studSeq = this.operations;
+    let student = this.operations;
 
     // Model solution's sequence
-    let modelSeq = modelAnswer.operations;
+    let model = modelAnswer.operations;
         
-    let i = 0; // points to studSet
-    let j = 0; // poinst to modelSeq
+    let i = 0; // index of student
+    let j = 0; // index of model
 
     while (j < maxGrade) {
-      let modelOp = modelSeq[j];
-      if (modelOp.operation === 'dequeue') {
-        if (studSeq[i].operation === 'dequeue' &&
-            studSeq[i].edge === modelOp.edge) {
+      if (model[j].operation === 'deq') {
+        if (student[i].equals(model[j])) {
             i++, j++;
         }
         else {
@@ -98,7 +117,15 @@ class PqOperationSequence {
         }
       }
       else {
-        let r = this.gradeEnqueueUpdate(studSeq, modelSeq, i, j);
+        let studentOps = [];
+        while (i < student.length && student[i].operation !== 'deq') {
+          studentOps.push(student[i++]);
+        }
+        let modelOps = [];
+        while (j < model.length && model[j].operation !== 'deq') {
+          modelOps.push(model[j++]);
+        }
+        let r = this.gradeEnqueueUpdate(student, model, i, j);
         // TODO
       }
     }
@@ -106,9 +133,10 @@ class PqOperationSequence {
     return { 'studentGrade': studentGrade, 'maxGrade': modelLength };
   }
 
-  gradeEnqueueUpdate(studSeq, modelSeq, i, j) {
-    let shouldBreak = false;
-    // TODO
-    return {'i': i, 'j': j, 'break': shouldBreak}
+  listIntersection(l1, l2) {
+
+    for (let i = 0; i < l1.length; i++) {
+
+    }
   }
 }
