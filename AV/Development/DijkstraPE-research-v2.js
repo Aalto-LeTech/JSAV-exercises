@@ -40,6 +40,11 @@
   var lastLinearTransform = -1; // for generateInstance()
   var debug = false; // produces debug prints to the console
 
+  // Storage of priority queue operations from student's answer to implement
+  // custom grading. From PqOperationSequence.js
+  var studentPqOperations = new PqOperationSequence();
+  var modelPqOperations = new PqOperationSequence();
+
   jsav.recorded();
 
   // JSAV Exercise
@@ -57,7 +62,6 @@
   exercise.undo = scaffoldedUndo;
   exercise.protoReset = exercise.reset;
   exercise.reset = scaffoldedReset;
-  exercise.pqOperations = [];
 
   exercise.reset();
 
@@ -89,6 +93,8 @@
     graph = jsav.ds.graph(layoutSettings);
 
     exerciseInstance = generateInstance();
+    studentPqOperations = new PqOperationSequence();
+    modelPqOperations = new PqOperationSequence();
     researchInstanceToJsav(exerciseInstance.graph, graph, layoutSettings);
     addMinheap();
     addTable(exerciseInstance.graph);
@@ -126,12 +132,19 @@
     $.fx.off = oldFx;
 
     console.log("Why hello! <3");
+    let grade = studentPqOperations.gradeAgainst(modelPqOperations);
+
     let score = {
-      correct: 1,
-      fix: 2,
-      student: 3,
-      total: 4,
-      undo: 5
+      // Number of correct steps in student's solution
+      correct: grade.studentGrade,
+      // Continuous grading mode not used, therefore `fix` is zero
+      fix: 0,
+      // Number of total steps in student's solution
+      student: studentPqOperations.length(),
+      // Number of total steps in model solution
+      total: grade.maxGrade,
+      // Continuous grading mode not used, therefore `undo` is zero
+      undo: 0
     }
     this.score = score;
   }
@@ -143,7 +156,7 @@
   function scaffoldedUndo() {
     console.log("Yee-haw! A custom undo!");
     exercise.protoUndo();
-    exercise.pqOperations.pop();
+    studentPqOperations.undo();
     return;
   };
 
@@ -154,7 +167,8 @@
   function scaffoldedReset() {
     console.log("Yee-ha! A custom reset!");
     exercise.protoReset();
-    exercise.pqOperations = [];
+    studentPqOperations.clear();
+    modelPqOperations.clear();
   }
 
   /**
@@ -273,18 +287,30 @@
     return [modelGraph, mintree];
   }
 
+  /**
+   * 1. Marks an edge as dequeued in the visualization (both student's and
+   *    model solutions).
+   * 2. Adds a dequeue operation into the operation sequence of either
+   *    student's or model solution. 
+   * @param {JSAV edge} edge  
+   * @param {*} av a JSAV algorithm visualization template.
+   *               If this is undefined, mark an edge in the model solution.
+   */
   function markEdge(edge, av) {
     edge.addClass("marked");
     edge.start().addClass("marked");
     edge.end().addClass("marked");
+    const v1 = edge.start().value();
+    const v2 = edge.end().value();
+    const pqOperation = new PqOperation('deq', v1 + v2);
     if (av) {
       debugPrint("Model solution gradeable step: mark edge " +
-       edge.start().value() + "-" + edge.end().value());
-      av.gradeableStep();
+        v1 + "-" + v2);
+      modelPqOperations.push(pqOperation);
     } else {
       debugPrint("Exercise gradeable step: mark edge " +
-       edge.start().value() + "-" + edge.end().value());
-      exercise.gradeableStep();
+        v1 + "-" + v2);
+      studentPqOperations.push(pqOperation);
     }
   }
 
@@ -475,6 +501,9 @@
 
     /**
      * Helper function to visit a node in the model solution.
+     * Makes a decision whether to add or update the note in the priority
+     * queue, or do nothing.
+     * 
      * @param src source node
      * @param neighbour neighbour node that is visited
      * @param srcDist distance to source
@@ -488,6 +517,8 @@
 
       const distViaSrc = srcDist + edge._weight;
       if (currNeighbourDist === Infinity) {
+        // Case 1: neighbour's distance is infinity.
+        // Add node to the priority queue.
         addNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
         debugPrint("Model solution gradeable step: ADD ROUTE WITH DIST:",
@@ -497,6 +528,8 @@
         highlight(edge, neighbour);
         av.gradeableStep();
       } else if (distViaSrc < currNeighbourDist) {
+        // Case 2: neighbour's distance is shorter through node `src`.
+        // Update node in the priority queue.
         const oldEdge = updateNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
         debugPrint("Model solution gradeable step:  UPDATE DISTANCE TO:",
@@ -509,6 +542,8 @@
         oldEdge.removeClass("queued")
         av.gradeableStep();
       } else {
+        // Case 3: neighbour's distance is equal or longer through node `src`.
+        // No not update the priority queue.
         debugPrint("KEEP DISTANCE THE SAME:",
                         currNeighbourDist + neighbour.value())
 
