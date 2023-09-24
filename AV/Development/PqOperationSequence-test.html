@@ -336,6 +336,49 @@
         assert.equal(grade.maxGrade, 4);
       })
 
+      QUnit.test('fullSequenceCorrect', function(assert) {
+        // Full sequence with enqueue, dequeue and update operations
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        const s1 = 'enq AB deq AB enq BC enq BD deq BD upd CD enq BX deq DE';
+        const modelOps = 8;
+        student.fromString(s1);
+        model.fromString(s1);
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, modelOps);
+        assert.equal(grade.maxGrade, modelOps);
+
+        // swap enqueue operations (BC, BD) and enqueue/update (CD, BX)
+        // s1 =    'enq AB deq AB enq BC enq BD deq BD upd CD enq BX deq DE';
+        const s2 = 'enq AB deq AB enq BD enq BC deq BD enq BX upd CD deq DE';
+        student.fromString(s2);
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, modelOps);
+        assert.equal(grade.maxGrade, modelOps);
+      })
+
+      QUnit.test('fullSequenceIncorrect', function(assert) {
+        // Full sequence with enqueue, dequeue and update operations
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        const s1 = 'enq AB deq AB enq BC enq BD deq BD upd CD enq BX deq DE';
+        const modelOps = 8;
+        student.fromString(s1);
+        model.fromString(s1);
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, modelOps);
+        assert.equal(grade.maxGrade, modelOps);
+
+        // swap *dequeue* operations (AB, BD)
+        // s1 =    'enq AB deq AB enq BC enq BD deq BD upd CD enq BX deq DE';
+        const s2 = 'enq AB deq BD enq BC enq BD deq AB upd CD enq BX deq DE';
+        student.fromString(s2);
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 1);
+        assert.equal(grade.maxGrade, modelOps);
+      })
     })
   </script>
 </body>
