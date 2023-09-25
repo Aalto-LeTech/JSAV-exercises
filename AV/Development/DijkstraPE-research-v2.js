@@ -116,25 +116,9 @@
    * Custom grading function for the exercise.
    */
   function scaffoldedGrader() {
-    var oldFx = $.fx.off || false;
-    $.fx.off = true;
-    // undo last step
-    this.jsav.backward(); // the empty new step
-    this.jsav.backward(); // the new graded step
-    // undo until the previous graded step
-    var undoGraders = ["default", "finder", "finalStep"];
-    if ((undoGraders.indexOf(this.options.grader) !== -1 ) && this.jsav.backward(gradeStepFilterFunction)) {
-      // if such step was found, redo it
-      this.jsav.forward();
-      this.jsav.step({updateRelative: false});
-    } else {
-      // ..if not, the first student step was incorrent and we can rewind to beginning
-      this.jsav.begin();
-    }
-    this.jsav._redo = [];
-    $.fx.off = oldFx;
-
-    console.log("Why hello! <3");
+    debugPrint('scaffoldedGrader():\n' +
+      'student: ' + studentPqOperations.toString() + '\n' +
+      'model  : ' + modelPqOperations.toString());
     let grade = studentPqOperations.gradeAgainst(modelPqOperations);
 
     let score = {
@@ -157,9 +141,34 @@
    * This is complementary to the function scaffoldedGrader().
    */
   function scaffoldedUndo() {
-    exercise.protoUndo();
+    // Modified from original JSAV undo function; source:
+    // https://github.com/vkaravir/JSAV/blob/master/src/exercise.js#L402-L420
+    var oldFx = $.fx.off || false;
+    $.fx.off = true;
+    // undo last step
+    this.jsav.backward(); // the empty new step
+    this.jsav.backward(); // the new graded step
+    // Undo until the previous graded step.
+    // Note: difference to original JSAV undo function: we know that all
+    // student's steps are gradable in this exercise.
+    // (Frankly, this if-else block might be related to the continuous
+    // grading mode of other JSAV exercises and thus irrelevant with this
+    // exercise, but let's keep it just in case it makes JSAV do some magic at
+    // the background. ;)
+    if (this.jsav.backward()) {
+      // if such step was found, redo it
+      this.jsav.forward();
+      this.jsav.step({updateRelative: false});
+    } else {
+      // ..if not, the first student step was incorrent and we can rewind
+      // to beginning
+      this.jsav.begin();
+    }
+    this.jsav._redo = [];
+    $.fx.off = oldFx;
+    // End of modified JSAV undo code
     studentPqOperations.undo();
-    return;
+    debugPrint('studentPqOperations: ' + studentPqOperations.toString());
   };
 
   /**
@@ -328,13 +337,13 @@
       // Add the operation to the priority queue operation sequence for
       // custom grading.
       modelPqOperations.push(pqOperation);
-      debugPrint('storePqOperationStep: model: ' + pqOperation.toString());
+      debugPrint('modelPqOperations: ' + modelPqOperations.toString());
     }
     else {
       // Similar block but for student's solution
       exercise.gradeableStep();
       studentPqOperations.push(pqOperation);
-      debugPrint('storePqOperationStep: student: ' + pqOperation.toString());
+      debugPrint('studentPqOperations: ' + studentPqOperations.toString());
     }
   }
 
@@ -1832,7 +1841,6 @@
       const nodeLabel = deleted.charAt(deleted.length - 5);
       const node = graph.nodes().filter(node =>
           node.element[0].getAttribute("data-value") === nodeLabel)[0];
-      // const srcLabel = table.value(2, findColByNode(nodeLabel));
       const srcLabel = deleted.charAt(deleted.length - 2);
       const srcNode = graph.nodes().filter(node =>
           node.element[0].getAttribute("data-value") === srcLabel)[0];
@@ -1845,9 +1853,6 @@
             "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
           });
       }
-      if (!edge.hasClass("marked")) {
-        markEdge(edge);
-      }
       // Give the last removed node a wider border (2px instead of 1) to 
       // emphasize that this is the last removed node. 
       if (focussed) {
@@ -1856,6 +1861,10 @@
       focussed = node;
       focussed.addClass("focusnode");
       minheap.layout();
+      // Call markEdge last, because it will also store the JSAV animation step
+      if (!edge.hasClass("marked")) {
+        markEdge(edge);
+      }
     })
   }
 
