@@ -38,7 +38,7 @@
   var focussed;
 
   var lastLinearTransform = -1; // for generateInstance()
-  var debug = false; // produces debug prints to the console
+  var debug = true; // produces debug prints to the console
 
   // Storage of priority queue operations from student's answer to implement
   // custom grading. From PqOperationSequence.js
@@ -295,18 +295,32 @@
    *    student's or model solution. 
    * @param {JSAV edge} edge  
    * @param {*} av a JSAV algorithm visualization template.
-   *               If this is undefined, mark an edge in the model solution.
+   *               If defined, mark an edge in the model solution.
+   *               If undefined, mark an edge in the student's solution.
    */
   function markEdge(edge, av) {
     edge.addClass("marked");
     edge.start().addClass("marked");
     edge.end().addClass("marked");
+    storePqOperationStep('deq', edge, av);
+  }
+
+  /**
+   * 1. Stores a priority queue operation related to an edge into either the
+   *    student's or model solution's PqOperationSequence.
+   * 2. Generates a gradeable step in the JSAV representation.
+   * @param {*} operation: one of: {'enq', 'deq', 'upd'}
+   * @param {JSAVedge} av a JSAV algorithm visualization template.
+   *               If this is undefined, mark an edge in the model solution.
+   * @param {*} av a JSAV algorithm visualization template.
+   *               If defined, store the operation for the model solution.
+   *               Otherwise store the operation for the student's solution.
+   */
+  function storePqOperationStep(operation, edge, av) {
     const v1 = edge.start().value();
     const v2 = edge.end().value();
-    const pqOperation = new PqOperation('deq', v1 + v2);
+    const pqOperation = new PqOperation(operation, v1 + v2);
     if (av) {
-      debugPrint("Model solution gradeable step: mark edge " +
-        v1 + "-" + v2);
       // Tell JSAV that this is a gradeable step just to:
       // (i) generate a step in the model solution;
       // (ii) make JSAV Exercise Recorder to record this step.
@@ -314,16 +328,13 @@
       // Add the operation to the priority queue operation sequence for
       // custom grading.
       modelPqOperations.push(pqOperation);
-    } else {
-      debugPrint("Exercise gradeable step: mark edge " +
-        v1 + "-" + v2);      
-      // Tell JSAV that this is a gradeable step. Although this step is
-      // actually graded with the custom grade, this call also ensured that
-      // JSAV Exercise Recorder records this step.
+      debugPrint('storePqOperationStep: model: ' + pqOperation.toString());
+    }
+    else {
+      // Similar block but for student's solution
       exercise.gradeableStep();
-      // Add the operation to the priority queue operation sequence for
-      // custom grading.
       studentPqOperations.push(pqOperation);
+      debugPrint('storePqOperationStep: student: ' + pqOperation.toString());
     }
   }
 
@@ -538,15 +549,9 @@
         av.umsg(interpret("av_ms_visit_neighbor_add"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
-        // Tell JSAV that this is a gradeable step just to:
-        // (i) generate a step in the model solution;
-        // (ii) make JSAV Exercise Recorder to record this step.        
-        av.gradeableStep();
-        // Add the operation to the priority queue operation sequence for
-        // custom grading.
-        modelPqOperations.push(new PqOperation('enq', src.value() + 
-          neighbour.value()));
-      } else if (distViaSrc < currNeighbourDist) {
+        storePqOperationStep('enq', edge, av);
+      }
+      else if (distViaSrc < currNeighbourDist) {
         // Case 2: neighbour's distance is shorter through node `src`.
         // Update node in the priority queue.
         const oldEdge = updateNode(src.value(), neighbour.value(), distViaSrc);
@@ -559,14 +564,7 @@
         highlight(edge, neighbour);
         av.step();
         oldEdge.removeClass("queued")
-        // Tell JSAV that this is a gradeable step just to:
-        // (i) generate a step in the model solution;
-        // (ii) make JSAV Exercise Recorder to record this step.   
-        av.gradeableStep();
-        // Add the operation to the priority queue operation sequence for
-        // custom grading.        
-        modelPqOperations.push(new PqOperation('upd', src.value() + 
-        neighbour.value()));
+        storePqOperationStep('upd', edge, av);
       } else {
         // Case 3: neighbour's distance is equal or longer through node `src`.
         // No not update the priority queue.
@@ -789,10 +787,7 @@
     insertMinheap(srcLabel, dstLabel, newDist);
     debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
       dstLabel + " distance " + newDist);
-    exercise.gradeableStep();
-    // Add the operation to the priority queue operation sequence for
-    // custom grading.
-    studentPqOperations.push(new PqOperation('enq', srcLabel + dstLabel));
+    storePqOperationStep('enq', event.data.edge);
     popup.close();
   }
 
@@ -866,10 +861,7 @@
     }
     debugPrint("Exercise gradeable step: update edge " + srcLabel + "-" +
       dstLabel + " distance " + newDist);
-    exercise.gradeableStep();
-    // Add the operation to the priority queue operation sequence for
-    // custom grading.
-    studentPqOperations.push(new PqOperation('upd', srcLabel + dstLabel));
+    storePqOperationStep('upd', event.data.edge);
     popup.close();
   }
 
