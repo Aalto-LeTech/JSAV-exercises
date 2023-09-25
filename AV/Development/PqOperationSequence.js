@@ -112,8 +112,9 @@ class OperableSet {
  * answer operations and student's solution.
  */
 class PqOperationSequence {
-  constructor() {
+  constructor(debug) {
     this.operations = [];
+    this.debug = debug;
   }
 
   /**
