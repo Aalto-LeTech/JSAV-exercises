@@ -79,7 +79,7 @@
   function init() {
     // Uncomment this to have a fixed exercise instance for demonstration
     // purpose
-    //JSAV.utils.rand.seedrandom("1");
+    // JSAV.utils.rand.seedrandom("1");
 
     // Create a JSAV graph instance
     if (graph) {
@@ -101,7 +101,9 @@
     addTable(exerciseInstance.graph);
 
     // For research
-    window.JSAVrecorder.addMetadata('roleMap', exerciseInstance['roleMap']);
+    if (window.JSAVrecorder) {
+      window.JSAVrecorder.addMetadata('roleMap', exerciseInstance['roleMap']);
+    }
 
     graph.layout();
     // mark the 'A' node
@@ -393,14 +395,14 @@
     }
 
     function highlight(edge, node) {
-      //Mark current edge as highlighted
+      // Mark current edge as highlighted
       edge.addClass("highlighted");
-      //Mark current node being visited as highlighted
+      // Mark current node being visited as highlighted
       node.addClass("highlighted");
-      //Mark current node being visited in the table
+      // Mark current node being visited in the table
       distances.addClass(node.value().charCodeAt(0) - "A".charCodeAt(0),
                          true, "highlighted");
-      //Mark current node being visited in the mintree
+      // Mark current node being visited in the mintree
       const treeNodeList = getTreeNodeList(mintree.root());
       const treeNode = treeNodeList.filter(treeNode =>
           treeNode.value().charAt(treeNode.value().length - 5)
@@ -450,8 +452,8 @@
 
       const ret = mintree.root().value();
 
-      //Mark table row as "unused" (grey background)
-      //Then set selected message, and step the av.
+      // Mark table row as "unused" (grey background)
+      // Then set selected message, and step the av.
       const nodeLabel = ret.charAt(ret.length - 5)
       distances.addClass(nodeLabel.charCodeAt(0) - "A".charCodeAt(0), true, "unused")
       av.umsg(interpret("av_ms_select_node"),
@@ -605,7 +607,7 @@
         node = node.parent();
       }
 
-      //Add queued class to the edge
+      // Add queued class to the edge
       const srcNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const dstNode = nodes.filter(node =>
@@ -625,17 +627,17 @@
     function updateNode(srcLabel, dstLabel, distance) {
       const label = distance + "<br>" + dstLabel + " (" + srcLabel + ")"
       const nodeArr = getTreeNodeList(mintree.root())
-      //Grab first node with the correct destination.
+      // Grab first node with the correct destination.
       const updatedNode = nodeArr.filter(node =>
               node.value().charAt(node.value().length - 5) === dstLabel)[0];
 
-      //If no node with the correct label exists, do nothing.
+      // If no node with the correct label exists, do nothing.
       if (!updatedNode) {
         return;
       }
       debugPrint("UPDATE:", updatedNode.value(), "TO:", distance + label);
 
-      //Add queued class to the edge
+      // Add queued class to the edge
       const srcNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const dstNode = nodes.filter(node =>
@@ -651,9 +653,9 @@
       const oldEdge = dstNode.edgeFrom(oldSrcNode) ?? dstNode.edgeTo(oldSrcNode)
       // oldEdge.removeClass("queued");
       updatedNode.value(label);
-      //Inline while loop to move the value up if needed.
-      //Because if you pass a node along as a parameter, it does not like
-      //being asked about its parent... Grading will break in ODSA part.
+      // Inline while loop to move the value up if needed.
+      // Because if you pass a node along as a parameter, it does not like
+      // being asked about its parent... Grading will break in ODSA part.
       var node = updatedNode;
       while (node != mintree.root() &&
              extractDistance(node) < extractDistance(node.parent())) {
@@ -774,11 +776,14 @@
     const popup = event.data.popup;
     debugPrint(event.data.edge)
     event.data.edge.addClass("queued");
-    window.JSAVrecorder.appendAnimationEventFields(
-      {
-        "pqOperation": "enqueue",
-        "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge, "Edge")
-      });
+    if (window.JSAVrecorder) {
+      window.JSAVrecorder.appendAnimationEventFields(
+        {
+          "pqOperation": "enqueue",
+          "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge,
+            "Edge")
+        });
+    }
 
     updateTable(srcLabel, dstLabel, newDist);
     insertMinheap(srcLabel, dstLabel, newDist);
@@ -807,12 +812,12 @@
     const newDist = event.data.newDist;
     const popup = event.data.popup;
 
-    const nodeArr = getTreeNodeList(minheap.root())
-    //Grab first node with the correct destination.
+    const nodeArr = getTreeNodeList(minheap.root());
+    // Grab first node with the correct destination.
     const updatedNode = nodeArr.filter(node =>
             node.value().charAt(node.value().length - 5) === dstLabel)[0];
 
-    //If no node with the correct label exists, do nothing.
+    // If no node with the correct label exists, do nothing.
     if (!updatedNode) {
       popup.close();
       window.alert(interpret("av_update_not_possible"));
@@ -820,29 +825,29 @@
     }
 
     updateTable(srcLabel, dstLabel, newDist);
-    //Add class to the new edge
+    // Add class to the new edge
     event.data.edge.addClass("queued")
-    //remove class from the old edge
-    //Have old label, find previous source node label
+    // remove class from the old edge
+    // Have old label, find previous source node label
     const oldLabel = updatedNode.value();
     const oldSrcLabel = oldLabel.charAt(oldLabel.length - 2);
-    //Find node objects to grab the egde
+    // Find node objects to grab the egde
     const oldNode = graph.nodes().filter(node =>
         node.element[0].getAttribute("data-value") === oldSrcLabel)[0];
     const dstNode = graph.nodes().filter(node =>
         node.element[0].getAttribute("data-value") === dstLabel)[0];
     const oldEdge = graph.getEdge(oldNode, dstNode)
               ?? graph.getEdge(dstNode, oldNode);
-    //Remove the queued class.
+    // Remove the queued class.
     oldEdge.removeClass("queued")
-    window.JSAVrecorder.appendAnimationEventFields(
-      {
-        "pqOperation": "update",
-        "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge, "Edge"),
-        "pqOut": window.JSAVrecorder.jsavObjectToJaalID(oldEdge, "Edge")
-      });
-
-
+    if (window.JSAVrecorder) {
+      window.JSAVrecorder.appendAnimationEventFields(
+        {
+          "pqOperation": "update",
+          "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge, "Edge"),
+          "pqOut": window.JSAVrecorder.jsavObjectToJaalID(oldEdge, "Edge")
+        });
+    }
     const oldDist = oldLabel.match(/\d+/)[0];
     const label = newDist + "<br>" + dstLabel + " (" + srcLabel + ")";
     updatedNode.value(label);
@@ -900,8 +905,8 @@
     const newDist = getUpdatedDistance(srcLabel, pathWeight);
     const label = newDist + dstLabel;
 
-    //Edge is listed in alphabetical order, regardless of which
-    //node is listed as the src or dst in JSAV.
+    // Edge is listed in alphabetical order, regardless of which
+    // node is listed as the src or dst in JSAV.
     const options = {
       "title": interpret("edge") + " " + ((srcLabel < dstLabel)
                                           ? (srcLabel + dstLabel)
@@ -1381,9 +1386,9 @@
       }
     }
 
-    //Create a 6 by 4 graph with the extra labels.
-    //Initialise empty edge array, this will be filled
-    //with the new edges with the two extra columns as off-set.
+    // Create a 6 by 4 graph with the extra labels.
+    // Initialise empty edge array, this will be filled
+    // with the new edges with the two extra columns as off-set.
     let paddedGraph = {
       vertexLabels: [...graph.vertexLabels,
                       "Q", "R", "S", "T", "U", "V", "W", "X"],
@@ -1393,26 +1398,26 @@
       paddedGraph.edges[i] = [];
     }
 
-    //Remap the 4 by 4 component to 6 by 4
-    //For left: add 2 empty node columns at the right side
-    //for right: add 2 empty node columns at the left side
+    // Remap the 4 by 4 component to 6 by 4
+    // For left: add 2 empty node columns at the right side
+    // for right: add 2 empty node columns at the left side
     if (left) {
       for (let i = 0; i < newGraph.edges.length; i++) {
-        //offset of new index compared to old. This is for the source.
+        // offset of new index compared to old. This is for the source.
         let offset = 2 * Math.floor(i/4);
         for (let e of newGraph.edges[i]) {
-          //new destination index.
+          // new destination index.
           let newIndex = e[0] + (2 * Math.floor(e[0]/4));
           paddedGraph.edges[i + offset].push([newIndex, e[1]])
         }
       }
     } else {
       for (let i = 0; i < newGraph.edges.length; i++) {
-        //Offset for the new source index.
+        // Offset for the new source index.
         // + 1 for the cases where i = 0, 4, 8, 12
         let offset = (i%4) ? 2 * (Math.ceil(i/4)) : 2 * (Math.ceil(i/4) + 1);
         for (let e of newGraph.edges[i]) {
-          //Offset and new index of the destination index.
+          // Offset and new index of the destination index.
           let off = (e[0]%4) ? Math.ceil(e[0]/4) : Math.ceil(e[0]/4) + 1;
           let newIndex = e[0] + 2 * off;
           paddedGraph.edges[i + offset].push([newIndex, e[1]])
@@ -1477,103 +1482,103 @@
     // numbers. This assumes that the component is placed on the right side,
     // an off-set of +4 needs to be added to use the nodes on the left side.
     const edgeNodeMap = {
-      0: [0, 1], //QR
-      1: [0, 6], //QS
-      2: [1, 7], //RT
-      3: [6, 7], //ST
-      4: [6, 12], //SU
-      5: [7, 13], //TV
-      6: [12, 13], //UV
-      7: [12, 18], //UW
-      8: [13, 19], //VX
-      9: [18, 19], //WX
-      10: [0, 7], //QT
-      11: [1, 6], //RS
-      12: [6, 13], //SV
-      13: [7, 12], //TU
-      14: [12, 19], //VX
-      15: [13, 18], //UX
+      0: [0, 1], // QR
+      1: [0, 6], // QS
+      2: [1, 7], // RT
+      3: [6, 7], // ST
+      4: [6, 12], // SU
+      5: [7, 13], // TV
+      6: [12, 13], // UV
+      7: [12, 18], // UW
+      8: [13, 19], // VX
+      9: [18, 19], // WX
+      10: [0, 7], // QT
+      11: [1, 6], // RS
+      12: [6, 13], // SV
+      13: [7, 12], // TU
+      14: [12, 19], // VX
+      15: [13, 18], // UX
     }
 
-    //untakenEdges is a list of all the edges that are possible
-    //to be added to the graph without the research component changing.
-    //We select randomly approximately half of these edges
+    // untakenEdges is a list of all the edges that are possible
+    // to be added to the graph without the research component changing.
+    // We select randomly approximately half of these edges
     let untakenEdges = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                         [10,11], [12,13], [14,15]];
 
     if (leftSide) {
       if (lastLinearTransform === 1) {
-        edgeNodeMap[16] = [16, 21] //PV
-        edgeNodeMap[17] = [21, 22] //OP
+        edgeNodeMap[16] = [16, 21] // PV
+        edgeNodeMap[17] = [21, 22] // OP
         untakenEdges.push(16, 17)
       }
       if (lastLinearTransform === 4) {
-        edgeNodeMap[16] = [10, 15] //LS
-        edgeNodeMap[17] = [15, 16] //LV
-        edgeNodeMap[18] = [15, 22] //LW
-        edgeNodeMap[19] = [16, 21] //PV
-        edgeNodeMap[20] = [21, 22] //PW
+        edgeNodeMap[16] = [10, 15] // LS
+        edgeNodeMap[17] = [15, 16] // LV
+        edgeNodeMap[18] = [15, 22] // LW
+        edgeNodeMap[19] = [16, 21] // PV
+        edgeNodeMap[20] = [21, 22] // PW
         untakenEdges.push(16, 17, [18, 19], 20);
       }
       if (lastLinearTransform === 0) {
-        edgeNodeMap[16] = [3, 4] //DQ
-        edgeNodeMap[17] = [3, 10] //DS
-        edgeNodeMap[18] = [4, 9] //HQ
-        edgeNodeMap[19] = [9, 10] //HS
-        edgeNodeMap[20] = [9, 16] //HU
+        edgeNodeMap[16] = [3, 4] // DQ
+        edgeNodeMap[17] = [3, 10] // DS
+        edgeNodeMap[18] = [4, 9] // HQ
+        edgeNodeMap[19] = [9, 10] // HS
+        edgeNodeMap[20] = [9, 16] // HU
         untakenEdges.push(16, [17, 18], 19, 20);
       }
       if (lastLinearTransform === 7) {
-        edgeNodeMap[16] = [3, 4] //DQ
-        edgeNodeMap[17] = [3, 10] //DS
+        edgeNodeMap[16] = [3, 4] // DQ
+        edgeNodeMap[17] = [3, 10] // DS
         untakenEdges.push(16, 17)
       }
     } else {
       if (lastLinearTransform === 3) {
-        edgeNodeMap[16] = [1, 2] //AR
-        edgeNodeMap[17] = [2, 7] //AT
+        edgeNodeMap[16] = [1, 2] // AR
+        edgeNodeMap[17] = [2, 7] // AT
         untakenEdges.push(16, 17)
       }
       if (lastLinearTransform === 5) {
-        edgeNodeMap[16] = [1, 2] //AR
-        edgeNodeMap[17] = [1, 8] //ER
-        edgeNodeMap[18] = [2, 7] //AT
-        edgeNodeMap[19] = [7, 8] //ET
-        edgeNodeMap[20] = [8, 13] //EV
+        edgeNodeMap[16] = [1, 2] // AR
+        edgeNodeMap[17] = [1, 8] // ER
+        edgeNodeMap[18] = [2, 7] // AT
+        edgeNodeMap[19] = [7, 8] // ET
+        edgeNodeMap[20] = [8, 13] // EV
         untakenEdges.push(16, [17, 18], 19, 20);
       }
       if (lastLinearTransform === 2) {
-        edgeNodeMap[16] = [7, 14] //IT
-        edgeNodeMap[17] = [13, 14] //IV
-        edgeNodeMap[18] = [13, 20] //MV
-        edgeNodeMap[19] = [14, 19] //IX
-        edgeNodeMap[20] = [19, 20] //MX
+        edgeNodeMap[16] = [7, 14] // IT
+        edgeNodeMap[17] = [13, 14] // IV
+        edgeNodeMap[18] = [13, 20] // MV
+        edgeNodeMap[19] = [14, 19] // IX
+        edgeNodeMap[20] = [19, 20] // MX
         untakenEdges.push(16, 17, [18, 19], 20);
       }
       if (lastLinearTransform === 6) {
-        edgeNodeMap[16] = [13, 20] //MV
-        edgeNodeMap[17] = [19, 20] //MX
+        edgeNodeMap[16] = [13, 20] // MV
+        edgeNodeMap[17] = [19, 20] // MX
         untakenEdges.push(16, 17)
       }
     }
 
-    //Replace cross points with one of the two edges, randomly selected
+    // Replace cross points with one of the two edges, randomly selected
     for (let i = 0; i < untakenEdges.length; i++) {
       if (Array.isArray(untakenEdges[i])) {
         untakenEdges[i] = untakenEdges[i][Math.round(JSAV.utils.rand.random())]
       }
     }
 
-    //Add half the number of edges that can be added to it.
-    //This is so that it doesn't look too empty or too full, as the total
-    //number of edges can be between 13 and 17, depending on how edge DH is.
+    // Add half the number of edges that can be added to it.
+    // This is so that it doesn't look too empty or too full, as the total
+    // number of edges can be between 13 and 17, depending on how edge DH is.
     const numEdges = Math.ceil(untakenEdges.length / 2);
     const takenEdges = shuffle(untakenEdges).slice(0, numEdges);
 
     for (i = 0; i < takenEdges.length; i++) {
       const nodes = edgeNodeMap[takenEdges[i]];
       const weight = Math.round(JSAV.utils.rand.random()*8) + 1;
-      //offset for the 16 "core" edges
+      // offset for the 16 "core" edges
       const offset = (takenEdges[i] < 16 && leftSide) ? 4 : 0;
       const src = nodes[0] + offset;
       const dst = nodes[1] + offset;
@@ -1656,8 +1661,8 @@
     // I J K L
     // M N O P
     // However, the *roles* of the vertices have been changed.
-    //The two possible layouts now are this:
-    //with core component (0...15) either on the left or right
+    // The two possible layouts now are this:
+    // with core component (0...15) either on the left or right
     const leftLayout = [0, 1, 2, 3, 16, 17,
                         4, 5, 6, 7, 18, 19,
                         8, 9, 10, 11, 20, 21,
@@ -1824,14 +1829,14 @@
                             "position": "relative",
                             "margin": "1em"});
 
-    //Add remove button
+    // Add remove button
     $("#removeButton").click(function() {
       const deleted = minheapDelete(0);
       if (!deleted) {
         return;
       }
-      //Format of node label: "x<br>D (S)", where x is the distance,
-      //D is the destination node label and S is the source node label
+      // Format of node label: "x<br>D (S)", where x is the distance,
+      // D is the destination node label and S is the source node label
       const nodeLabel = deleted.charAt(deleted.length - 5);
       const node = graph.nodes().filter(node =>
           node.element[0].getAttribute("data-value") === nodeLabel)[0];
@@ -1841,12 +1846,13 @@
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
       edge.removeClass("queued")
-      window.JSAVrecorder.appendAnimationEventFields(
-        {
-          "pqOperation": "dequeue",
-          "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
-        });
-
+      if (window.JSAVrecorder) {
+        window.JSAVrecorder.appendAnimationEventFields(
+          {
+            "pqOperation": "dequeue",
+            "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
+          });
+      }
       if (!edge.hasClass("marked")) {
         markEdge(edge);
       }
@@ -1931,7 +1937,7 @@
 
     heapsize.value(heapsize.value() - 1);
 
-    //PLACEHOLDER: be able to remove other than min
+    // PLACEHOLDER: be able to remove other than min
     const ret = (index === 0) ? minheap.root().value() : minheap.root().value();
 
     // Parent of the last node in the heap
