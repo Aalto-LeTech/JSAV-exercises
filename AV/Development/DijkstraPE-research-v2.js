@@ -3,7 +3,7 @@
  * Johanna Sänger, Artturi Tilanterä
  * johanna.sanger@kantisto.nl
  * artturi.tilantera@aalto.fi
- * 17 August 2022
+ * 25 August 2023
  */
 
 /* global ODSA, graphUtils */
@@ -57,7 +57,8 @@
     fix: fixState
   });
   /* Set custom undo and reset function because we also have a custom
-   * grader. */
+   * grader. Save the default prototype functions into separate variables,
+   * because we also want to call them. */
   exercise.protoUndo = exercise.undo;
   exercise.undo = scaffoldedUndo;
   exercise.protoReset = exercise.reset;
@@ -154,7 +155,6 @@
    * This is complementary to the function scaffoldedGrader().
    */
   function scaffoldedUndo() {
-    console.log("Yee-haw! A custom undo!");
     exercise.protoUndo();
     studentPqOperations.undo();
     return;
@@ -165,7 +165,6 @@
    * This is complementary to the function scaffoldedGrader().
    */
   function scaffoldedReset() {
-    console.log("Yee-ha! A custom reset!");
     exercise.protoReset();
     studentPqOperations.clear();
     modelPqOperations.clear();
@@ -306,10 +305,22 @@
     if (av) {
       debugPrint("Model solution gradeable step: mark edge " +
         v1 + "-" + v2);
+      // Tell JSAV that this is a gradeable step just to:
+      // (i) generate a step in the model solution;
+      // (ii) make JSAV Exercise Recorder to record this step.
+      av.gradeableStep();
+      // Add the operation to the priority queue operation sequence for
+      // custom grading.
       modelPqOperations.push(pqOperation);
     } else {
       debugPrint("Exercise gradeable step: mark edge " +
-        v1 + "-" + v2);
+        v1 + "-" + v2);      
+      // Tell JSAV that this is a gradeable step. Although this step is
+      // actually graded with the custom grade, this call also ensured that
+      // JSAV Exercise Recorder records this step.
+      exercise.gradeableStep();
+      // Add the operation to the priority queue operation sequence for
+      // custom grading.
       studentPqOperations.push(pqOperation);
     }
   }
@@ -332,7 +343,6 @@
     const aNode = nodes[indexOfLabel["A"]];
     av.umsg(interpret("av_ms_select_a"));
     av.step();
-    // aNode.neighbors().forEach(node => initialNode(aNode, node))
     aNode.neighbors().forEach(node => visitNeighbour(aNode, node, 0));
 
     while (modelheapsize > 0) {
@@ -526,7 +536,14 @@
         av.umsg(interpret("av_ms_visit_neighbor_add"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
+        // Tell JSAV that this is a gradeable step just to:
+        // (i) generate a step in the model solution;
+        // (ii) make JSAV Exercise Recorder to record this step.        
         av.gradeableStep();
+        // Add the operation to the priority queue operation sequence for
+        // custom grading.
+        modelPqOperations.push(new PqOperation('enq', src.value() + 
+          neighbour.value()));
       } else if (distViaSrc < currNeighbourDist) {
         // Case 2: neighbour's distance is shorter through node `src`.
         // Update node in the priority queue.
@@ -540,7 +557,14 @@
         highlight(edge, neighbour);
         av.step();
         oldEdge.removeClass("queued")
+        // Tell JSAV that this is a gradeable step just to:
+        // (i) generate a step in the model solution;
+        // (ii) make JSAV Exercise Recorder to record this step.   
         av.gradeableStep();
+        // Add the operation to the priority queue operation sequence for
+        // custom grading.        
+        modelPqOperations.push(new PqOperation('upd', src.value() + 
+        neighbour.value()));
       } else {
         // Case 3: neighbour's distance is equal or longer through node `src`.
         // No not update the priority queue.
@@ -761,6 +785,9 @@
     debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
       dstLabel + " distance " + newDist);
     exercise.gradeableStep();
+    // Add the operation to the priority queue operation sequence for
+    // custom grading.
+    studentPqOperations.push(new PqOperation('enq', srcLabel + dstLabel));
     popup.close();
   }
 
@@ -835,6 +862,9 @@
     debugPrint("Exercise gradeable step: update edge " + srcLabel + "-" +
       dstLabel + " distance " + newDist);
     exercise.gradeableStep();
+    // Add the operation to the priority queue operation sequence for
+    // custom grading.
+    studentPqOperations.push(new PqOperation('upd', srcLabel + dstLabel));
     popup.close();
   }
 
