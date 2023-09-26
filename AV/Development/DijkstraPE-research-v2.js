@@ -33,9 +33,11 @@
   // Number of elements in the binary heap
   var heapsize = jsav.variable(0);
 
-  // This variable keeps track of what node has been focussed after a dequeue
-  // operation, to make sure that the class can be removed. 
-  var focussed;
+  // A list of JSAV graph nodes to keeps track of what node has been focused
+  // after a dequeue operation. This is make sure that the class can be removed
+  // and that after undoing a dequeue operation the previously focused node is
+  // again shown as focused.
+  var focusedNodes = [];
 
   var lastLinearTransform = -1; // for generateInstance()
   var debug = true; // produces debug prints to the console
@@ -167,8 +169,27 @@
     this.jsav._redo = [];
     $.fx.off = oldFx;
     // End of modified JSAV undo code
-    studentPqOperations.undo();
+    
+    const undoneOperation = studentPqOperations.undo();
     debugPrint('studentPqOperations: ' + studentPqOperations.toString());
+    
+    if (undoneOperation.operation === 'deq') {
+      // Remove the recently dequeued node from focusedNodes so that when the
+      // student performs the next dequeue operation, the correct graph node
+      // will lose its "focusedNode" CSS class.
+      focusedNodes.pop();
+      // Note: JSAV remembers all student's previous steps, including which
+      // node had the CSS class "focusnode" at each step. Therefore, we don't
+      // need to call .addClass("focusnode") for the previously focused node.
+      // Debug print focusedNodes
+      let s = "focusedNodes after an undo:";
+      for (const x of focusedNodes) {
+        s += ' ' + x.value();
+      }
+      debugPrint(s);
+    }
+    
+    
   };
 
   /**
@@ -179,6 +200,7 @@
     exercise.protoReset();
     studentPqOperations.clear();
     modelPqOperations.clear();
+    focusedNodes = [];
   }
 
   /**
@@ -1854,12 +1876,20 @@
           });
       }
       // Give the last removed node a wider border (2px instead of 1) to 
-      // emphasize that this is the last removed node. 
-      if (focussed) {
-        focussed.removeClass("focusnode");
+      // emphasize that this is the last removed node.
+      if (focusedNodes.length > 0) {
+        focusedNodes[focusedNodes.length - 1].removeClass("focusnode");
+      }      
+      node.addClass("focusnode");
+      focusedNodes.push(node);
+      
+      // Debug print focusedNodes
+      let s = "focusedNodes:";
+      for (const x of focusedNodes) {
+        s += ' ' + x.value();
       }
-      focussed = node;
-      focussed.addClass("focusnode");
+      debugPrint(s);
+
       minheap.layout();
       // Call markEdge last, because it will also store the JSAV animation step
       if (!edge.hasClass("marked")) {
