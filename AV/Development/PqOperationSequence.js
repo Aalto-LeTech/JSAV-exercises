@@ -128,9 +128,11 @@ class PqOperationSequence {
   /**
    * Removes the last operation from the sequence.
    * This should be used when the user clicks the Undo button.
+   * 
+   * @returns {PqOperation} the undoed operation
    */
   undo() {
-    this.operations.pop();
+    return this.operations.pop();
   }
 
   /**
