@@ -1,19 +1,57 @@
 /* global ODSA, graphUtils */
 (function ($) {
   "use strict";
-  var exercise,
-      graph,
-      minheap,
-      table,
-      config = ODSA.UTILS.loadConfig(),
-      interpret = config.interpreter,
-      settings = config.getSettings(),
-      jsav = new JSAV($('.avcontainer'), {settings: settings});
 
+  // JSAV Graph instance for the student's solution.
+  var graph;
+
+  // JSAV Matrix for the student's solution, to display the node-distance
+  // -parent table
+  var table;
+
+  // JSAV Binary Tree  for the student's solution, to display the priority
+  // queue as a binary heap
+  var minheap;
+
+  // JSAV Visualization
+  var jsav = new JSAV($('.avcontainer'), {settings: settings});
+
+  // Number of elements in the binary heap
   var heapsize = jsav.variable(0);
+
+  // OpenDSA configuration and translation interpreter
+  var config = ODSA.UTILS.loadConfig(),
+      interpret = config.interpreter,
+      settings = config.getSettings();
+  
   var debug = false; // produces debug prints to console
 
+  // Storage of priority queue operations from student's answer to implement
+  // custom grading. From PqOperationSequence.js
+  var studentPqOperations = new PqOperationSequence();
+  var modelPqOperations = new PqOperationSequence();
+
   jsav.recorded();
+
+  // JSAV Exercise
+  var exercise = jsav.exercise(model, init, {
+    compare: [{ class: "marked" }],
+    controls: $('.jsavexercisecontrols'),
+    resetButtonTitle: interpret("reset"),
+    modelDialog: {width: "960px"},
+    grader: scaffoldedGrader,
+    fix: fixState
+  });
+  /* Set custom undo and reset function because we also have a custom
+   * grader. Save the default prototype functions into separate variables,
+   * because we also want to call them. */
+    exercise.protoUndo = exercise.undo;
+    exercise.undo = scaffoldedUndo;
+    exercise.protoReset = exercise.reset;
+    exercise.reset = scaffoldedReset;
+
+  exercise.reset();
+
 
   function init() {
     // Uncomment this to have a fixed exercise instance for demonstration
@@ -596,15 +634,6 @@
   function about() {
     window.alert(ODSA.AV.aboutstring(interpret(".avTitle"), interpret("av_Authors")));
   }
-
-  exercise = jsav.exercise(model, init, {
-    compare: [{ class: "marked" }],
-    controls: $('.jsavexercisecontrols'),
-    resetButtonTitle: interpret("reset"),
-    modelDialog: {width: "960px"},
-    fix: fixState
-  });
-  exercise.reset();
 
   /**
    * Edge click listeners are bound to the graph itself,
