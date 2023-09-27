@@ -1,3 +1,11 @@
+/*
+ * Research version of Dijkstra's algorithm JSAV exercise
+ * Johanna Sänger, Artturi Tilanterä
+ * johanna.sanger@kantisto.nl
+ * artturi.tilantera@aalto.fi
+ * 25 August 2023
+ */
+
 /* global ODSA, graphUtils */
 (function ($) {
   "use strict";
