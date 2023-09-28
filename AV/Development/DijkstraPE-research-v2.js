@@ -386,8 +386,16 @@
     var modelheapsize = 0;
     const aNode = nodes[indexOfLabel["A"]];
     av.umsg(interpret("av_ms_select_a"));
+    aNode.addClass("focusnode");
     av.step();
     aNode.neighbors().forEach(node => visitNeighbour(aNode, node, 0));
+
+    // A JSAV node which was dequeued before the current node and therefore
+    // was given a wider border to "focus" it (grab the student's attention).
+    // (Yes, this is similar to the upper scope variable focusedNodes,
+    // except that because the model answer does not need an undo function,
+    // this variable is not an array but just a single JSAV node.)
+    var previousFocusedNode = aNode;
 
     while (modelheapsize > 0) {
       const rootVal = deleteRoot();
@@ -397,6 +405,14 @@
       const dstIndex =  dstNode.value().charCodeAt(0) - "A".charCodeAt(0);
       const srcNode = nodes[indexOfLabel[distances.value(dstIndex, 2)]]
       const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode);
+
+      // Give the last removed node a wider border (2px instead of 1) to 
+      // emphasize that this is the last removed node.
+      // This is consistent with the student's solution view.
+      previousFocusedNode.removeClass("focusnode");
+      dstNode.addClass("focusnode");
+      previousFocusedNode = dstNode;
+
       av.umsg(interpret("av_ms_add_edge"),
               {fill: {from: srcNode.value(), to: dstNode.value()}});
       edge.removeClass("queued");
@@ -410,7 +426,12 @@
       neighbours.forEach(node => visitNeighbour(dstNode, node, dist))
     }
     av.umsg(interpret("av_ms_unreachable"));
+    previousFocusedNode.removeClass("focusnode");
     av.step();
+
+    /**********************************************
+     * Helper functions inside function dijkstra()
+     **********************************************/
 
     /* Sorts neighbours of a node by alphabetic order of their node values.
      * Implementation: selection sort.
@@ -696,7 +717,11 @@
       mintree.layout();
       return oldEdge
     }
+    /*****************************************************
+     * End of function dijkstra() and its inner functions 
+     *****************************************************/
   }
+
 
   /*
   * Artturi's debug print, because inspecting JSAV data structures in a
