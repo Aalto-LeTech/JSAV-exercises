@@ -53,10 +53,10 @@
   /* Set custom undo and reset function because we also have a custom
    * grader. Save the default prototype functions into separate variables,
    * because we also want to call them. */
-    exercise.protoUndo = exercise.undo;
-    exercise.undo = scaffoldedUndo;
-    exercise.protoReset = exercise.reset;
-    exercise.reset = scaffoldedReset;
+  exercise.protoUndo = exercise.undo;
+  exercise.undo = scaffoldedUndo;
+  exercise.protoReset = exercise.reset;
+  exercise.reset = scaffoldedReset;
 
   exercise.reset();
 
@@ -64,7 +64,7 @@
   function init() {
     // Uncomment this to have a fixed exercise instance for demonstration
     // purpose
-    //JSAV.utils.rand.seedrandom("1");
+    // JSAV.utils.rand.seedrandom("1");
 
     // Settings for input
     const width = 500, height = 400,  // pixels
@@ -72,6 +72,9 @@
           directed = false,
           nVertices = [11, 3],
           nEdges = [14, 2];
+    
+    studentPqOperations = new PqOperationSequence();
+    modelPqOperations = new PqOperationSequence();
 
     // First create a random planar graph instance in neighbour list format
     let nlGraph = undefined,
@@ -139,6 +142,105 @@
     return [graph, minheap];
   }
 
+  /**
+   * Custom grading function for the exercise.
+   */
+  function scaffoldedGrader() {
+    debugPrint('scaffoldedGrader():\n' +
+      'student: ' + studentPqOperations.toString() + '\n' +
+      'model  : ' + modelPqOperations.toString());
+    let grade = studentPqOperations.gradeAgainst(modelPqOperations);
+
+    let score = {
+      // Number of correct steps in student's solution
+      correct: grade.studentGrade,
+      // Continuous grading mode not used, therefore `fix` is zero
+      fix: 0,
+      // Number of total steps in student's solution
+      student: studentPqOperations.length(),
+      // Number of total steps in model solution
+      total: grade.maxGrade,
+      // Continuous grading mode not used, therefore `undo` is zero
+      undo: 0
+    }
+    this.score = score;
+  }
+
+  /**
+   * Custom undo function for the exercise.
+   * This is complementary to the function scaffoldedGrader().
+   */
+  function scaffoldedUndo() {
+    // Modified from original JSAV undo function; source:
+    // https://github.com/vkaravir/JSAV/blob/master/src/exercise.js#L402-L420
+    var oldFx = $.fx.off || false;
+    $.fx.off = true;
+    // undo last step
+    this.jsav.backward(); // the empty new step
+    this.jsav.backward(); // the new graded step
+    // Undo until the previous graded step.
+    // Note: difference to original JSAV undo function: we know that all
+    // student's steps are gradable in this exercise.
+    // (Frankly, this if-else block might be related to the continuous
+    // grading mode of other JSAV exercises and thus irrelevant with this
+    // exercise, but let's keep it just in case it makes JSAV do some magic at
+    // the background. ;)
+    if (this.jsav.backward()) {
+      // if such step was found, redo it
+      this.jsav.forward();
+      this.jsav.step({updateRelative: false});
+    } else {
+      // ..if not, the first student step was incorrent and we can rewind
+      // to beginning
+      this.jsav.begin();
+    }
+    this.jsav._redo = [];
+    $.fx.off = oldFx;
+    // End of modified JSAV undo code
+
+    const undoneOperation = studentPqOperations.undo();
+    debugPrint('studentPqOperations: ' + studentPqOperations.toString());
+    
+    if (undoneOperation.operation === 'deq') {
+      // Remove the recently dequeued node from focusedNodes so that when the
+      // student performs the next dequeue operation, the correct graph node
+      // will lose its "focusedNode" CSS class.
+      focusedNodes.pop();
+      // Note: JSAV remembers all student's previous steps, including which
+      // node had the CSS class "focusnode" at each step. Therefore, we don't
+      // need to call .addClass("focusnode") for the previously focused node.
+      // Debug print focusedNodes
+      let s = "focusedNodes after an undo:";
+      for (const x of focusedNodes) {
+        s += ' ' + x.value();
+      }
+      debugPrint(s);
+    }
+    
+    
+  };
+
+  /**
+   * Custom reset function for this exercise.
+   * This is complementary to the function scaffoldedGrader().
+   */
+  function scaffoldedReset() {
+    exercise.protoReset();
+    studentPqOperations.clear();
+    modelPqOperations.clear();
+    focusedNodes = [];
+  }
+
+  /**
+   * From JSAV API: http://jsav.io/exercises/exercise/
+   *
+   * "A function that will fix the student’s solution to match the current step
+   * in model solution. Before this function is called, the previous incorrect
+   * step in student’s solution is undone. The function gets the model
+   * structures as a parameter."
+   *
+   * The exercise currently has fix button disabled.
+   */
   function fixState(modelGraph) {
     var graphEdges = graph.edges(),
         modelEdges = modelGraph.edges();
@@ -211,14 +313,53 @@
     return [modelGraph, mintree];
   }
 
+ /**
+   * 1. Marks an edge as dequeued in the visualization (both student's and
+   *    model solutions).
+   * 2. Adds a dequeue operation into the operation sequence of either
+   *    student's or model solution. 
+   * @param {JSAV edge} edge  
+   * @param {*} av a JSAV algorithm visualization template.
+   *               If defined, mark an edge in the model solution.
+   *               If undefined, mark an edge in the student's solution.
+   */
   function markEdge(edge, av) {
     edge.addClass("marked");
     edge.start().addClass("marked");
     edge.end().addClass("marked");
+    storePqOperationStep('deq', edge, av);
+  }
+
+  /**
+   * 1. Stores a priority queue operation related to an edge into either the
+   *    student's or model solution's PqOperationSequence.
+   * 2. Generates a gradeable step in the JSAV representation.
+   * @param {*} operation: one of: {'enq', 'deq', 'upd'}
+   * @param {JSAVedge} av a JSAV algorithm visualization template.
+   *               If this is undefined, mark an edge in the model solution.
+   * @param {*} av a JSAV algorithm visualization template.
+   *               If defined, store the operation for the model solution.
+   *               Otherwise store the operation for the student's solution.
+   */
+  function storePqOperationStep(operation, edge, av) {
+    const v1 = edge.start().value();
+    const v2 = edge.end().value();
+    const pqOperation = new PqOperation(operation, v1 + v2);
     if (av) {
+      // Tell JSAV that this is a gradeable step just to:
+      // (i) generate a step in the model solution;
+      // (ii) make JSAV Exercise Recorder to record this step.
       av.gradeableStep();
-    } else {
+      // Add the operation to the priority queue operation sequence for
+      // custom grading.
+      modelPqOperations.push(pqOperation);
+      debugPrint('modelPqOperations: ' + modelPqOperations.toString());
+    }
+    else {
+      // Similar block but for student's solution
       exercise.gradeableStep();
+      studentPqOperations.push(pqOperation);
+      debugPrint('studentPqOperations: ' + studentPqOperations.toString());
     }
   }
 
@@ -261,6 +402,9 @@
 
     /**
      * Helper function to visit a node in the model solution.
+     * Makes a decision whether to add or update the note in the priority
+     * queue, or do nothing.
+     * 
      * @param src source node
      * @param neighbour neighbour node that is visited
      */
@@ -273,6 +417,9 @@
       const dist = edge._weight;
 
       if (currNeighbourDist === Infinity) {
+        // Case 1: neighbour's distance is infinity.
+        // Add node to the priority queue.
+        
         addNode(src.value(), neighbour.value(), dist);
         updateModelTable(neighbour, src, dist);
         debugPrint("Model solution gradeable step: ADD ROUTE WITH DIST:",
@@ -316,8 +463,8 @@
 
       const ret = mintree.root().value();
 
-      //Mark table row as "unused" (grey background)
-      //Then set selected message, and step the av.
+      // Mark table row as "unused" (grey background)
+      // Then set selected message, and step the av.
       const nodeLabel = ret.charAt(ret.length - 5)
       distances.addClass(nodeLabel.charCodeAt(0) - "A".charCodeAt(0), true, "unused")
       av.umsg(interpret("av_ms_select_node"),
@@ -462,14 +609,14 @@
     }
 
     function highlight(edge, node) {
-      //Mark current edge as highlighted
+      // Mark current edge as highlighted
       edge.addClass("highlighted");
-      //Mark current node being visited as highlighted
+      // Mark current node being visited as highlighted
       node.addClass("highlighted");
-      //Mark current node being visited in the table
+      // Mark current node being visited in the table
       distances.addClass(node.value().charCodeAt(0) - "A".charCodeAt(0),
                          true, "highlighted");
-      //Mark current node being visited in the mintree
+      // Mark current node being visited in the mintree
       const treeNodeList = getTreeNodeList(mintree.root());
       const treeNode = treeNodeList.filter(treeNode =>
           treeNode.value().charAt(treeNode.value().length - 5)
