@@ -90,6 +90,10 @@
   margin: 10px;
 }
 
+.focusnode {
+  border: 2px solid;
+}
+
 .avcontainer .jsavhorizontalarray > li:first-child {
   max-width: none !important;
   min-width: 70px !important;
