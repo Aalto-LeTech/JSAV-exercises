@@ -386,8 +386,16 @@
     var modelheapsize = 0;
     const aNode = nodes[indexOfLabel["A"]];
     av.umsg(interpret("av_ms_select_a"));
+    aNode.addClass("focusnode");
     av.step();
     aNode.neighbors().forEach(node => visitNeighbour(aNode, node, 0));
+
+    // A JSAV node which was dequeued before the current node and therefore
+    // was given a wider border to "focus" it (grab the student's attention).
+    // (Yes, this is similar to the upper scope variable focusedNodes,
+    // except that because the model answer does not need an undo function,
+    // this variable is not an array but just a single JSAV node.)
+    var previousFocusedNode = aNode;
 
     while (modelheapsize > 0) {
       const rootVal = deleteRoot();
@@ -397,6 +405,14 @@
       const dstIndex =  dstNode.value().charCodeAt(0) - "A".charCodeAt(0);
       const srcNode = nodes[indexOfLabel[distances.value(dstIndex, 2)]]
       const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode);
+
+      // Give the last removed node a wider border (2px instead of 1) to 
+      // emphasize that this is the last removed node.
+      // This is consistent with the student's solution view.
+      previousFocusedNode.removeClass("focusnode");
+      dstNode.addClass("focusnode");
+      previousFocusedNode = dstNode;
+
       av.umsg(interpret("av_ms_add_edge"),
               {fill: {from: srcNode.value(), to: dstNode.value()}});
       edge.removeClass("queued");
@@ -410,7 +426,12 @@
       neighbours.forEach(node => visitNeighbour(dstNode, node, dist))
     }
     av.umsg(interpret("av_ms_unreachable"));
+    previousFocusedNode.removeClass("focusnode");
     av.step();
+
+    /**********************************************
+     * Helper functions inside function dijkstra()
+     **********************************************/
 
     /* Sorts neighbours of a node by alphabetic order of their node values.
      * Implementation: selection sort.
@@ -454,17 +475,35 @@
       }
     }
 
+    function highlightUpdate(edge, node) {
+      // Mark current node being updated in the table
+      const tableRow = node.value().charCodeAt(0) - "A".charCodeAt(0);
+      distances.removeClass(tableRow, true, "highlighted");
+      distances.addClass(tableRow, true, "updated");
+      // Mark current node being visited in the mintree
+      const treeNodeList = getTreeNodeList(mintree.root());
+      const treeNode = treeNodeList.filter(treeNode =>
+          treeNode.value().charAt(treeNode.value().length - 5)
+          === node.value())[0];
+      if (treeNode) {
+        treeNode.removeClass("highlighted")
+        treeNode.addClass("updated")
+      }
+    }
+
     function removeHighlight(edge, node) {
       edge.removeClass("highlighted");
       node.removeClass("highlighted");
-      distances.removeClass(node.value().charCodeAt(0) - "A".charCodeAt(0),
-                         true, "highlighted")
+      const tableIndex = node.value().charCodeAt(0) - "A".charCodeAt(0);
+      distances.removeClass(tableIndex, true, "highlighted");
+      distances.removeClass(tableIndex, true, "updated");
       const treeNodeList = getTreeNodeList(mintree.root());
       const treeNode = treeNodeList.filter(treeNode =>
         treeNode.value().charAt(treeNode.value().length - 5)
         === node.value())[0];
       if (treeNode) {
-        treeNode.removeClass("highlighted")
+        treeNode.removeClass("highlighted");
+        treeNode.removeClass("updated");
       }
     }
     /**
@@ -549,8 +588,8 @@
     function updateTable (dst, src, distance) {
       const dstIndex = dst.value().charCodeAt(0) - "A".charCodeAt(0);
       debugPrint("ADD:", dst.value(), distance, src.value())
-      distances.value(dstIndex, 1, distance)
-      distances.value(dstIndex, 2, src.value())
+      distances.value(dstIndex, 1, distance);
+      distances.value(dstIndex, 2, src.value());
     }
 
     /**
@@ -573,27 +612,37 @@
       if (currNeighbourDist === Infinity) {
         // Case 1: neighbour's distance is infinity.
         // Add node to the priority queue.
+
+        // First step: highlight the comparison
+        av.umsg(interpret("av_ms_visit_neighbor_add"),
+        {fill: {node: src.value(), neighbor: neighbour.value()}});
+        highlight(edge, neighbour);
+        av.step()
+
+        // Second step: highlight the update
         addNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
         debugPrint("Model solution gradeable step: ADD ROUTE WITH DIST:",
           distViaSrc + neighbour.value());
-        av.umsg(interpret("av_ms_visit_neighbor_add"),
-                {fill: {node: src.value(), neighbor: neighbour.value()}});
-        highlight(edge, neighbour);
+        highlightUpdate(edge, neighbour);
         storePqOperationStep('enq', edge, av);
       }
       else if (distViaSrc < currNeighbourDist) {
         // Case 2: neighbour's distance is shorter through node `src`.
         // Update node in the priority queue.
+
+        // First step: highlight the comparison
+        av.umsg(interpret("av_ms_visit_neighbor_update"),
+        {fill: {node: src.value(), neighbor: neighbour.value()}});
+        highlight(edge, neighbour);
+        av.step(); 
+
+        // Second step: highlight the update
         const oldEdge = updateNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
         debugPrint("Model solution gradeable step:  UPDATE DISTANCE TO:",
-         distViaSrc + neighbour.value());
-
-        av.umsg(interpret("av_ms_visit_neighbor_update"),
-                {fill: {node: src.value(), neighbor: neighbour.value()}});
-        highlight(edge, neighbour);
-        av.step();
+         distViaSrc + neighbour.value());      
+        highlightUpdate(edge, neighbour);
         oldEdge.removeClass("queued")
         storePqOperationStep('upd', edge, av);
       } else {
@@ -696,7 +745,11 @@
       mintree.layout();
       return oldEdge
     }
+    /*****************************************************
+     * End of function dijkstra() and its inner functions 
+     *****************************************************/
   }
+
 
   /*
   * Artturi's debug print, because inspecting JSAV data structures in a
