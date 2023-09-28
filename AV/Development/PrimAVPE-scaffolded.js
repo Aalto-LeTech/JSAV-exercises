@@ -379,9 +379,17 @@
   function prim(nodes, distances, av, mintree) {
     var modelheapsize = 0;
     const aNode = nodes.find(node => node.value() === "A");
+    aNode.addClass("focusnode");
 
     aNode.neighbors().forEach(node => visitNeighbour(aNode, node));
     // debugPrint(aNode);
+
+    // A JSAV node which was dequeued before the current node and therefore
+    // was given a wider border to "focus" it (grab the student's attention).
+    // (Yes, this is similar to the upper scope variable focusedNodes,
+    // except that because the model answer does not need an undo function,
+    // this variable is not an array but just a single JSAV node.)
+    var previousFocusedNode = aNode;
 
     while (modelheapsize > 0) {
       const rootVal = deleteRoot();
@@ -390,6 +398,14 @@
       const dstIndex =  dstNode.value().charCodeAt(0) - "A".charCodeAt(0);
       const srcNode = nodes.find(node => node.value() === distances.value(dstIndex, 2))
       const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode);
+      
+      // Give the last removed node a wider border (2px instead of 1) to 
+      // emphasize that this is the last removed node.
+      // This is consistent with the student's solution view.
+      previousFocusedNode.removeClass("focusnode");
+      dstNode.addClass("focusnode");
+      previousFocusedNode = dstNode;
+      
       av.umsg(interpret("av_ms_add_edge"),
               {fill: {from: srcNode.value(), to: dstNode.value()}});
       edge.removeClass("queued");
@@ -403,8 +419,12 @@
       neighbours.forEach(node => visitNeighbour(dstNode, node))
     }
     av.umsg(interpret("av_ms_unreachable"));
+    previousFocusedNode.removeClass("focusnode");
     av.step();
 
+    /******************************************
+     * Helper functions inside function prim()
+     ******************************************/
 
     /**
      * Helper function to visit a node in the model solution.
@@ -675,10 +695,15 @@
       }
       return dist;
     }
+
     // returns the node index given the node's value
     function getIndex(value) {
       return value.charCodeAt(0) - "A".charCodeAt(0);
     }
+    
+    /*****************************************************
+     * End of function dijkstra() and its inner functions 
+     *****************************************************/   
   }
 
   function testPrim(graph) {
