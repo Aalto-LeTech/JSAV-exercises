@@ -475,17 +475,35 @@
       }
     }
 
+    function highlightUpdate(edge, node) {
+      // Mark current node being updated in the table
+      const tableRow = node.value().charCodeAt(0) - "A".charCodeAt(0);
+      distances.removeClass(tableRow, true, "highlighted");
+      distances.addClass(tableRow, true, "updated");
+      // Mark current node being visited in the mintree
+      const treeNodeList = getTreeNodeList(mintree.root());
+      const treeNode = treeNodeList.filter(treeNode =>
+          treeNode.value().charAt(treeNode.value().length - 5)
+          === node.value())[0];
+      if (treeNode) {
+        treeNode.removeClass("highlighted")
+        treeNode.addClass("updated")
+      }
+    }
+
     function removeHighlight(edge, node) {
       edge.removeClass("highlighted");
       node.removeClass("highlighted");
-      distances.removeClass(node.value().charCodeAt(0) - "A".charCodeAt(0),
-                         true, "highlighted")
+      const tableIndex = node.value().charCodeAt(0) - "A".charCodeAt(0);
+      distances.removeClass(tableIndex, true, "highlighted");
+      distances.removeClass(tableIndex, true, "updated");
       const treeNodeList = getTreeNodeList(mintree.root());
       const treeNode = treeNodeList.filter(treeNode =>
         treeNode.value().charAt(treeNode.value().length - 5)
         === node.value())[0];
       if (treeNode) {
-        treeNode.removeClass("highlighted")
+        treeNode.removeClass("highlighted");
+        treeNode.removeClass("updated");
       }
     }
     /**
@@ -570,8 +588,8 @@
     function updateTable (dst, src, distance) {
       const dstIndex = dst.value().charCodeAt(0) - "A".charCodeAt(0);
       debugPrint("ADD:", dst.value(), distance, src.value())
-      distances.value(dstIndex, 1, distance)
-      distances.value(dstIndex, 2, src.value())
+      distances.value(dstIndex, 1, distance);
+      distances.value(dstIndex, 2, src.value());
     }
 
     /**
@@ -594,27 +612,37 @@
       if (currNeighbourDist === Infinity) {
         // Case 1: neighbour's distance is infinity.
         // Add node to the priority queue.
+
+        // First step: highlight the comparison
+        av.umsg(interpret("av_ms_visit_neighbor_add"),
+        {fill: {node: src.value(), neighbor: neighbour.value()}});
+        highlight(edge, neighbour);
+        av.step()
+
+        // Second step: highlight the update
         addNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
         debugPrint("Model solution gradeable step: ADD ROUTE WITH DIST:",
           distViaSrc + neighbour.value());
-        av.umsg(interpret("av_ms_visit_neighbor_add"),
-                {fill: {node: src.value(), neighbor: neighbour.value()}});
-        highlight(edge, neighbour);
+        highlightUpdate(edge, neighbour);
         storePqOperationStep('enq', edge, av);
       }
       else if (distViaSrc < currNeighbourDist) {
         // Case 2: neighbour's distance is shorter through node `src`.
         // Update node in the priority queue.
+
+        // First step: highlight the comparison
+        av.umsg(interpret("av_ms_visit_neighbor_update"),
+        {fill: {node: src.value(), neighbor: neighbour.value()}});
+        highlight(edge, neighbour);
+        av.step(); 
+
+        // Second step: highlight the update
         const oldEdge = updateNode(src.value(), neighbour.value(), distViaSrc);
         updateTable(neighbour, src, distViaSrc);
         debugPrint("Model solution gradeable step:  UPDATE DISTANCE TO:",
-         distViaSrc + neighbour.value());
-
-        av.umsg(interpret("av_ms_visit_neighbor_update"),
-                {fill: {node: src.value(), neighbor: neighbour.value()}});
-        highlight(edge, neighbour);
-        av.step();
+         distViaSrc + neighbour.value());      
+        highlightUpdate(edge, neighbour);
         oldEdge.removeClass("queued")
         storePqOperationStep('upd', edge, av);
       } else {
