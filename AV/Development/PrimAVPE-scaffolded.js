@@ -125,9 +125,9 @@
       directed: directed
     });
 
-    //Shift the x and y of each node 30 left and up.
-    //Otherwise the graph is centered bottom right, now it is centered
-    //more or less in the middle
+    // Shift the x and y of each node 30 left and up.
+    // Otherwise the graph is centered bottom right, now it is centered
+    // more or less in the middle
     nlGraph.vertices.forEach(vertex => {
       vertex.x = vertex.x - 30;
       vertex.y = vertex.y - 30;
@@ -854,8 +854,8 @@
     const dist = edge._weight;
     const label = dist + dstLabel;
 
-    //Edge is listed in alphabetical order, regardless of which
-    //node is listed as the src or dst in JSAV.
+    // Edge is listed in alphabetical order, regardless of which
+    // node is listed as the src or dst in JSAV.
     const options = {
       "title": interpret("edge") + " " + ((srcLabel < dstLabel)
                                           ? (srcLabel + dstLabel)
@@ -946,12 +946,12 @@
     const dist = event.data.dist;
     const popup = event.data.popup;
 
-    const nodeArr = getTreeNodeList(minheap.root())
-    //Grab first node with the correct destination.
+    const nodeArr = getTreeNodeList(minheap.root());
+    // Grab first node with the correct destination.
     const updatedNode = nodeArr.filter(node =>
             node.value().charAt(node.value().length - 5) === dstLabel)[0];
 
-    //If no node with the correct label exists, do nothing.
+    // If no node with the correct label exists, do nothing.
     if (!updatedNode) {
       popup.close();
       window.alert(interpret("av_update_not_possible"));
@@ -959,28 +959,30 @@
     }
 
     updateTable(srcLabel, dstLabel, dist);
-    //Add class to the new edge
+    // Add class to the new edge
     event.data.edge.addClass("queued")
-    //remove class from the old edge
-    //Have old label, find previous source node label
+    // Remove class from the old edge
+    // Have old label, find previous source node label
     const oldLabel = updatedNode.value();
     const oldSrcLabel = oldLabel.charAt(oldLabel.length - 2);
-    //Find node objects to grab the egde
+    // Find node objects to grab the egde
     const oldNode = graph.nodes().filter(node =>
         node.element[0].getAttribute("data-value") === oldSrcLabel)[0];
     const dstNode = graph.nodes().filter(node =>
         node.element[0].getAttribute("data-value") === dstLabel)[0];
     const oldEdge = graph.getEdge(oldNode, dstNode)
               ?? graph.getEdge(dstNode, oldNode);
-    //Remove the queued class.
+    // Remove the queued class.
     oldEdge.removeClass("queued");
-    window.JSAVrecorder.appendAnimationEventFields(
-      {
-        "pqOperation": "update",
-        "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge, "Edge"),
-        "pqOut": window.JSAVrecorder.jsavObjectToJaalID(oldEdge, "Edge")
-      });
-
+    if (window.JSAVrecorder) {
+      window.JSAVrecorder.appendAnimationEventFields(
+        {
+          "pqOperation": "update",
+          "pqIn": window.JSAVrecorder.jsavObjectToJaalID(
+                  event.data.edge, "Edge"),
+          "pqOut": window.JSAVrecorder.jsavObjectToJaalID(oldEdge, "Edge")
+        });
+    }
 
     const oldDist = oldLabel.match(/\d+/)[0];
     const label = dist + "<br>" + dstLabel + " (" + srcLabel + ")";
@@ -992,12 +994,12 @@
       var node = updatedNode;
       while (node != minheap.root() &&
              extractDistance(node) <= extractDistance(node.parent())) {
-        //If the distance is the same as the parent node, we only want to
-        //swap them around if the node's destination comes earlier in the
-        //alphabet than its parent's.
+        // If the distance is the same as the parent node, we only want to
+        // swap them around if the node's destination comes earlier in the
+        // alphabet than its parent's.
         if (extractDistance(node) === extractDistance(node.parent()) &&
             extractDestination(node) > extractDestination(node.parent())) {
-          //Alphabetically later, so break the while loop.
+          // Alphabetically later, so break the while loop.
           break;
         }
         const temp = node.parent().value();
@@ -1008,7 +1010,7 @@
     }
     debugPrint("Exercise gradeable step: update edge " + srcLabel + "-" +
       dstLabel + " distance " + dist);
-    exercise.gradeableStep();
+      storePqOperationStep('upd', event.data.edge);
     popup.close();
   }
 
@@ -1047,7 +1049,6 @@
   /**
    * Add the minheap to the JSAV instance.
    * The function adds a dummy div with class 'bintree' to center the minheap.
-   *
    */
   function addMinheap () {
     if (minheap) {
@@ -1094,32 +1095,52 @@
                             "position": "relative",
                             "margin": "1em"});
 
-    //Add remove button
+    // Add remove button
     $("#removeButton").click(function() {
       const deleted = minheapDelete(0);
       if (!deleted) {
         return;
       }
-      //Format of node label: "x<br>D (S)", where x is the distance,
-      //D is the destination node label and S is the source node label
+      // Format of node label: "x<br>D (S)", where x is the distance,
+      // D is the destination node label and S is the source node label
       const nodeLabel = deleted.charAt(deleted.length - 5);
       const node = graph.nodes().filter(node =>
           node.element[0].getAttribute("data-value") === nodeLabel)[0];
       const srcLabel = table.value(2, findColByNode(nodeLabel));
-      // const srcLabel = deleted.charAt(deleted.length - 2);
       const srcNode = graph.nodes().filter(node =>
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
       edge.removeClass("queued");
-      window.JSAVrecorder.appendAnimationEventFields(
-        {
-          "pqOperation": "dequeue",
-          "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
-        });
+
+      if (window.JSAVrecorder) {
+        window.JSAVrecorder.appendAnimationEventFields(
+          {
+            "pqOperation": "dequeue",
+            "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
+          });
+      }
+
+      // Give the last removed node a wider border (2px instead of 1) to
+      // emphasize that this is the last removed node.
+      if (focusedNodes.length > 0) {
+        focusedNodes[focusedNodes.length - 1].removeClass("focusnode");
+      }      
+      node.addClass("focusnode");
+      focusedNodes.push(node);
+      
+      // Debug print focusedNodes
+      let s = "focusedNodes:";
+      for (const x of focusedNodes) {
+        s += ' ' + x.value();
+      }
+      debugPrint(s);
+
+      minheap.layout();
+      // Call markEdge last, because it will also store the JSAV animation step
       if (!edge.hasClass("marked")) {
         markEdge(edge);
       }
-      minheap.layout();
+
     })
   }
 
@@ -1231,7 +1252,7 @@
 
     heapsize.value(heapsize.value() - 1);
 
-    //PLACEHOLDER: be able to remove other than min
+    // PLACEHOLDER: be able to remove other than min
     const ret = minheap.root().value();
 
     // Parent of the last node in the heap
