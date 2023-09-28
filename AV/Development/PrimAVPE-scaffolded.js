@@ -446,26 +446,36 @@
         // Case 1: neighbour's distance is infinity.
         // Add node to the priority queue.
         
+        // First step: highlight the comparison
+        av.umsg(interpret("av_ms_visit_neighbor_add"),
+        {fill: {node: src.value(), neighbor: neighbour.value()}});
+        highlight(edge, neighbour);
+        av.step()
+
+        // Second step: highlight the update
         addNode(src.value(), neighbour.value(), dist);
         updateModelTable(neighbour, src, dist);
         debugPrint("Model solution gradeable step: ADD ROUTE WITH DIST:",
         dist + neighbour.value());
-        av.umsg(interpret("av_ms_visit_neighbor_add"),
-                {fill: {node: src.value(), neighbor: neighbour.value()}});
-        highlight(edge, neighbour);
+        highlightUpdate(edge, neighbour);    
         storePqOperationStep('enq', edge, av);
       }
       else if (dist < currNeighbourDist) {
-         // Case 2: neighbour's distance is shorter through node `src`.
-         // Update node in the priority queue.
+        // Case 2: neighbour's distance is shorter through node `src`.
+        // Update node in the priority queue.
+
+        // First step: highlight the comparison
+        av.umsg(interpret("av_ms_visit_neighbor_update"),
+                {fill: {node: src.value(), neighbor: neighbour.value()}});
+        highlight(edge, neighbour);
+        av.step();
+
+        // Second step: highlight the update
         updateNode(src.value(), neighbour.value(), dist);
         updateModelTable(neighbour, src, dist);
         debugPrint("Model solution gradeable step:  UPDATE DISTANCE TO:",
         dist + neighbour.value());
-
-        av.umsg(interpret("av_ms_visit_neighbor_update"),
-                {fill: {node: src.value(), neighbor: neighbour.value()}});
-        highlight(edge, neighbour);
+        highlightUpdate(edge, neighbour);
         storePqOperationStep('upd', edge, av);
       }
       else {
@@ -658,17 +668,36 @@
       }
     }
 
+    function highlightUpdate(edge, node) {
+      // Mark current node being updated in the table
+      const tableRow = node.value().charCodeAt(0) - "A".charCodeAt(0);
+      distances.removeClass(tableRow, true, "highlighted");
+      distances.addClass(tableRow, true, "updated");
+      // Mark current node being visited in the mintree
+      const treeNodeList = getTreeNodeList(mintree.root());
+      const treeNode = treeNodeList.filter(treeNode =>
+          treeNode.value().charAt(treeNode.value().length - 5)
+          === node.value())[0];
+      if (treeNode) {
+        treeNode.removeClass("highlighted")
+        treeNode.addClass("updated")
+      }
+    }
+      
+
     function removeHighlight(edge, node) {
       edge.removeClass("highlighted");
       node.removeClass("highlighted");
-      distances.removeClass(node.value().charCodeAt(0) - "A".charCodeAt(0),
-                         true, "highlighted")
+      const tableIndex = node.value().charCodeAt(0) - "A".charCodeAt(0);
+      distances.removeClass(tableIndex, true, "highlighted");
+      distances.removeClass(tableIndex, true, "updated");      
       const treeNodeList = getTreeNodeList(mintree.root());
       const treeNode = treeNodeList.filter(treeNode =>
         treeNode.value().charAt(treeNode.value().length - 5)
         === node.value())[0];
       if (treeNode) {
-        treeNode.removeClass("highlighted")
+        treeNode.removeClass("highlighted");
+        treeNode.removeClass("updated");
       }
     }
 
@@ -681,9 +710,9 @@
      */
      function updateModelTable (dst, src, distance) {
       const dstIndex = dst.value().charCodeAt(0) - "A".charCodeAt(0);
-      debugPrint("ADD:", dst.value(), distance, src.value())
-      distances.value(dstIndex, 1, distance)
-      distances.value(dstIndex, 2, src.value())
+      debugPrint("ADD:", dst.value(), distance, src.value());
+      distances.value(dstIndex, 1, distance);
+      distances.value(dstIndex, 2, src.value());
     }
 
     // returns the distance given a node index
@@ -700,7 +729,7 @@
     function getIndex(value) {
       return value.charCodeAt(0) - "A".charCodeAt(0);
     }
-    
+
     /*****************************************************
      * End of function dijkstra() and its inner functions 
      *****************************************************/   
