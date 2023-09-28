@@ -173,7 +173,7 @@
     const undoneOperation = studentPqOperations.undo();
     debugPrint('studentPqOperations: ' + studentPqOperations.toString());
     
-    if (undoneOperation.operation === 'deq') {
+    if (undoneOperation && undoneOperation.operation === 'deq') {
       // Remove the recently dequeued node from focusedNodes so that when the
       // student performs the next dequeue operation, the correct graph node
       // will lose its "focusedNode" CSS class.
