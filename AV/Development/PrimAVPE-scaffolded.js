@@ -27,6 +27,12 @@
   // Number of elements in the binary heap
   var heapsize = jsav.variable(0);
 
+  // A list of JSAV graph nodes to keeps track of what node has been focused
+  // after a dequeue operation. This is make sure that the class can be removed
+  // and that after undoing a dequeue operation the previously focused node is
+  // again shown as focused.
+  var focusedNodes = [];
+
   // OpenDSA configuration and translation interpreter
   var config = ODSA.UTILS.loadConfig(),
       interpret = config.interpreter,
@@ -201,7 +207,7 @@
     const undoneOperation = studentPqOperations.undo();
     debugPrint('studentPqOperations: ' + studentPqOperations.toString());
     
-    if (undoneOperation.operation === 'deq') {
+    if (undoneOperation && undoneOperation.operation === 'deq') {
       // Remove the recently dequeued node from focusedNodes so that when the
       // student performs the next dequeue operation, the correct graph node
       // will lose its "focusedNode" CSS class.
