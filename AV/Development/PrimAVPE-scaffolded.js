@@ -32,7 +32,7 @@
       interpret = config.interpreter,
       settings = config.getSettings();
   
-  var debug = false; // produces debug prints to console
+  var debug = true; // produces debug prints to console
 
   // Storage of priority queue operations from student's answer to implement
   // custom grading. From PqOperationSequence.js
@@ -1010,7 +1010,7 @@
     }
     debugPrint("Exercise gradeable step: update edge " + srcLabel + "-" +
       dstLabel + " distance " + dist);
-      storePqOperationStep('upd', event.data.edge);
+    storePqOperationStep('upd', event.data.edge);
     popup.close();
   }
 
