@@ -427,8 +427,11 @@
         av.umsg(interpret("av_ms_visit_neighbor_add"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
-        av.gradeableStep();
-      } else if (dist < currNeighbourDist) {
+        storePqOperationStep('enq', edge, av);
+      }
+      else if (dist < currNeighbourDist) {
+         // Case 2: neighbour's distance is shorter through node `src`.
+         // Update node in the priority queue.
         updateNode(src.value(), neighbour.value(), dist);
         updateModelTable(neighbour, src, dist);
         debugPrint("Model solution gradeable step:  UPDATE DISTANCE TO:",
@@ -437,8 +440,11 @@
         av.umsg(interpret("av_ms_visit_neighbor_update"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
-        av.gradeableStep();
-      } else {
+        storePqOperationStep('upd', edge, av);
+      }
+      else {
+        // Case 3: neighbour's distance is equal or longer through node `src`.
+        // Do not update the priority queue.
         debugPrint("KEEP DISTANCE THE SAME:",
                         currNeighbourDist + neighbour.value())
 
@@ -511,10 +517,10 @@
       var node = newNode;
       while (i > 0 && node.parent()
             && extractDistance(node.parent()) >= distance) {
-        //If the distance is the same as the parent, we only want to swap them if
-        //the destination node alphabetically comes first compared to the parent.
-        //If parent is alphabetically first,
-        //we break from the while loop.
+        // If the distance is the same as the parent, we only want to swap them
+        // if the destination node alphabetically comes first compared to the
+        // parent. If parent is alphabetically first, we break from the while
+        // loop.
         if (extractDistance(node.parent()) === distance
             && extractDestination (node.parent()) < extractDestination (node)) {
           break;
@@ -525,7 +531,7 @@
         node = node.parent();
       }
 
-      //Add queued class to the edge
+      // Add queued class to the edge
       const srcNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const dstNode = nodes.filter(node =>
@@ -545,24 +551,24 @@
     function updateNode(srcLabel, dstLabel, distance) {
       const label = distance + "<br>" + dstLabel + " (" + srcLabel + ")"
       const nodeArr = getTreeNodeList(mintree.root())
-      //Grab first node with the correct destination.
+      // Grab first node with the correct destination.
       const updatedNode = nodeArr.filter(node =>
               node.value().charAt(node.value().length - 5) === dstLabel)[0];
 
-      //If no node with the correct label exists, do nothing.
+      // If no node with the correct label exists, do nothing.
       if (!updatedNode) {
         return;
       }
       debugPrint("UPDATE:", updatedNode.value(), "TO:", distance + label);
 
-      //Add queued class to the edge
+      // Add queued class to the edge
       const srcNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const dstNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === dstLabel)[0];
       const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode)
       edge.addClass("queued")
-      //Remove queued class from the old edge
+      // Remove queued class from the old edge
       const oldLabel = updatedNode.value();
       const oldSrcLabel = oldLabel.charAt(oldLabel.length - 2);
       const oldSrcNode = nodes.filter(node =>
@@ -570,9 +576,9 @@
       const oldEdge = dstNode.edgeFrom(oldSrcNode) ?? dstNode.edgeTo(oldSrcNode)
       oldEdge.removeClass("queued");
       updatedNode.value(label);
-      //Inline while loop to move the value up if needed.
-      //Because if you pass a node along as a parameter, it does not like
-      //being asked about its parent... Grading will break in ODSA part.
+      // Inline while loop to move the value up if needed.
+      // Because if you pass a node along as a parameter, it does not like
+      // being asked about its parent... Grading will break in ODSA part.
       var node = updatedNode;
       while (node != mintree.root() &&
              extractDistance(node) < extractDistance(node.parent())) {
@@ -893,30 +899,34 @@
    * Update the table to indicate the distance newDist and parent srcLabel.
    * @param event click event, which has the parameters srcLabel, dstLabel,
    * newDist and popup.
+   * 
    * @param srcLabel the source node label
    * @param dstLabel the destination node label
    * @param newDist the new distance from A to destination
    * @param popup the popup window, used to close the window before returning.
    */
 
-   function enqueueClicked (event) {
+  function enqueueClicked (event) {
     const srcLabel = event.data.srcLabel;
     const dstLabel = event.data.dstLabel;
     const dist = event.data.dist;
     const popup = event.data.popup;
     debugPrint(event.data.edge)
     event.data.edge.addClass("queued");
-    window.JSAVrecorder.appendAnimationEventFields(
-      {
-        "pqOperation": "enqueue",
-        "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge, "Edge")
-      });
+    if (window.JSAVrecorder) {
+      window.JSAVrecorder.appendAnimationEventFields(
+        {
+          "pqOperation": "enqueue",
+          "pqIn": window.JSAVrecorder.jsavObjectToJaalID(
+            event.data.edge, "Edge")
+        });
+    }
 
     updateTable(srcLabel, dstLabel, dist);
     insertMinheap(srcLabel, dstLabel, dist);
     debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
       dstLabel + " distance " + dist);
-    exercise.gradeableStep();
+    storePqOperationStep('enq', event.data.edge)
     popup.close();
   }
 
