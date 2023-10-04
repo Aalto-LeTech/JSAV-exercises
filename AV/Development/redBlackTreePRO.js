@@ -201,7 +201,8 @@
     highlighted.removeClass("highlighted");
     var g = node.grandparent();
     g.addClass("highlighted");
-    jsav.umsg(interpret("av_rotation_2"));
+    jsav.umsg(interpret("av_rotation_1") + 
+      interpret("av_unbalanced_highlighted"));
     jsav.step();
 
     if (node === node.parent().left()) {
