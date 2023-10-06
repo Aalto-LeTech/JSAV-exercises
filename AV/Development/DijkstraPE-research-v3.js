@@ -40,7 +40,7 @@
   var focusedNodes = [];
 
   var lastLinearTransform = -1; // for generateInstance()
-  var debug = false; // produces debug prints to the console
+  var debug = true; // produces debug prints to the console
 
   // Storage of priority queue operations from student's answer to implement
   // custom grading. From PqOperationSequence.js
@@ -331,6 +331,9 @@
    */
   function markEdge(edge, av) {
     edge.addClass("marked");
+    for (const node of [edge.startnode, edge.endnode]) {
+      node.removeClass("queued");
+    }
     edge.start().addClass("marked");
     edge.end().addClass("marked");
     storePqOperationStep('deq', edge, av);
@@ -685,13 +688,15 @@
         node = node.parent();
       }
 
-      // Add queued class to the edge
+      // Add queued class to the edge and node to emphasize that they are now
+      // in the fringe
       const srcNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const dstNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === dstLabel)[0];
       const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode);
-      edge.addClass("queued")
+      edge.addClass("queued");
+      dstNode.addClass("queued")
 
       mintree.layout();
     }
@@ -856,14 +861,21 @@
     const dstLabel = event.data.dstLabel;
     const newDist = event.data.newDist;
     const popup = event.data.popup;
-    debugPrint(event.data.edge)
-    event.data.edge.addClass("queued");
+    const edge = event.data.edge;
+    debugPrint(edge)
+    edge.addClass("queued");
+    for (const node of [edge.startnode, edge.endnode]) {
+      console.log("enqueueClicked: " + node.value() + " " + node.hasClass("marked"));
+      if (node.hasClass("marked") == false) {
+        node.addClass("queued");
+      }
+    }
+    
     if (window.JSAVrecorder) {
       window.JSAVrecorder.appendAnimationEventFields(
         {
           "pqOperation": "enqueue",
-          "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge,
-            "Edge")
+          "pqIn": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
         });
     }
 
@@ -871,7 +883,7 @@
     insertMinheap(srcLabel, dstLabel, newDist);
     debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
       dstLabel + " distance " + newDist);
-    storePqOperationStep('enq', event.data.edge);
+    storePqOperationStep('enq', edge);
     popup.close();
   }
 
