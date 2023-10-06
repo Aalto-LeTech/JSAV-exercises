@@ -794,7 +794,7 @@
    * @returns true when node contains class 'marked', else false
    */
   function isMarked (node) {
-    return node.element[0].classList.contains("spanning")
+    return node.hasClass("marked");
   }
 
 
