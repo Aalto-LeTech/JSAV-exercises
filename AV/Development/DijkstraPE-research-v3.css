@@ -23,11 +23,11 @@
   stroke-width: 10;
   stroke: #d1c39d;
 }
-.jsavgraph .jsavedge.queued, .legend .edge.queued {
+.jsavgraph .jsavedge.fringe, .legend .edge.fringe {
   stroke-width: 10;
   stroke: #d59f0d;
 }
-.jsavgraph .jsavedge.marked, .legend .edge.spanning {
+.jsavgraph .jsavedge.spanning, .legend .edge.spanning {
   stroke-width: 16;
   stroke: #ffe000;;
 }
@@ -38,10 +38,10 @@
 .jsavgraph .jsavnode {
   background-color: #d1c39d;
 }
-.jsavgraph .jsavnode.queued, .legend .edge.spa {
+.jsavgraph .jsavnode.fringe {
   background-color: #d59f0d;
 }
-.jsavgraph .jsavnode.marked {
+.jsavgraph .jsavnode.spanning {
   background-color: #FFF050;
 }
 .jsavgraph .jsavnode.highlighted {
