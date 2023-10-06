@@ -26,17 +26,20 @@
   stroke-width: 10;
   stroke: #d1c39d;
 }
-.jsavgraph .jsavedge.marked {
-  stroke-width: 16;
-  stroke: #ffe000;;
-}
 .jsavgraph .jsavedge.queued {
   stroke-width: 10;
   stroke: #d59f0d;
 }
+.jsavgraph .jsavedge.marked {
+  stroke-width: 16;
+  stroke: #ffe000;;
+}
 .jsavgraph .jsavedge.highlighted {
   stroke: #4ebd44;
   stroke-width: 16;
+}
+.jsavgraph .jsavnode.queued {
+  background-color: #d59f0d;
 }
 .jsavgraph .jsavnode.highlighted {
   background-color: #4ebd44;
