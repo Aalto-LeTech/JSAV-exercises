@@ -126,6 +126,12 @@ span.compare {
   background-color: #ffffff;
 }
 
+.jsavmodelanswer .legend {
+  position: absolute;
+  left: 650px;
+  z-index: 5;
+}
+
 .flex {
   display: flex;
   flex-wrap: nowrap;
