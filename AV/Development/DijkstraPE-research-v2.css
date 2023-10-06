@@ -1,0 +1,137 @@
+#container {
+  width: 900px;
+  height: 950px;
+}
+.jsavline {
+  height: 45px;
+  margin: 0 0 0 20px;
+}
+
+#procontrols {
+  text-align: center;
+}
+
+.jsavgraph {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.jsavgraph svg {
+  z-index: 0;
+}
+
+.jsavnode.marked {
+  background-color: #FFF050;
+}
+.jsavgraph .jsavedge {
+  stroke-width: 10;
+  stroke: #d1c39d;
+}
+.jsavgraph .jsavedge.marked {
+  stroke-width: 16;
+  stroke: #ffe000;;
+}
+.jsavgraph .jsavedge.queued {
+  stroke-width: 10;
+  stroke: #d59f0d;
+}
+.jsavgraph .jsavedge.highlighted {
+  stroke: #4ebd44;
+  stroke-width: 16;
+}
+.jsavgraph .jsavnode.highlighted {
+  background-color: #4ebd44;
+}
+
+.jsavindex.highlighted {
+  background-color: #4ebd44;
+}
+
+.jsavtree .jsavnode.highlighted {
+  background-color: #4ebd44;
+}
+
+.jsavgraph .jsavedgelabel {
+  font-size: 16px;
+  background-color: transparent;
+  text-shadow: 0 0 5px #fff;
+}
+.jsavautoresize .jsavnode {
+  min-width: 45px;
+  min-height: 45px;
+}
+
+.jsavtree {
+  min-width: 400px;
+  min-height: 250px;
+  margin: 0px;
+}
+
+.bintree {
+  min-width: 400px;
+  min-height: 250px;
+  max-width: 400px;
+  max-height: 250px;
+  margin: auto;
+  background-color: #ffffff;
+  border: 1px #000000 solid;
+}
+
+.prioqueue {
+  text-align: center;
+  margin: 0px;
+}
+
+.jsavtree svg {
+  margin: 10px;
+}
+
+.jsavtreenode {
+  margin: 10px;
+}
+
+.focusnode {
+  border: 2px solid;
+}
+
+.avcontainer .jsavhorizontalarray > li:first-child {
+  max-width: none !important;
+  min-width: 70px !important;
+}
+
+.legend {
+  height: 250px;
+  width: 250px;
+  border: 1px solid;
+  background-color: #ffffff;
+}
+
+.edge {
+  stroke-width: 10;
+  stroke: #d1c39d;
+}
+
+.edge.spanning {
+  stroke: #ffe000;
+  stroke-width: 16px;
+}
+
+.edge.queued {
+  stroke: #d59f0d;
+}
+
+.flex {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+.flex > div {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+
+.green {
+  color: #4ebd44;
+  font-weight: bold;
+}
