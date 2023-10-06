@@ -849,6 +849,7 @@
   }
 
   /**
+   * Event handler:
    * Add a node to the priority queue with label dstLabel and distance newDist.
    * Update the table to indicate the distance newDist and parent srcLabel.
    * @param event click event, which has the parameters srcLabel, dstLabel,
@@ -890,6 +891,7 @@
   }
 
   /**
+   * Event handler:
    * Update the first instance of the node with label dstLabel. The updated
    * node is moved up or down the tree as needed.
    * @param event click event, which has the parameters srcLabel, dstLabel,
@@ -961,6 +963,53 @@
       dstLabel + " distance " + newDist);
     storePqOperationStep('upd', event.data.edge);
     popup.close();
+  }
+
+  /**
+   * Event handler: Dequeue button click of the priority queue.
+   */
+  function dequeueClicked() {
+    const deleted = minheapDelete(0);
+    if (!deleted) {
+      return;
+    }
+    // Format of node label: "x<br>D (S)", where x is the distance,
+    // D is the destination node label and S is the source node label
+    const nodeLabel = deleted.charAt(deleted.length - 5);
+    const node = graph.nodes().filter(node =>
+        node.element[0].getAttribute("data-value") === nodeLabel)[0];
+    const srcLabel = deleted.charAt(deleted.length - 2);
+    const srcNode = graph.nodes().filter(node =>
+        node.element[0].getAttribute("data-value") === srcLabel)[0];
+    const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
+    edge.removeClass("fringe");
+    if (window.JSAVrecorder) {
+      window.JSAVrecorder.appendAnimationEventFields(
+        {
+          "pqOperation": "dequeue",
+          "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
+        });
+    }
+    // Give the last removed node a wider border (2px instead of 1) to 
+    // emphasize that this is the last removed node.
+    if (focusedNodes.length > 0) {
+      focusedNodes[focusedNodes.length - 1].removeClass("focusnode");
+    }      
+    node.addClass("focusnode");
+    focusedNodes.push(node);
+    
+    // Debug print focusedNodes
+    let s = "focusedNodes:";
+    for (const x of focusedNodes) {
+      s += ' ' + x.value();
+    }
+    debugPrint(s);
+
+    minheap.layout();
+    // Call markEdge last, because it will also store the JSAV animation step
+    if (!edge.hasClass("spanning")) {
+      markEdge(edge);
+    }
   }
 
   /**
@@ -1882,29 +1931,11 @@
     heapsize = heapsize.value(0);
     // We generate the priority queue and legend on the fly. 
 
-    const edge = '<path d="M25,30L75,30" class="edge"></path>'
-               +'<text x="90" y="35">' + interpret("legend_unvisited") + '</text>'
-    const fringeEdge = '<path d="M25,80L75,80" class="edge fringe">'
-                     + '</path><text x="90" y="85">'
-                     + interpret("legend_fringe") + '</text>'
-    const spanningEdge = '<path d="M25,130L75,130" class="edge spanning">' 
-                       + '</path><text x="90" y="135">'
-                       + interpret("legend_spanning_tree") + '</text>'
-    const node = '<circle cx="50" cy="200" r="22" fill="none" stroke="black" />'
-               + '<text x="45" y="195">5</text>'
-               + '<text x="35" y="213"> C (B)</text>'
-               + '<text x="90" y="190">' + interpret("node_explanation") + '</text>'
-    const legend = "<div><div class='prioqueue'><strong>" 
-                 + interpret("legend")
-                 + "</strong></div>" 
-                 + "<div class='legend'><svg version='1.1' xmlns='http://www.w3.org/2000/svg'> "
-                 + edge + fringeEdge + spanningEdge + node
-                 + " </svg></div></div>"
     $(".jsavcanvas").append("<div class='flex'>"
         + "<div class='left'><div class='prioqueue'><strong>"
         + interpret("priority_queue")
         + "</strong></div><div class='bintree'></div></div>" 
-        + legend
+        + generateLegend()
         + "</div>");
 
     // Explicitly set the size of this one, otherwise it defaults to
@@ -1913,56 +1944,41 @@
     minheap = jsav.ds.binarytree({relativeTo: $(".bintree"),
                                   myAnchor: "center center"});
     minheap.layout()
-    const html = "<button type='button' id='removeButton'>"+ interpret("#dequeue") +"</button>";
-    $(".jsavtree").append(html)
-    $("#removeButton").css({"float": "right",
-                            "position": "relative",
-                            "margin": "1em"});
 
-    // Add remove button
-    $("#removeButton").click(function() {
-      const deleted = minheapDelete(0);
-      if (!deleted) {
-        return;
-      }
-      // Format of node label: "x<br>D (S)", where x is the distance,
-      // D is the destination node label and S is the source node label
-      const nodeLabel = deleted.charAt(deleted.length - 5);
-      const node = graph.nodes().filter(node =>
-          node.element[0].getAttribute("data-value") === nodeLabel)[0];
-      const srcLabel = deleted.charAt(deleted.length - 2);
-      const srcNode = graph.nodes().filter(node =>
-          node.element[0].getAttribute("data-value") === srcLabel)[0];
-      const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
-      edge.removeClass("fringe")
-      if (window.JSAVrecorder) {
-        window.JSAVrecorder.appendAnimationEventFields(
-          {
-            "pqOperation": "dequeue",
-            "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
-          });
-      }
-      // Give the last removed node a wider border (2px instead of 1) to 
-      // emphasize that this is the last removed node.
-      if (focusedNodes.length > 0) {
-        focusedNodes[focusedNodes.length - 1].removeClass("focusnode");
-      }      
-      node.addClass("focusnode");
-      focusedNodes.push(node);
-      
-      // Debug print focusedNodes
-      let s = "focusedNodes:";
-      for (const x of focusedNodes) {
-        s += ' ' + x.value();
-      }
-      debugPrint(s);
+    // Add Dequeue button
+    const html = "<button type='button' id='dequeueButton'>" +
+      interpret("#dequeue") +"</button>";
+    $(".jsavtree").append(html);
+    $("#dequeueButton").click(dequeueClicked);
+  }
 
-      minheap.layout();
-      // Call markEdge last, because it will also store the JSAV animation step
-      if (!edge.hasClass("spanning")) {
-        markEdge(edge);
-      }
-    })
+  /**
+   * Generates HTML+SVG code for the legend.
+   * 
+   * @returns: string
+   */
+  function generateLegend() {
+    const edge = '<path d="M25,30L75,30" class="edge"></path>' +
+      '<text x="90" y="35">' + interpret("legend_unvisited") + '</text>';
+    
+    const fringeEdge = '<path d="M25,80L75,80" class="edge fringe">' +
+      '</path><text x="90" y="85">' + interpret("legend_fringe") + '</text>';
+
+    const spanningEdge = '<path d="M25,130L75,130" class="edge spanning">' +
+      '</path><text x="90" y="135">'+
+      interpret("legend_spanning_tree") + '</text>';
+
+    const node =
+      '<circle cx="50" cy="200" r="22" fill="none" stroke="black" />' +
+      '<text x="45" y="195">5</text>' + '<text x="35" y="213"> C (B)</text>' +
+      '<text x="90" y="190">' + interpret("node_explanation") + '</text>';
+
+    return "<div><div class='prioqueue'><strong>" +
+      interpret("legend") + "</strong></div>" +
+      "<div class='legend'>" +
+      "<svg version='1.1' xmlns='http://www.w3.org/2000/svg'>" +
+      edge + fringeEdge + spanningEdge + node +
+      " </svg></div></div>";
   }
 
   /**
