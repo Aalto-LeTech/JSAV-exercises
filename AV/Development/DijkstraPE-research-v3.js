@@ -293,8 +293,12 @@
     // Mark the initial node
     modelNodes[exerciseInstance.startIndex].addClass("spanning");
 
+    $(".jsavcanvas").append(generateLegend(true));
+
+    // Create a binary heap
     const mintree = modeljsav.ds.binarytree();
     mintree.layout();
+
     modeljsav.displayInit();
 
     // start the algorithm
@@ -1935,7 +1939,7 @@
         + "<div class='left'><div class='prioqueue'><strong>"
         + interpret("priority_queue")
         + "</strong></div><div class='bintree'></div></div>" 
-        + generateLegend()
+        + generateLegend(false)
         + "</div>");
 
     // Explicitly set the size of this one, otherwise it defaults to
@@ -1957,7 +1961,7 @@
    * 
    * @returns: string
    */
-  function generateLegend() {
+  function generateLegend(forModelAnswer) {
     const edge = '<path d="M25,30L75,30" class="edge"></path>' +
       '<text x="90" y="35">' + interpret("legend_unvisited") + '</text>';
     
@@ -1973,8 +1977,13 @@
       '<text x="45" y="195">5</text>' + '<text x="35" y="213"> C (B)</text>' +
       '<text x="90" y="190">' + interpret("node_explanation") + '</text>';
 
-    return "<div><div class='prioqueue'><strong>" +
-      interpret("legend") + "</strong></div>" +
+    let title = "";
+    if (!forModelAnswer) {
+      title = "<div><div class='prioqueue'><strong>" +
+        interpret("legend") + "</strong></div>";
+    }
+
+    return title +
       "<div class='legend'>" +
       "<svg version='1.1' xmlns='http://www.w3.org/2000/svg'>" +
       edge + fringeEdge + spanningEdge + node +
