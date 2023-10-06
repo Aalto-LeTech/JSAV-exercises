@@ -461,27 +461,27 @@
     }
 
     function highlight(edge, node) {
-      // Mark current edge as highlighted
-      edge.addClass("highlighted");
-      // Mark current node being visited as highlighted
-      node.addClass("highlighted");
+      // Mark current edge as compare
+      edge.addClass("compare");
+      // Mark current node being visited as compare
+      node.addClass("compare");
       // Mark current node being visited in the table
       distances.addClass(node.value().charCodeAt(0) - "A".charCodeAt(0),
-                         true, "highlighted");
+                         true, "compare");
       // Mark current node being visited in the mintree
       const treeNodeList = getTreeNodeList(mintree.root());
       const treeNode = treeNodeList.filter(treeNode =>
           treeNode.value().charAt(treeNode.value().length - 5)
           === node.value())[0];
       if (treeNode) {
-        treeNode.addClass("highlighted")
+        treeNode.addClass("compare")
       }
     }
 
     function highlightUpdate(edge, node) {
       // Mark current node being updated in the table
       const tableRow = node.value().charCodeAt(0) - "A".charCodeAt(0);
-      distances.removeClass(tableRow, true, "highlighted");
+      distances.removeClass(tableRow, true, "compare");
       distances.addClass(tableRow, true, "updated");
       // Mark current node being visited in the mintree
       const treeNodeList = getTreeNodeList(mintree.root());
@@ -489,23 +489,23 @@
           treeNode.value().charAt(treeNode.value().length - 5)
           === node.value())[0];
       if (treeNode) {
-        treeNode.removeClass("highlighted")
+        treeNode.removeClass("compare")
         treeNode.addClass("updated")
       }
     }
 
     function removeHighlight(edge, node) {
-      edge.removeClass("highlighted");
-      node.removeClass("highlighted");
+      edge.removeClass("compare");
+      node.removeClass("compare");
       const tableIndex = node.value().charCodeAt(0) - "A".charCodeAt(0);
-      distances.removeClass(tableIndex, true, "highlighted");
+      distances.removeClass(tableIndex, true, "compare");
       distances.removeClass(tableIndex, true, "updated");
       const treeNodeList = getTreeNodeList(mintree.root());
       const treeNode = treeNodeList.filter(treeNode =>
         treeNode.value().charAt(treeNode.value().length - 5)
         === node.value())[0];
       if (treeNode) {
-        treeNode.removeClass("highlighted");
+        treeNode.removeClass("compare");
         treeNode.removeClass("updated");
       }
     }

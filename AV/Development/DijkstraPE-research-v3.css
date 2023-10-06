@@ -31,7 +31,7 @@
   stroke-width: 16;
   stroke: #ffe000;;
 }
-.jsavgraph .jsavedge.highlighted {
+.jsavgraph .jsavedge.compare {
   stroke: #4ebd44;
   stroke-width: 16;
 }
@@ -44,25 +44,28 @@
 .jsavgraph .jsavnode.spanning {
   background-color: #FFF050;
 }
-.jsavgraph .jsavnode.highlighted {
-  background-color: #4ebd44;
+.jsavgraph .jsavnode.focusnode {
+  border: 2px solid;
 }
 
-.jsavindex.highlighted {
+/* Comparison operation in the model answer, used for
+ * .jsavnode, .jsavindex, and span.compare in the narration text. */
+.compare, .jsavgraph .jsavnode.compare {
   background-color: #4ebd44;
 }
-
-.jsavtree .jsavnode.highlighted {
-  background-color: #4ebd44;
+span.compare {
+  padding: 3px;
 }
 
 .jsavindex.updated {
-  background-color: #4ebd44;
+  color: white;
+  background-color: black;
   font-weight: bold;
 }
 
 .jsavtree .jsavnode.updated {
-  background-color: #4ebd44;
+  color: white;
+  background-color: black;
   font-weight: bold;
 }
 
@@ -105,10 +108,6 @@
   margin: 10px;
 }
 
-.focusnode {
-  border: 2px solid;
-}
-
 .avcontainer .jsavhorizontalarray > li:first-child {
   max-width: none !important;
   min-width: 70px !important;
@@ -132,7 +131,3 @@
   margin-right: 20px;
 }
 
-span.compare {
-  background-color: #4ebd44;
-  padding: 3px;
-}
