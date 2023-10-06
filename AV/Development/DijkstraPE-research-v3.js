@@ -617,8 +617,9 @@
         // Add node to the priority queue.
 
         // First step: highlight the comparison
-        av.umsg(interpret("av_ms_visit_neighbor_add"),
-        {fill: {node: src.value(), neighbor: neighbour.value()}});
+        av.umsg(interpret("av_ms_visit_neighbor_compare") + ' ' +
+                interpret("av_ms_visit_neighbor_add"),
+                {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
         av.step()
 
@@ -635,8 +636,9 @@
         // Update node in the priority queue.
 
         // First step: highlight the comparison
-        av.umsg(interpret("av_ms_visit_neighbor_update"),
-        {fill: {node: src.value(), neighbor: neighbour.value()}});
+        av.umsg(interpret("av_ms_visit_neighbor_compare") + ' ' +
+                interpret("av_ms_visit_neighbor_update"),
+                {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
         av.step(); 
 
@@ -654,7 +656,8 @@
         debugPrint("KEEP DISTANCE THE SAME:",
                         currNeighbourDist + neighbour.value())
 
-        av.umsg(interpret("av_ms_visit_neighbor_no_action"),
+        av.umsg(interpret("av_ms_visit_neighbor_compare") + ' ' +
+                interpret("av_ms_visit_neighbor_no_action"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
                 highlight(edge, neighbour);
         av.step();
