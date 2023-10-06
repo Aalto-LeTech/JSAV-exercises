@@ -113,6 +113,12 @@ span.compare {
   min-width: 70px !important;
 }
 
+#dequeueButton {
+  float: right;
+  position: relative;
+  margin: 15px;
+}
+
 .legend {
   height: 250px;
   width: 250px;
