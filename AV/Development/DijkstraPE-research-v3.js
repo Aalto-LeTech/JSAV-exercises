@@ -540,8 +540,8 @@
       // Then set selected message, and step the av.
       const nodeLabel = ret.charAt(ret.length - 5)
       distances.addClass(nodeLabel.charCodeAt(0) - "A".charCodeAt(0), true, "unused")
-      av.umsg(interpret("av_ms_select_node"),
-              {fill: {node: nodeLabel}});
+      // av.umsg(interpret("av_ms_select_node"),
+      //         {fill: {node: nodeLabel}});
       av.step();
 
       // Parent node of last node in the heap
