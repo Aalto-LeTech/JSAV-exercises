@@ -1881,13 +1881,13 @@
     // We generate the priority queue and legend on the fly. 
 
     const edge = '<path d="M25,30L75,30" class="edge"></path>'
-               +'<text x="90" y="35">' + interpret("graph_edge") + '</text>'
+               +'<text x="90" y="35">' + interpret("legend_unvisited") + '</text>'
     const queuedEdge = '<path d="M25,80L75,80" class="edge queued">'
                      + '</path><text x="90" y="85">'
-                     + interpret("enqueued_edge") + '</text>'
+                     + interpret("legend_fringe") + '</text>'
     const spanningEdge = '<path d="M25,130L75,130" class="edge spanning">' 
                        + '</path><text x="90" y="135">'
-                       + interpret("spanning_edge") + '</text>'
+                       + interpret("legend_spanning_tree") + '</text>'
     const node = '<circle cx="50" cy="200" r="22" fill="none" stroke="black" />'
                + '<text x="45" y="195">5</text>'
                + '<text x="35" y="213"> C (B)</text>'
