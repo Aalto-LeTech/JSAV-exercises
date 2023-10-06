@@ -19,9 +19,6 @@
   z-index: 0;
 }
 
-.jsavnode.marked {
-  background-color: #FFF050;
-}
 .jsavgraph .jsavedge {
   stroke-width: 10;
   stroke: #d1c39d;
@@ -38,8 +35,14 @@
   stroke: #4ebd44;
   stroke-width: 16;
 }
+.jsavgraph .jsavnode {
+  background-color: #d1c39d;
+}
 .jsavgraph .jsavnode.queued {
   background-color: #d59f0d;
+}
+.jsavgraph .jsavnode.marked {
+  background-color: #FFF050;
 }
 .jsavgraph .jsavnode.highlighted {
   background-color: #4ebd44;

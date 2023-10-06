@@ -28,9 +28,9 @@
       "edge": "Edge",
       "legend": "Legend",
       "node_explanation": "<tspan>C has distance 5 from A</tspan><tspan x='90' dy='20'>with parent B</tspan>",
-      "graph_edge": "Graph edge",
-      "enqueued_edge": "Enqueued edge",
-      "spanning_edge": "Spanning tree edge"
+      "legend_unvisited": "Unvisited",
+      "legend_fringe": "Fringe",
+      "legend_spanning_tree": "Spanning tree"
     },
     "fi": {
       ".avTitle": "Dijkstran algoritmi",
@@ -60,9 +60,9 @@
       "edge": "Särmä",
       "legend": "Selite",
       "node_explanation": "<tspan>C:n etäisyys A:sta on 5</tspan><tspan x='90' dy='20'>vanhemman B kautta</tspan>",
-      "graph_edge": "Verkon särmä",
-      "enqueued_edge": "Jonossa oleva särmä",
-      "spanning_edge": "Virityspuun särmä"
+      "legend_unvisited": "Tuntematon",
+      "legend_fringe": "Reunus",
+      "legend_spanning_tree": "Virityspuu"
     }
   },
   "params": {
