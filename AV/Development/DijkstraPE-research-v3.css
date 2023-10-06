@@ -132,8 +132,7 @@
   margin-right: 20px;
 }
 
-
-.green {
-  color: #4ebd44;
-  font-weight: bold;
+span.compare {
+  background-color: #4ebd44;
+  padding: 3px;
 }
