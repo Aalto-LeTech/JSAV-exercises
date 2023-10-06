@@ -40,7 +40,7 @@
   var focusedNodes = [];
 
   var lastLinearTransform = -1; // for generateInstance()
-  var debug = true; // produces debug prints to the console
+  var debug = false; // produces debug prints to the console
 
   // Storage of priority queue operations from student's answer to implement
   // custom grading. From PqOperationSequence.js
