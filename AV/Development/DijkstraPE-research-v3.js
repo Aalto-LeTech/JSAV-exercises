@@ -51,7 +51,7 @@
 
   // JSAV Exercise
   var exercise = jsav.exercise(model, init, {
-    compare: [{ class: ["marked", "queued"] }],
+    compare: [{ class: ["spanning", "fringe"] }],
     controls: $('.jsavexercisecontrols'),
     modelDialog: {width: "960px"},
     resetButtonTitle: interpret("reset"),
@@ -109,7 +109,7 @@
 
     graph.layout();
     // mark the 'A' node
-    graph.nodes()[exerciseInstance.startIndex].addClass("marked");
+    graph.nodes()[exerciseInstance.startIndex].addClass("spanning");
     jsav.displayInit();
     return [graph, minheap];
   }
@@ -221,7 +221,7 @@
     for (var i = 0; i < graphEdges.length; i++) {
       var edge = graphEdges[i],
           modelEdge = modelEdges[i];
-      if (modelEdge.hasClass("marked") && !edge.hasClass("marked")) {
+      if (modelEdge.hasClass("spanning") && !edge.hasClass("spanning")) {
         // mark the edge that is marked in the model, but not in the exercise
         markEdge(edge);
         break;
@@ -291,7 +291,7 @@
     });
 
     // Mark the initial node
-    modelNodes[exerciseInstance.startIndex].addClass("marked");
+    modelNodes[exerciseInstance.startIndex].addClass("spanning");
 
     const mintree = modeljsav.ds.binarytree();
     mintree.layout();
@@ -309,7 +309,7 @@
     // hide all edges that are not part of the spanning tree
     var modelEdges = modelGraph.edges();
     for (i = 0; i < modelGraph.edges().length; i++) {
-      if (!modelEdges[i].hasClass("marked")) {
+      if (!modelEdges[i].hasClass("spanning")) {
         modelEdges[i].hide();
       }
     }
@@ -330,12 +330,12 @@
    *               If undefined, mark an edge in the student's solution.
    */
   function markEdge(edge, av) {
-    edge.addClass("marked");
+    edge.addClass("spanning");
     for (const node of [edge.startnode, edge.endnode]) {
-      node.removeClass("queued");
+      node.removeClass("fringe");
     }
-    edge.start().addClass("marked");
-    edge.end().addClass("marked");
+    edge.start().addClass("spanning");
+    edge.end().addClass("spanning");
     storePqOperationStep('deq', edge, av);
   }
 
@@ -418,12 +418,12 @@
 
       av.umsg(interpret("av_ms_add_edge"),
               {fill: {from: srcNode.value(), to: dstNode.value()}});
-      edge.removeClass("queued");
-      if (!edge.hasClass("marked")) {
+      edge.removeClass("fringe");
+      if (!edge.hasClass("spanning")) {
         markEdge(edge, av);
       }
       const neighbours = dstNode.neighbors().filter(node =>
-        !node.hasClass("marked"));
+        !node.hasClass("spanning"));
       debugPrint("Neighbours of " + dstNode.value() + " before sorting");
       sortNeighbours(neighbours);
       neighbours.forEach(node => visitNeighbour(dstNode, node, dist))
@@ -570,7 +570,7 @@
      */
     function initialNode(src, dst) {
       const edge = src.edgeTo(dst) ?? src.edgeFrom(dst);
-      edge.addClass("queued")
+      edge.addClass("fringe")
       const dstIndex = dst.value().charCodeAt(0) - "A".charCodeAt(0);
       distances.value(dstIndex, 1, edge._weight);
       distances.value(dstIndex, 2, src.value());
@@ -646,7 +646,7 @@
         debugPrint("Model solution gradeable step:  UPDATE DISTANCE TO:",
          distViaSrc + neighbour.value());      
         highlightUpdate(edge, neighbour);
-        oldEdge.removeClass("queued")
+        oldEdge.removeClass("fringe")
         storePqOperationStep('upd', edge, av);
       } else {
         // Case 3: neighbour's distance is equal or longer through node `src`.
@@ -695,8 +695,8 @@
       const dstNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === dstLabel)[0];
       const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode);
-      edge.addClass("queued");
-      dstNode.addClass("queued")
+      edge.addClass("fringe");
+      dstNode.addClass("fringe")
 
       mintree.layout();
     }
@@ -726,7 +726,7 @@
       const dstNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === dstLabel)[0];
       const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode)
-      edge.addClass("queued")
+      edge.addClass("fringe")
       // We determine what the old edge is so that we can remove the queued
       // class from it later. 
       const oldLabel = updatedNode.value();
@@ -734,7 +734,6 @@
       const oldSrcNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === oldSrcLabel)[0];
       const oldEdge = dstNode.edgeFrom(oldSrcNode) ?? dstNode.edgeTo(oldSrcNode)
-      // oldEdge.removeClass("queued");
       updatedNode.value(label);
       // Inline while loop to move the value up if needed.
       // Because if you pass a node along as a parameter, it does not like
@@ -795,7 +794,7 @@
    * @returns true when node contains class 'marked', else false
    */
   function isMarked (node) {
-    return node.element[0].classList.contains("marked")
+    return node.element[0].classList.contains("spanning")
   }
 
 
@@ -863,11 +862,11 @@
     const popup = event.data.popup;
     const edge = event.data.edge;
     debugPrint(edge)
-    edge.addClass("queued");
+    edge.addClass("fringe");
     for (const node of [edge.startnode, edge.endnode]) {
-      console.log("enqueueClicked: " + node.value() + " " + node.hasClass("marked"));
-      if (node.hasClass("marked") == false) {
-        node.addClass("queued");
+      console.log("enqueueClicked: " + node.value() + " " + node.hasClass("spanning"));
+      if (node.hasClass("spanning") == false) {
+        node.addClass("fringe");
       }
     }
     
@@ -917,7 +916,7 @@
 
     updateTable(srcLabel, dstLabel, newDist);
     // Add class to the new edge
-    event.data.edge.addClass("queued")
+    event.data.edge.addClass("fringe")
     // remove class from the old edge
     // Have old label, find previous source node label
     const oldLabel = updatedNode.value();
@@ -930,7 +929,7 @@
     const oldEdge = graph.getEdge(oldNode, dstNode)
               ?? graph.getEdge(dstNode, oldNode);
     // Remove the queued class.
-    oldEdge.removeClass("queued")
+    oldEdge.removeClass("fringe")
     if (window.JSAVrecorder) {
       window.JSAVrecorder.appendAnimationEventFields(
         {
@@ -1882,7 +1881,7 @@
 
     const edge = '<path d="M25,30L75,30" class="edge"></path>'
                +'<text x="90" y="35">' + interpret("legend_unvisited") + '</text>'
-    const queuedEdge = '<path d="M25,80L75,80" class="edge queued">'
+    const fringeEdge = '<path d="M25,80L75,80" class="edge fringe">'
                      + '</path><text x="90" y="85">'
                      + interpret("legend_fringe") + '</text>'
     const spanningEdge = '<path d="M25,130L75,130" class="edge spanning">' 
@@ -1896,7 +1895,7 @@
                  + interpret("legend")
                  + "</strong></div>" 
                  + "<div class='legend'><svg version='1.1' xmlns='http://www.w3.org/2000/svg'> "
-                 + edge + queuedEdge + spanningEdge + node
+                 + edge + fringeEdge + spanningEdge + node
                  + " </svg></div></div>"
     $(".jsavcanvas").append("<div class='flex'>"
         + "<div class='left'><div class='prioqueue'><strong>"
@@ -1932,7 +1931,7 @@
       const srcNode = graph.nodes().filter(node =>
           node.element[0].getAttribute("data-value") === srcLabel)[0];
       const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
-      edge.removeClass("queued")
+      edge.removeClass("fringe")
       if (window.JSAVrecorder) {
         window.JSAVrecorder.appendAnimationEventFields(
           {
@@ -1957,7 +1956,7 @@
 
       minheap.layout();
       // Call markEdge last, because it will also store the JSAV animation step
-      if (!edge.hasClass("marked")) {
+      if (!edge.hasClass("spanning")) {
         markEdge(edge);
       }
     })
