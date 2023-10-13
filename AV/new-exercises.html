@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Aalto University JSAV/OpenDSA exercises 2023</title>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="new-exercises.css" type="text/css" />
+  </head>
+  <body>
+    <h1>Aalto University JSAV/OpenDSA exercises 2023</h1>
+    <p>These visual algorithm simulation exercises have been developed at
+    <a href="https://research.cs.aalto.fi/LeTech/">Learning + Technology
+        research group</a> at Aalto University during years 2021-2023.
+    The exercises are implemented with <a href="http://jsav.io">JSAV</a>
+    and developed further from corresponding exercises in the 
+    <a href="https://opendsa-server.cs.vt.edu/">OpenDSA electronic textbook</a>.
+    </p>
+    
+    <p>Authors</p>
+    <ul>
+        <li>Ari Korhonen, Otto Seppälä, Juha Sorva: supervision, design</li>
+        <li>Artturi Tilanterä: design, implementation</li>
+        <li>Johanna Sänger: implementation</li>
+    </ul>
+
+    <h2>Non-Scaffolded Dijkstra's algorithm</h2>
+
+    <ul>
+        <li>Pseudocode with highlighted GUI operations</li>
+        <li>Color legend to highlight algorithmic concepts</li>
+        <li>Semi-rectangular grid</li>
+        <li>Exercise instances generated from a template</li>
+            <ul>
+                <li>A disconnected component</li>
+                <li>Two edge relaxation situations</li>
+                <li>Two situations where a relaxation is not required</li>
+                <li>The student's solution can be remapped to the template</li>
+            </ul>
+        <li>Student clicks an edge to add it to the spanning tree</li>
+    </ul>
+
+    <iframe src="Development/DijkstraPE-research.html" width="1400" height="800">
+        <a href="Development/DijkstraPE-research.html">See the exercise here</a>
+    </iframe>
+
+    <h2>Scaffolded Dijkstra's algorithm v1</h2>
+
+    <ul>
+        <li>Used at autumn 2022</li>
+        <li>Similar to Non-Scaffolded Dijkstra's algorithm exercise</li>
+        <li>Priority queue interface: enqueue, dequeue, update operations</li>
+        <li>Color legend</li>
+        <li>Most recently dequeued vertex is highlighted</li>
+    </ul>
+
+    <iframe src="Development/DijkstraPE-research-v2.html" width="1000" height="1000">
+        <a href="Development/DijkstraPE-research-v2.html">See the exercise here</a>
+    </iframe>
+
+    <h2>Scaffolded Dijkstra's algorithm v2</h2>
+
+    <ul>
+        <li>Used at autumn 2023</li>
+        <li>Similar to Scaffolded Dijkstra's algorithm v1</li>
+        <li>Both vertices and edges are colored according to algorithmic concepts</li>
+    </ul>
+
+    <iframe src="Development/DijkstraPE-research-v3.html" width="1000" height="1000">
+        <a href="Development/DijkstraPE-research-v3.html">See the exercise here</a>
+    </iframe>
+  </body>
+</html>
