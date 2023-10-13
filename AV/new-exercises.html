@@ -4,7 +4,7 @@
     <title>Aalto University JSAV/OpenDSA exercises 2023</title>
     <meta charset="utf-8">
     <meta name="robots" content="noindex, nofollow">
-    <link rel="stylesheet" href="new-exercises.css" type="text/css" />
+    <link rel="stylesheet" href="new-exercises.css" type="text/css" >
   </head>
   <body>
     <h1>Aalto University JSAV/OpenDSA exercises 2023</h1>
@@ -16,17 +16,65 @@
     <a href="https://opendsa-server.cs.vt.edu/">OpenDSA electronic textbook</a>.
     </p>
     
-    <p>Authors</p>
+    <h3>Authors</h3>
     <ul>
         <li>Ari Korhonen, Otto Seppälä, Juha Sorva: supervision, design</li>
         <li>Artturi Tilanterä: design, implementation</li>
         <li>Johanna Sänger: implementation</li>
     </ul>
 
-    <h2>Non-Scaffolded Dijkstra's algorithm</h2>
+    <h2>Depth-first search and Breadth-first search</h2>
+
+    <ul>
+        <li>Semi-rectangular grid (avoid confusing edge overlap)</li>
+        <li>Random graph</li>
+        <li>A disconnected component</li>
+        <li>Pseudocode inside exercise</li>
+    </ul>
+
+    <iframe src="Development/graphDFSPE.html" width="1000" height="620">
+    </iframe>
+
+    <iframe src="Development/graphBFSPE.html" width="1000" height="620">
+    </iframe>
+
+    <h2>Kruskal's algorithm</h2>
+
+    <ul>
+        <li>Semi-rectangular grid (avoid confusing edge overlap)</li>
+        <li>Random graph</li>
+        <li>Uniform color scheme with DFS &amp; BFS</li>
+    </ul>
+
+    <iframe src="Development/KruskalPE.html" width="850" height="650">
+    </iframe>
+
+    <h2>Scaffolded Prim's algorithm</h2>
+
+    <ul>
+        <li>Priority queue interface: enqueue, dequeue, update operations</li>
+        <li>Color legend</li>
+        <li>Model answer highlights comparison operations</li>
+    </ul>
+
+    <iframe src="Development/PrimAVPE-scaffolded.html" width="1000" height="1000">
+    </iframe>
+
+    <h2>Non-Scaffolded Prim's algorithm</h2>
 
     <ul>
         <li>Pseudocode with highlighted GUI operations</li>
+        <li>Student clicks an edge to add it to the spanning tree</li>
+    </ul>
+
+    <iframe src="Development/PrimAVPE.html" width="1400" height="700">
+    </iframe>
+
+    <h2>Scaffolded Dijkstra's algorithm v1</h2>
+
+    <ul>
+        <li>Used at autumn 2022 experiment</li>
+        <li>Priority queue interface: enqueue, dequeue, update operations</li>
         <li>Color legend to highlight algorithmic concepts</li>
         <li>Semi-rectangular grid</li>
         <li>Exercise instances generated from a template</li>
@@ -36,37 +84,35 @@
                 <li>Two situations where a relaxation is not required</li>
                 <li>The student's solution can be remapped to the template</li>
             </ul>
-        <li>Student clicks an edge to add it to the spanning tree</li>
-    </ul>
-
-    <iframe src="Development/DijkstraPE-research.html" width="1400" height="800">
-        <a href="Development/DijkstraPE-research.html">See the exercise here</a>
-    </iframe>
-
-    <h2>Scaffolded Dijkstra's algorithm v1</h2>
-
-    <ul>
-        <li>Used at autumn 2022</li>
-        <li>Similar to Non-Scaffolded Dijkstra's algorithm exercise</li>
-        <li>Priority queue interface: enqueue, dequeue, update operations</li>
-        <li>Color legend</li>
         <li>Most recently dequeued vertex is highlighted</li>
     </ul>
 
     <iframe src="Development/DijkstraPE-research-v2.html" width="1000" height="1000">
-        <a href="Development/DijkstraPE-research-v2.html">See the exercise here</a>
     </iframe>
 
     <h2>Scaffolded Dijkstra's algorithm v2</h2>
 
     <ul>
-        <li>Used at autumn 2023</li>
+        <li>Will be used at autumn 2023</li>
         <li>Similar to Scaffolded Dijkstra's algorithm v1</li>
         <li>Both vertices and edges are colored according to algorithmic concepts</li>
     </ul>
 
     <iframe src="Development/DijkstraPE-research-v3.html" width="1000" height="1000">
-        <a href="Development/DijkstraPE-research-v3.html">See the exercise here</a>
     </iframe>
+
+
+    <h2>Non-Scaffolded Dijkstra's algorithm</h2>
+
+    <ul>
+        <li>Pseudocode with highlighted GUI operations</li>
+        <li>Student clicks an edge to add it to the spanning tree</li>
+        <li>Hard to do without pen and paper notes</li>
+    </ul>
+
+    <iframe src="Development/DijkstraPE-research.html" width="1400" height="800">
+    </iframe>
+
+
   </body>
 </html>
