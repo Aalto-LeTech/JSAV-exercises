@@ -670,7 +670,7 @@
     }
 
     /**
-     * Helper function to add a new node.
+     * Helper function to add a new node into the priority queue (binary heap).
      * @param srcLabel label of the source node
      * @param dstLabel destination node's label
      * @param distance distance to the node
@@ -797,11 +797,13 @@
   }
 
   /**
-   * @param node node to be queried if it is marked
-   * @returns true when node contains class 'marked', else false
+   * Checks whether the node is in the spanning tree.
+   * 
+   * @param node node to be checked
+   * @returns true when node contains class 'spanning', else false
    */
-  function isMarked (node) {
-    return node.hasClass("marked");
+  function inSpanningTree (node) {
+    return node.hasClass("spanning");
   }
 
 
@@ -872,8 +874,7 @@
     debugPrint(edge)
     edge.addClass("fringe");
     for (const node of [edge.startnode, edge.endnode]) {
-      console.log("enqueueClicked: " + node.value() + " " + node.hasClass("spanning"));
-      if (node.hasClass("spanning") == false) {
+      if (!inSpanningTree(node)) {
         node.addClass("fringe");
       }
     }
@@ -1035,7 +1036,7 @@
     const node1 = $("#" + node1id).data("node");
     const node2 = $("#" + node2id).data("node");
 
-    const src =  isMarked(node1) ? node1 : node2;
+    const src =  inSpanningTree(node1) ? node1 : node2;
     const dst = (src === node1) ? node2 : node1;
     if (!src || !dst) {
       console.warn("Either start or end is not defined. Start: ",
