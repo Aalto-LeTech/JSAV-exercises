@@ -29,11 +29,30 @@
     // Produces a legend for Scaffolded Prim & Dijkstra using JSAV API
 
     var jsav = new JSAV("container");
-    createBinaryHeap(jsav, 30, 50);
-    createLegend(jsav, 500, 50);
+    createBinaryHeap(jsav, 30, 50, interpret, dequeueClicked);
+    createLegend(jsav, 500, 50, interpret);
     jsav.displayInit();
 
-    function createBinaryHeap(av, x, y) {
+    /* Dummy click handler */
+    function dequeueClicked() {
+        console.log("Dummy click handler here!");
+    }
+
+    /* Produces dummy translations in one language */
+    function interpret(s) {
+        const translations = {
+            'dequeue': 'Dequeue',
+            'legend': 'Legend',
+            'legend_unvisited': 'Unvisited',
+            'legend_fringe': 'Fringe',
+            'legend_spanning_tree': 'Spanning Tree',
+            'node_explanation': 'C has distance 5 from A<br>with parent B',
+            'priority_queue': 'Priority Queue'
+        }
+        return translations[s];
+    }
+
+    function createBinaryHeap(av, x, y, interpret, clickHandler) {
         // Center on a pixel to produce crisp edges
         x = Math.floor(x) + 0.5;
         y = Math.floor(y) + 0.5;
@@ -43,16 +62,24 @@
             "stroke-width": 1,
             fill: "none",
         }).addClass("binaryheapbox");
-        jsav.label("Priority Queue", {left: x + 150, top: y - 30});
+        jsav.label(interpret("priority_queue"), {left: x + 150, top: y - 30});
 
-        minheap = av.ds.binarytree({relativeTo: $(".binaryheapbox"),
+        let minheap = av.ds.binarytree({relativeTo: $(".binaryheapbox"),
                                   myAnchor: "center center"});
         const dummyNode = minheap.newNode("test");
         minheap.root(dummyNode);
         minheap.layout();
+
+        // Add Dequeue button
+        /* const html = "<button type='button' id='dequeueButton'>" +
+        interpret("#dequeue") +"</button>";
+        $(".jsavtree").append(html);
+        $("#dequeueButton").click(clickHandler); */
+
+        return minheap;
     }
 
-    function createLegend(av, x, y) {
+    function createLegend(av, x, y, interpret) {
         // Center on a pixel to produce crisp edges
         x = Math.floor(x) + 0.5;
         y = Math.floor(y) + 0.5;
@@ -62,17 +89,18 @@
             "stroke-width": 1,
             fill: "white",
         }).addClass("legendbox");
-        jsav.label("Legend", {left: x + 100, top: y - 30});
+        jsav.label(interpret("legend"), {left: x + 100, top: y - 30});
 
         const hpos = [26, 76, 90]; // line start, line end, text start (pixels)
         const vpos = [30, 80, 130]; // vertical position for each three edge types
         const edgeClass = ["legend-edge", "legend-fringe", "legend-spanning"];
-        const edgeText = ["Unvisited", "Fringe", "Spanning tree"];
+        const edgeText = ["legend_unvisited", "legend_fringe", 
+            "legend_spanning_tree"];
         const textvadjust = -22;
         for (let i = 0; i < 3; i++) {
             jsav.g.line(x + hpos[0], y + vpos[i],
                     x + hpos[1], y + vpos[i]).addClass(edgeClass[i]);
-            jsav.label(edgeText[i], {left: x + hpos[2],
+            jsav.label(interpret(edgeText[i]), {left: x + hpos[2],
                     top: y + vpos[i] + textvadjust,
                     "text-align": "center"})
                 .addClass("legendtext")            
@@ -81,7 +109,7 @@
         jsav.label("5<br>C (B)", {left: x + 35, top: y + 166})
             .addClass("legendtext")
             .addClass("textcentering");
-        jsav.label("C has distance 5 from A<br>with parent B",
+        jsav.label(interpret("node_explanation"),
                 {left: x + hpos[2], top: y + 166})
             .addClass("legendtext");
     }
