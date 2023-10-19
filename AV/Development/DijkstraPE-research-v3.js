@@ -103,9 +103,9 @@
     studentPqOperations = new PqOperationSequence();
     modelPqOperations = new PqOperationSequence();
     researchInstanceToJsav(exerciseInstance.graph, graph, layoutSettings);
-    addMinheap();
+    addMinheap(100, 530);
     if (!exerciseLegendCreated) {
-      createLegend(jsav, 650, 530, interpret);
+      createLegend(jsav, 520, 530, interpret);
       exerciseLegendCreated = true;
     }
     addTable(exerciseInstance.graph);
@@ -1932,25 +1932,30 @@
   }
 
   /**
-   * Add the minheap to the JSAV instance.
-   * The function adds a dummy div with class 'bintree' to center the minheap.
+   * Add the minheap to the student's JSAV instance.
    *
+   * @param {int} x: position: pixels from left
+   * @param {int} y: position: pixels from top
    */
-  function addMinheap () {
+  function addMinheap(x, y) {
     if (minheap) {
       minheap.clear();
-      $(".flex").remove();
     }
     heapsize = heapsize.value(0);
-    // We generate the priority queue and legend on the fly. 
 
-    $(".jsavcanvas").append("<div class='flex'>"
-        + "<div class='left'><div class='prioqueue'><strong>"
-        + interpret("priority_queue")
-        + "</strong></div><div class='bintree'></div></div>" 
-        + "</div>");
+    // Center on a pixel to produce crisp edges
+    x = Math.floor(x) + 0.5;
+    y = Math.floor(y) + 0.5;
 
-    minheap = jsav.ds.binarytree({relativeTo: $(".bintree"),
+    const width = 400; // pixels
+    const height = 250; // pixels
+    jsav.g.rect(x, y, width, height, {
+        "stroke-width": 1,
+        fill: "none",
+    }).addClass("binaryheapbox");
+    jsav.label(interpret("priority_queue"), {left: x + 150, top: y - 35});
+
+    minheap = jsav.ds.binarytree({relativeTo: $(".binaryheapbox"),
                                   myAnchor: "center center"});
     minheap.layout()
 
@@ -2005,7 +2010,7 @@
         "stroke-width": 1,
         fill: "white",
     }).addClass("legendbox");
-    av.label(interpret("legend"), {left: x + 100, top: y - 30});
+    av.label(interpret("legend"), {left: x + 100, top: y - 35});
 
     const hpos = [26, 76, 90]; // line start, line end, text start (pixels)
     const vpos = [30, 80, 130]; // vertical position for each three edge types
