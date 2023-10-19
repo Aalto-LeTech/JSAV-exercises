@@ -12,6 +12,9 @@
         .jsavbinarytree {
             background-color: white;
         }
+        #dequeueButton {
+            z-index: 110;
+        }
     </style>
 </head>
     <div id="container">
@@ -71,10 +74,10 @@
         minheap.layout();
 
         // Add Dequeue button
-        /* const html = "<button type='button' id='dequeueButton'>" +
-        interpret("#dequeue") +"</button>";
+        const html = "<button type='button' id='dequeueButton'>" +
+        interpret("dequeue") +"</button>";
         $(".jsavtree").append(html);
-        $("#dequeueButton").click(clickHandler); */
+        $("#dequeueButton").click(clickHandler);
 
         return minheap;
     }
