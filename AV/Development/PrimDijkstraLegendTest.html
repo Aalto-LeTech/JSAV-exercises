@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="../../lib/odsaAV-min.css" type="text/css" />
     <link rel="stylesheet" href="../../lib/odsaStyle-min.css" type="text/css" />
     <link rel="stylesheet" href="DijkstraPE-research-v3.css" />
+    <style>
+        .jsavbinarytree {
+            background-color: white;
+        }
+    </style>
 </head>
     <div id="container">
         <div class="jsavcontrols"></div>
@@ -23,39 +28,65 @@
 (function() {
     // Produces a legend for Scaffolded Prim & Dijkstra using JSAV API
 
-    var jsav = new JSAV("container");    
-    let x = 50.5; // Center on a pixel to produce crisp edges
-    let y = 30.5; // Center on a pixel to produce crisp edges
-    const width = 250; // pixels
-    const height = 250; // pixels
-    jsav.g.rect(x, y, width, height, {
-        "stroke-width": 1,
-        fill: "white",
-    }).addClass("legendbox");
-    jsav.label("Legend", {left: x + 100, top: y - 30});
-
-    const hpos = [26, 76, 90]; // line start, line end, text start (pixels)
-    const vpos = [30, 80, 130]; // vertical position for each three edge types
-    const edgeClass = ["legend-edge", "legend-fringe", "legend-spanning"];
-    const edgeText = ["Unvisited", "Fringe", "Spanning tree"];
-    const textvadjust = -22;
-    for (let i = 0; i < 3; i++) {
-        jsav.g.line(x + hpos[0], y + vpos[i],
-                x + hpos[1], y + vpos[i]).addClass(edgeClass[i]);
-        jsav.label(edgeText[i], {left: x + hpos[2],
-                   top: y + vpos[i] + textvadjust,
-                   "text-align": "center"})
-            .addClass("legendtext")            
-    }
-    jsav.g.circle(x + 51, y + 201, 22);    
-    jsav.label("5<br>C (B)", {left: x + 35, top: y + 166})
-        .addClass("legendtext")
-        .addClass("textcentering");
-    jsav.label("C has distance 5 from A<br>with parent B",
-               {left: x + hpos[2], top: y + 166})
-        .addClass("legendtext");
-
+    var jsav = new JSAV("container");
+    createBinaryHeap(jsav, 30, 50);
+    createLegend(jsav, 500, 50);
     jsav.displayInit();
+
+    function createBinaryHeap(av, x, y) {
+        // Center on a pixel to produce crisp edges
+        x = Math.floor(x) + 0.5;
+        y = Math.floor(y) + 0.5;
+        const width = 400; // pixels
+        const height = 250; // pixels
+        jsav.g.rect(x, y, width, height, {
+            "stroke-width": 1,
+            fill: "none",
+        }).addClass("binaryheapbox");
+        jsav.label("Priority Queue", {left: x + 150, top: y - 30});
+
+        minheap = av.ds.binarytree({relativeTo: $(".binaryheapbox"),
+                                  myAnchor: "center center"});
+        const dummyNode = minheap.newNode("test");
+        minheap.root(dummyNode);
+        minheap.layout();
+    }
+
+    function createLegend(av, x, y) {
+        // Center on a pixel to produce crisp edges
+        x = Math.floor(x) + 0.5;
+        y = Math.floor(y) + 0.5;
+        const width = 250; // pixels
+        const height = 250; // pixels
+        jsav.g.rect(x, y, width, height, {
+            "stroke-width": 1,
+            fill: "white",
+        }).addClass("legendbox");
+        jsav.label("Legend", {left: x + 100, top: y - 30});
+
+        const hpos = [26, 76, 90]; // line start, line end, text start (pixels)
+        const vpos = [30, 80, 130]; // vertical position for each three edge types
+        const edgeClass = ["legend-edge", "legend-fringe", "legend-spanning"];
+        const edgeText = ["Unvisited", "Fringe", "Spanning tree"];
+        const textvadjust = -22;
+        for (let i = 0; i < 3; i++) {
+            jsav.g.line(x + hpos[0], y + vpos[i],
+                    x + hpos[1], y + vpos[i]).addClass(edgeClass[i]);
+            jsav.label(edgeText[i], {left: x + hpos[2],
+                    top: y + vpos[i] + textvadjust,
+                    "text-align": "center"})
+                .addClass("legendtext")            
+        }
+        jsav.g.circle(x + 51, y + 201, 22);    
+        jsav.label("5<br>C (B)", {left: x + 35, top: y + 166})
+            .addClass("legendtext")
+            .addClass("textcentering");
+        jsav.label("C has distance 5 from A<br>with parent B",
+                {left: x + hpos[2], top: y + 166})
+            .addClass("legendtext");
+    }
+
+    
   }());
 
 </script>
