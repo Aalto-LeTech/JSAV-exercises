@@ -1056,7 +1056,7 @@
     const dstLabel = dst.element[0].getAttribute("data-value");
     const pathWeight = edge._weight;
     const newDist = getUpdatedDistance(srcLabel, pathWeight);
-    const label = newDist + dstLabel;
+    const label = dstLabel + interpret("at_distance") + newDist;
 
     // Edge is listed in alphabetical order, regardless of which
     // node is listed as the src or dst in JSAV.
@@ -1068,11 +1068,12 @@
       "dialongRootElement": $(this)
     }
 
-    const html = "<button type='button' id='enqueueButton'>"
-                 + interpret("#enqueue") + ": " + label
-                 + "</button> <br> <button type='button'"
-                 + "id='updateButton'>"  + interpret("#update") + ": "
-                 + label +"</button>";
+    const html = "<p>" + interpret("node") + ' ' + dstLabel +
+                 interpret("at_distance") + newDist + "</p>" + 
+                 "<button type='button' id='enqueueButton'>" +
+                 interpret("#enqueue") + "</button>&emsp;" +
+                 "<button type='button id='updateButton'>" +
+                 interpret("#update") + "</button>";
 
     const popup = JSAV.utils.dialog(html, options);
 
@@ -1093,7 +1094,7 @@
   }
 
   $(".jsavcontainer").on("click", ".jsavnode", function () {
-    window.alert("Please, click on the edges, not the nodes.");
+    window.alert(interpret("av_please_click_edges"));
   });
 
   /**
@@ -1941,20 +1942,22 @@
     if (minheap) {
       minheap.clear();
     }
+    else {
+      // Create a box with a text "Priority Queue"
+
+      // Center on a pixel to produce crisp edges
+      x = Math.floor(x) + 0.5;
+      y = Math.floor(y) + 0.5;
+
+      const width = 400; // pixels
+      const height = 250; // pixels
+      jsav.g.rect(x, y, width, height, {
+          "stroke-width": 1,
+          fill: "none",
+      }).addClass("binaryheapbox");
+      jsav.label(interpret("priority_queue"), {left: x + 150, top: y - 35});
+    }
     heapsize = heapsize.value(0);
-
-    // Center on a pixel to produce crisp edges
-    x = Math.floor(x) + 0.5;
-    y = Math.floor(y) + 0.5;
-
-    const width = 400; // pixels
-    const height = 250; // pixels
-    jsav.g.rect(x, y, width, height, {
-        "stroke-width": 1,
-        fill: "none",
-    }).addClass("binaryheapbox");
-    jsav.label(interpret("priority_queue"), {left: x + 150, top: y - 35});
-
     minheap = jsav.ds.binarytree({relativeTo: $(".binaryheapbox"),
                                   myAnchor: "center center"});
     minheap.layout()
