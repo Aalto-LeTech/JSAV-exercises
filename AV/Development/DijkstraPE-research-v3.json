@@ -27,7 +27,7 @@
       "parent": "Parent",
       "edge": "Edge",
       "legend": "Legend",
-      "node_explanation": "<tspan>C has distance 5 from A</tspan><tspan x='90' dy='20'>with parent B</tspan>",
+      "node_explanation": "C has distance 5 from A<br>with parent B",
       "legend_unvisited": "Unvisited",
       "legend_fringe": "Fringe",
       "legend_spanning_tree": "Spanning tree"

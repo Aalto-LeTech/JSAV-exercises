@@ -21,6 +21,9 @@
   // queue as a binary heap
   var minheap;
 
+  // Legend box in the exercise view;
+  var exerciseLegendCreated = false;
+
   // OpenDSA configuration and translation interpreter
   var config = ODSA.UTILS.loadConfig(),
       interpret = config.interpreter,
@@ -70,6 +73,7 @@
 
   /*
    * Exercise initializer function.
+   * This function is called every time the Reset button is clicked.
    *
    * Returns:
    * [modelGraph, mintree]: JSAV data structures created in modeljsav that
@@ -100,7 +104,10 @@
     modelPqOperations = new PqOperationSequence();
     researchInstanceToJsav(exerciseInstance.graph, graph, layoutSettings);
     addMinheap();
-    createLegend(jsav, 650, 530, interpret);
+    if (!exerciseLegendCreated) {
+      createLegend(jsav, 650, 530, interpret);
+      exerciseLegendCreated = true;
+    }
     addTable(exerciseInstance.graph);
 
     // For research
