@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex, nofollow" />
+    <title>JSAV Legend test for Prim and Dijkstra</title>
+    <link rel="stylesheet" href="../../JSAV/css/JSAV.css" type="text/css" />
+    <link rel="stylesheet" href="../../lib/odsaAV-min.css" type="text/css" />
+    <link rel="stylesheet" href="../../lib/odsaStyle-min.css" type="text/css" />
+    <link rel="stylesheet" href="DijkstraPE-research-v3.css" />
+</head>
+    <div id="container">
+        <div class="jsavcontrols"></div>
+        <p class="jsavoutput jsavline"></p>
+        <div class="jsavcanvas"></div>
+    </div>
+    <script src="../../lib/jquery.min.js"></script>
+    <script src="../../lib/jquery-ui.min.js"></script>
+    <script src="../../JSAV/lib/jquery.transit.js"></script>
+    <script src="../../JSAV/lib/raphael.js"></script>
+    <script src="../../JSAV/build/JSAV-min.js"></script>
+    <script>
+(function() {
+    // Produces a legend for Scaffolded Prim & Dijkstra using JSAV API
+
+    var jsav = new JSAV("container");    
+    let x = 50.5; // Center on a pixel to produce crisp edges
+    let y = 30.5; // Center on a pixel to produce crisp edges
+    const width = 250; // pixels
+    const height = 250; // pixels
+    jsav.g.rect(x, y, width, height, {
+        "stroke-width": 1,
+        fill: "white",
+    }).addClass("legendbox");
+    jsav.label("Legend", {left: x + 100, top: y - 30});
+
+    const hpos = [26, 76, 90]; // line start, line end, text start (pixels)
+    const vpos = [30, 80, 130]; // vertical position for each three edge types
+    const edgeClass = ["legend-edge", "legend-fringe", "legend-spanning"];
+    const edgeText = ["Unvisited", "Fringe", "Spanning tree"];
+    const textvadjust = -22;
+    for (let i = 0; i < 3; i++) {
+        jsav.g.line(x + hpos[0], y + vpos[i],
+                x + hpos[1], y + vpos[i]).addClass(edgeClass[i]);
+        jsav.label(edgeText[i], {left: x + hpos[2],
+                   top: y + vpos[i] + textvadjust,
+                   "text-align": "center"})
+            .addClass("legendtext")            
+    }
+    jsav.g.circle(x + 51, y + 201, 22);    
+    jsav.label("5<br>C (B)", {left: x + 35, top: y + 166})
+        .addClass("legendtext")
+        .addClass("textcentering");
+    jsav.label("C has distance 5 from A<br>with parent B",
+               {left: x + hpos[2], top: y + 166})
+        .addClass("legendtext");
+
+    jsav.displayInit();
+  }());
+
+</script>
+</body>
+</html>
