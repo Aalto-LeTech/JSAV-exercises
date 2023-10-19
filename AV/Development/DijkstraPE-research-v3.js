@@ -100,6 +100,7 @@
     modelPqOperations = new PqOperationSequence();
     researchInstanceToJsav(exerciseInstance.graph, graph, layoutSettings);
     addMinheap();
+    createLegend(jsav, 650, 530, interpret);
     addTable(exerciseInstance.graph);
 
     // For research
@@ -293,7 +294,8 @@
     // Mark the initial node
     modelNodes[exerciseInstance.startIndex].addClass("spanning");
 
-    $(".jsavcanvas").append(generateLegend(true));
+    // $(".jsavcanvas").append(generateLegend(true));
+    createLegend(modeljsav, 650, 400, interpret);
 
     // Create a binary heap
     const mintree = modeljsav.ds.binarytree();
@@ -1918,9 +1920,8 @@
     table = jsav.ds.matrix([labelArr, distanceArr, parentArr],
                            {style: "table",
                            width: width,
-                           relativeTo: $(".flex"),
-                           myAnchor: "center top",
-                           top: "150px"});
+                           left: 10,
+                           top: 780});
   }
 
   /**
@@ -1940,12 +1941,8 @@
         + "<div class='left'><div class='prioqueue'><strong>"
         + interpret("priority_queue")
         + "</strong></div><div class='bintree'></div></div>" 
-        + generateLegend(false)
         + "</div>");
 
-    // Explicitly set the size of this one, otherwise it defaults to
-    // the size that the graph has. 
-    $(".legend > svg").css({'height': '250px', 'width': '250px'})
     minheap = jsav.ds.binarytree({relativeTo: $(".bintree"),
                                   myAnchor: "center center"});
     minheap.layout()
@@ -1990,6 +1987,41 @@
       edge + fringeEdge + spanningEdge + node +
       " </svg></div></div>";
   }
+
+  function createLegend(av, x, y, interpret) {
+    // Center on a pixel to produce crisp edges
+    x = Math.floor(x) + 0.5;
+    y = Math.floor(y) + 0.5;
+    const width = 250; // pixels
+    const height = 250; // pixels
+    av.g.rect(x, y, width, height, {
+        "stroke-width": 1,
+        fill: "white",
+    }).addClass("legendbox");
+    av.label(interpret("legend"), {left: x + 100, top: y - 30});
+
+    const hpos = [26, 76, 90]; // line start, line end, text start (pixels)
+    const vpos = [30, 80, 130]; // vertical position for each three edge types
+    const edgeClass = ["legend-edge", "legend-fringe", "legend-spanning"];
+    const edgeText = ["legend_unvisited", "legend_fringe", 
+        "legend_spanning_tree"];
+    const textvadjust = -22;
+    for (let i = 0; i < 3; i++) {
+        av.g.line(x + hpos[0], y + vpos[i],
+                x + hpos[1], y + vpos[i]).addClass(edgeClass[i]);
+        av.label(interpret(edgeText[i]), {left: x + hpos[2],
+                top: y + vpos[i] + textvadjust,
+                "text-align": "center"})
+            .addClass("legendtext")            
+    }
+    av.g.circle(x + 51, y + 201, 22);    
+    av.label("5<br>C (B)", {left: x + 35, top: y + 166})
+        .addClass("legendtext")
+        .addClass("textcentering");
+    av.label(interpret("node_explanation"),
+            {left: x + hpos[2], top: y + 166})
+        .addClass("legendtext");
+}
 
   /**
    * Insert the new node into the minheap according to the

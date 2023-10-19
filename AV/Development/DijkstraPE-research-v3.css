@@ -19,15 +19,21 @@
   z-index: 0;
 }
 
-.jsavgraph .jsavedge, .legend .edge {
+.legendtext {
+  z-index: 110;
+}
+.textcentering {
+  text-align: center;
+}
+.jsavgraph .jsavedge, .legend-edge {
   stroke-width: 10;
   stroke: #d1c39d;
 }
-.jsavgraph .jsavedge.fringe, .legend .edge.fringe {
+.jsavgraph .jsavedge.fringe, .legend-fringe {
   stroke-width: 10;
   stroke: #d59f0d;
 }
-.jsavgraph .jsavedge.spanning, .legend .edge.spanning {
+.jsavgraph .jsavedge.spanning, .legend-spanning {
   stroke-width: 16;
   stroke: #ffe000;;
 }
@@ -119,27 +125,15 @@ span.compare {
   margin: 15px;
 }
 
-.legend {
-  height: 250px;
-  width: 250px;
-  border: 1px solid;
-  background-color: #ffffff;
-}
-
 .jsavmodelanswer .legend {
   position: absolute;
   left: 650px;
   z-index: 5;
 }
 
-.flex {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
+.jsavbinarytree {
+  background-color: white;
 }
-
-.flex > div {
-  margin-left: 20px;
-  margin-right: 20px;
+#dequeueButton {
+  z-index: 110;
 }
-
