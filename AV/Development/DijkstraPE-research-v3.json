@@ -59,7 +59,7 @@
       "parent": "Vanhempi",
       "edge": "Särmä",
       "legend": "Selite",
-      "node_explanation": "<tspan>C:n etäisyys A:sta on 5</tspan><tspan x='90' dy='20'>vanhemman B kautta</tspan>",
+      "node_explanation": "C:n etäisyys A:sta on 5<br>vanhemman B kautta",
       "legend_unvisited": "Tuntematon",
       "legend_fringe": "Reunus",
       "legend_spanning_tree": "Virityspuu"
