@@ -294,7 +294,7 @@
     });
     distances.element.css({
       position: "absolute",
-      top: 0,
+      top: -30,
       left: 10
     });
 
@@ -302,10 +302,13 @@
     modelNodes[exerciseInstance.startIndex].addClass("spanning");
 
     // $(".jsavcanvas").append(generateLegend(true));
-    createLegend(modeljsav, 650, 400, interpret);
+    createLegend(modeljsav, 550, 400, interpret);
 
     // Create a binary heap
-    const mintree = modeljsav.ds.binarytree();
+    const mintree = modeljsav.ds.binarytree({relativeTo: modelGraph,
+      left: -150, top: 291});
+    modeljsav.label(interpret("priority_queue"), {relativeTo: mintree,
+        top: -100});
     mintree.layout();
 
     modeljsav.displayInit();
@@ -1939,34 +1942,34 @@
    * @param {int} y: position: pixels from top
    */
   function addMinheap(x, y) {
+    let previouslyExistingMinheap = false;
     if (minheap) {
+      previouslyExistingMinheap = true;
       minheap.clear();
+      $('.flexcontainer').remove();
+      $('#dequeueButton').remove();
     }
-    else {
-      // Create a box with a text "Priority Queue"
 
-      // Center on a pixel to produce crisp edges
-      x = Math.floor(x) + 0.5;
-      y = Math.floor(y) + 0.5;
+    $(".jsavcanvas").append("<div class='flexcontainer'></div>");
+    minheap = jsav.ds.binarytree({relativeTo: $(".flexcontainer"),
+      left: -180, top: 140});
 
-      const width = 400; // pixels
-      const height = 250; // pixels
-      jsav.g.rect(x, y, width, height, {
-          "stroke-width": 1,
-          fill: "none",
-      }).addClass("binaryheapbox");
-      jsav.label(interpret("priority_queue"), {left: x + 150, top: y - 35});
-    }
-    heapsize = heapsize.value(0);
-    minheap = jsav.ds.binarytree({relativeTo: $(".binaryheapbox"),
-                                  myAnchor: "center center"});
-    minheap.layout()
+    if (!previouslyExistingMinheap) {
+      jsav.label(interpret("priority_queue"), {relativeTo: minheap,
+        top: -135});
+      }
 
     // Add Dequeue button
     const html = "<button type='button' id='dequeueButton'>" +
-      interpret("#dequeue") +"</button>";
+    interpret("#dequeue") +"</button>";
     $(".jsavtree").append(html);
     $("#dequeueButton").click(dequeueClicked);
+    
+    heapsize = heapsize.value(0);
+
+    minheap.layout()
+
+    
   }
 
   function createLegend(av, x, y, interpret) {
