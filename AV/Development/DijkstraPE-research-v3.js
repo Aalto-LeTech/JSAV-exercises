@@ -3,7 +3,7 @@
  * Johanna Sänger, Artturi Tilanterä
  * johanna.sanger@kantisto.nl
  * artturi.tilantera@aalto.fi
- * 25 August 2023
+ * 19 October 2023
  */
 
 /* global ODSA, graphUtils */
@@ -1967,40 +1967,6 @@
       interpret("#dequeue") +"</button>";
     $(".jsavtree").append(html);
     $("#dequeueButton").click(dequeueClicked);
-  }
-
-  /**
-   * Generates HTML+SVG code for the legend.
-   * 
-   * @returns: string
-   */
-  function generateLegend(forModelAnswer) {
-    const edge = '<path d="M25,30L75,30" class="edge"></path>' +
-      '<text x="90" y="35">' + interpret("legend_unvisited") + '</text>';
-    
-    const fringeEdge = '<path d="M25,80L75,80" class="edge fringe">' +
-      '</path><text x="90" y="85">' + interpret("legend_fringe") + '</text>';
-
-    const spanningEdge = '<path d="M25,130L75,130" class="edge spanning">' +
-      '</path><text x="90" y="135">'+
-      interpret("legend_spanning_tree") + '</text>';
-
-    const node =
-      '<circle cx="50" cy="200" r="22" fill="none" stroke="black" />' +
-      '<text x="45" y="195">5</text>' + '<text x="35" y="213"> C (B)</text>' +
-      '<text x="90" y="190">' + interpret("node_explanation") + '</text>';
-
-    let title = "";
-    if (!forModelAnswer) {
-      title = "<div><div class='prioqueue'><strong>" +
-        interpret("legend") + "</strong></div>";
-    }
-
-    return title +
-      "<div class='legend'>" +
-      "<svg version='1.1' xmlns='http://www.w3.org/2000/svg'>" +
-      edge + fringeEdge + spanningEdge + node +
-      " </svg></div></div>";
   }
 
   function createLegend(av, x, y, interpret) {
