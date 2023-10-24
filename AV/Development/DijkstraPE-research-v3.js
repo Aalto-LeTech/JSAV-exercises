@@ -51,7 +51,7 @@
   var modelPqOperations = new PqOperationSequence();
 
   // Instance generator (from DijkstraInstanceGenerator.js)
-  var generator = new DijkstraInstanceGenerator();
+  var generator = new DijkstraInstanceGenerator(debug);
 
   jsav.recorded();
 
@@ -694,6 +694,243 @@
   })
 
   $("#about").click(about);
+  
+  /**
+   * Add the initial distance table to the JSAV.
+   * The table has distance for A as 0, '∞' for the rest
+   * Parent is '-' for all.
+   * @param riGraph the research instance graph.
+   */
+  function addTable (riGraph) {
+    if (table) {
+      table.clear()
+    }
+    const labelArr = [interpret("node"), ...(riGraph.vertexLabels.sort())];
+    const distanceArr = Array.from('∞'.repeat(riGraph.vertexLabels.length - 1));
+    distanceArr.unshift(interpret("distance"), 0);
+    const parentArr = Array.from('-'.repeat(riGraph.vertexLabels.length));
+    parentArr.unshift(interpret("parent"));
+    const width = String((riGraph.vertexLabels.length) * 30 + 100) + "px";
+    table = jsav.ds.matrix([labelArr, distanceArr, parentArr],
+                           {style: "table",
+                           width: width,
+                           left: 10,
+                           top: 780});
+  }
+
+  /**
+   * Add the minheap to the student's JSAV instance.
+   *
+   * @param {int} x: position: pixels from left
+   * @param {int} y: position: pixels from top
+   */
+  function addMinheap(x, y) {
+    let previouslyExistingMinheap = false;
+    if (minheap) {
+      previouslyExistingMinheap = true;
+      minheap.clear();
+      $('.flexcontainer').remove();
+      $('#dequeueButton').remove();
+    }
+
+    $(".jsavcanvas").append("<div class='flexcontainer'></div>");
+    minheap = jsav.ds.binarytree({relativeTo: $(".flexcontainer"),
+      left: -180, top: 140});
+
+    if (!previouslyExistingMinheap) {
+      jsav.label(interpret("priority_queue"), {relativeTo: minheap,
+        top: -135});
+      }
+
+    // Add Dequeue button
+    const html = "<button type='button' id='dequeueButton'>" +
+    interpret("#dequeue") +"</button>";
+    $(".jsavtree").append(html);
+    $("#dequeueButton").click(dequeueClicked);
+    
+    heapsize = heapsize.value(0);
+
+    minheap.layout()
+
+    
+  }
+
+  /**
+   * Creates a legend box which explains the edge colors.
+   * This is used for both the student's view and the model answer.
+   * 
+   * @param {JSAV} av A JSAV algorithm visualization template
+   * @param {number} x Location: pixels from left in *av*
+   * @param {number} y Location: pixels from top in *av*
+   * @param {function(string)} interpret A JSAV interpreter function
+   */
+  function createLegend(av, x, y, interpret) {
+    // Center on a pixel to produce crisp edges
+    x = Math.floor(x) + 0.5;
+    y = Math.floor(y) + 0.5;
+    const width = 250; // pixels
+    const height = 250; // pixels
+    av.g.rect(x, y, width, height, {
+        "stroke-width": 1,
+        fill: "white",
+    }).addClass("legendbox");
+    av.label(interpret("legend"), {left: x + 100, top: y - 35});
+
+    const hpos = [26, 76, 90]; // line start, line end, text start (pixels)
+    const vpos = [30, 80, 130]; // vertical position for each three edge types
+    const edgeClass = ["legend-edge", "legend-fringe", "legend-spanning"];
+    const edgeText = ["legend_unvisited", "legend_fringe", 
+        "legend_spanning_tree"];
+    const textvadjust = -22;
+    for (let i = 0; i < 3; i++) {
+        av.g.line(x + hpos[0], y + vpos[i],
+                x + hpos[1], y + vpos[i]).addClass(edgeClass[i]);
+        av.label(interpret(edgeText[i]), {left: x + hpos[2],
+                top: y + vpos[i] + textvadjust,
+                "text-align": "center"})
+            .addClass("legendtext")            
+    }
+    av.g.circle(x + 51, y + 201, 22);    
+    av.label("5<br>C (B)", {left: x + 35, top: y + 166})
+        .addClass("legendtext")
+        .addClass("textcentering");
+    av.label(interpret("node_explanation"),
+            {left: x + hpos[2], top: y + 166})
+        .addClass("legendtext");
+}
+
+  /**
+   * Insert the new node into the minheap according to the
+   * insertMinheap algorithm.
+   * @param {string} srcLabel label of the source node
+   * @param {string} dstLabel label of the destination node
+   * @param {string} distance distance to be inserted.
+   */
+  function insertMinheap (srcLabel, dstLabel, distance) {
+    var i = heapsize.value();
+
+    heapsize.value(heapsize.value() + 1);
+
+    const label = distance + "<br>" + dstLabel + " (" + srcLabel + ")"
+    const newNode = minheap.newNode(label);
+    if (i === 0) {
+      minheap.root(newNode);
+    } else {
+      const parent = findParent(i, minheap);
+      (i % 2 === 1) ? parent.left(newNode) : parent.right(newNode);
+    }
+
+    // Heapify up
+    var node = newNode;
+    while (i > 0 && extractDistance(node.parent()) > distance) {
+      node.value(node.parent().value());
+      i = Math.floor((i-1)/2);
+      node.parent().value(label);
+      node = node.parent();
+    }
+
+    minheap.layout();
+  }
+
+  /**
+   * Return the parent node of node at index.
+   * @param {number} index the index of the node whose parent we want.
+   * 
+   * @returns parent of node at index.
+   */
+  function findParent (index, heap) {
+    const chain = [];
+    while (index > 0) {
+      index = Math.floor((index - 1) / 2);
+      chain.unshift(index);
+    }
+    var parent_node = heap.root();
+    for (var i = 1; i < chain.length; i++) {
+      var prev_index = chain[i-1];
+      var curr_index = chain[i];
+      if (prev_index * 2 + 1 === curr_index) {
+        parent_node = parent_node.left();
+      } else {
+        parent_node = parent_node.right();
+      }
+    }
+
+    return parent_node;
+  }
+
+  /**
+   * minheapDelete function, delete node at index.
+   * @param {number} index index of node to be deleted
+   * @returns value of the deleted node.
+   */
+  function minheapDelete(index) {
+    if (heapsize.value() === 0) {
+      return
+    }
+
+    heapsize.value(heapsize.value() - 1);
+
+    // PLACEHOLDER: be able to remove other than min
+    const ret = (index === 0) ? minheap.root().value() : minheap.root().value();
+
+    // Parent of the last node in the heap
+    const parentLast = findParent(heapsize.value(), minheap);
+
+    // The last node in the heap (the one to be deleted)
+    const lastNode = (heapsize.value() % 2 === 1) ? parentLast.left()
+                                                  : parentLast.right();
+
+    if (lastNode) {
+      // Swap the values of the root and the last node
+      minheap.root().value(lastNode.value());
+      lastNode.value(ret);
+
+      lastNode.remove();
+
+      minHeapify(minheap.root());
+    } else {
+      minheap.root().remove();
+    }
+    return ret
+  }
+
+  /**
+   * minHeapify algorithm from a node.
+   * @param {*} root The node from which to min-heapify.
+   */
+  function minHeapify(root) {
+    const left = root.left();
+    const right = root.right();
+    var smallest = root;
+    if (left && extractDistance(left) < extractDistance(smallest)) {
+      smallest = left;
+    }
+    if (right && extractDistance(right) < extractDistance(smallest)) {
+      smallest = right;
+    }
+    if (smallest != root) {
+      const temp = smallest.value();
+      smallest.value(root.value());
+      root.value(temp);
+      minHeapify(smallest);
+    }
+
+  }
+
+  /**
+   * Helper function to extract the distance from the minheap tree.
+   * @param {*} node node whose distance is being extracted
+   * @returns the distance.
+   */
+  function extractDistance (node) {
+    return Number(node.value().match(/\d+/)[0])
+  }
+
+  function debugPrint(x) {
+    if (debug) {
+      console.log(x);
+    }
+  }
 
   /*
    * Creates the model solution of the exercise.
@@ -1169,233 +1406,6 @@
     /*****************************************************
      * End of function dijkstra() and its inner functions 
      *****************************************************/
-  }
-  
-  /**
-   * Add the initial distance table to the JSAV.
-   * The table has distance for A as 0, '∞' for the rest
-   * Parent is '-' for all.
-   * @param riGraph the research instance graph.
-   */
-  function addTable (riGraph) {
-    if (table) {
-      table.clear()
-    }
-    const labelArr = [interpret("node"), ...(riGraph.vertexLabels.sort())];
-    const distanceArr = Array.from('∞'.repeat(riGraph.vertexLabels.length - 1));
-    distanceArr.unshift(interpret("distance"), 0);
-    const parentArr = Array.from('-'.repeat(riGraph.vertexLabels.length));
-    parentArr.unshift(interpret("parent"));
-    const width = String((riGraph.vertexLabels.length) * 30 + 100) + "px";
-    table = jsav.ds.matrix([labelArr, distanceArr, parentArr],
-                           {style: "table",
-                           width: width,
-                           left: 10,
-                           top: 780});
-  }
-
-  /**
-   * Add the minheap to the student's JSAV instance.
-   *
-   * @param {int} x: position: pixels from left
-   * @param {int} y: position: pixels from top
-   */
-  function addMinheap(x, y) {
-    let previouslyExistingMinheap = false;
-    if (minheap) {
-      previouslyExistingMinheap = true;
-      minheap.clear();
-      $('.flexcontainer').remove();
-      $('#dequeueButton').remove();
-    }
-
-    $(".jsavcanvas").append("<div class='flexcontainer'></div>");
-    minheap = jsav.ds.binarytree({relativeTo: $(".flexcontainer"),
-      left: -180, top: 140});
-
-    if (!previouslyExistingMinheap) {
-      jsav.label(interpret("priority_queue"), {relativeTo: minheap,
-        top: -135});
-      }
-
-    // Add Dequeue button
-    const html = "<button type='button' id='dequeueButton'>" +
-    interpret("#dequeue") +"</button>";
-    $(".jsavtree").append(html);
-    $("#dequeueButton").click(dequeueClicked);
-    
-    heapsize = heapsize.value(0);
-
-    minheap.layout()
-
-    
-  }
-
-  function createLegend(av, x, y, interpret) {
-    // Center on a pixel to produce crisp edges
-    x = Math.floor(x) + 0.5;
-    y = Math.floor(y) + 0.5;
-    const width = 250; // pixels
-    const height = 250; // pixels
-    av.g.rect(x, y, width, height, {
-        "stroke-width": 1,
-        fill: "white",
-    }).addClass("legendbox");
-    av.label(interpret("legend"), {left: x + 100, top: y - 35});
-
-    const hpos = [26, 76, 90]; // line start, line end, text start (pixels)
-    const vpos = [30, 80, 130]; // vertical position for each three edge types
-    const edgeClass = ["legend-edge", "legend-fringe", "legend-spanning"];
-    const edgeText = ["legend_unvisited", "legend_fringe", 
-        "legend_spanning_tree"];
-    const textvadjust = -22;
-    for (let i = 0; i < 3; i++) {
-        av.g.line(x + hpos[0], y + vpos[i],
-                x + hpos[1], y + vpos[i]).addClass(edgeClass[i]);
-        av.label(interpret(edgeText[i]), {left: x + hpos[2],
-                top: y + vpos[i] + textvadjust,
-                "text-align": "center"})
-            .addClass("legendtext")            
-    }
-    av.g.circle(x + 51, y + 201, 22);    
-    av.label("5<br>C (B)", {left: x + 35, top: y + 166})
-        .addClass("legendtext")
-        .addClass("textcentering");
-    av.label(interpret("node_explanation"),
-            {left: x + hpos[2], top: y + 166})
-        .addClass("legendtext");
-}
-
-  /**
-   * Insert the new node into the minheap according to the
-   * insertMinheap algorithm.
-   * @param srcLabel label of the source node
-   * @param dstLabel label of the destination node
-   * @param distance distance to be inserted.
-   */
-  function insertMinheap (srcLabel, dstLabel, distance) {
-    var i = heapsize.value();
-
-    heapsize.value(heapsize.value() + 1);
-
-    const label = distance + "<br>" + dstLabel + " (" + srcLabel + ")"
-    const newNode = minheap.newNode(label);
-    if (i === 0) {
-      minheap.root(newNode);
-    } else {
-      const parent = findParent(i, minheap);
-      (i % 2 === 1) ? parent.left(newNode) : parent.right(newNode);
-    }
-
-    // Heapify up
-    var node = newNode;
-    while (i > 0 && extractDistance(node.parent()) > distance) {
-      node.value(node.parent().value());
-      i = Math.floor((i-1)/2);
-      node.parent().value(label);
-      node = node.parent();
-    }
-
-    minheap.layout();
-  }
-
-  /**
-   * Return the parent node of node at index.
-   * @param {*} index the index of the node whose parent we want.
-   * @returns parent of node at index.
-   */
-  function findParent (index, heap) {
-    const chain = [];
-    while (index > 0) {
-      index = Math.floor((index - 1) / 2);
-      chain.unshift(index);
-    }
-    var parent_node = heap.root();
-    for (var i = 1; i < chain.length; i++) {
-      var prev_index = chain[i-1];
-      var curr_index = chain[i];
-      if (prev_index * 2 + 1 === curr_index) {
-        parent_node = parent_node.left();
-      } else {
-        parent_node = parent_node.right();
-      }
-    }
-
-    return parent_node;
-  }
-
-  /**
-   * minheapDelete function, delete node at index.
-   * @param {*} index index of node to be deleted
-   * @returns value of the deleted node.
-   */
-  function minheapDelete(index) {
-    if (heapsize.value() === 0) {
-      return
-    }
-
-    heapsize.value(heapsize.value() - 1);
-
-    // PLACEHOLDER: be able to remove other than min
-    const ret = (index === 0) ? minheap.root().value() : minheap.root().value();
-
-    // Parent of the last node in the heap
-    const parentLast = findParent(heapsize.value(), minheap);
-
-    // The last node in the heap (the one to be deleted)
-    const lastNode = (heapsize.value() % 2 === 1) ? parentLast.left()
-                                                  : parentLast.right();
-
-    if (lastNode) {
-      // Swap the values of the root and the last node
-      minheap.root().value(lastNode.value());
-      lastNode.value(ret);
-
-      lastNode.remove();
-
-      minHeapify(minheap.root());
-    } else {
-      minheap.root().remove();
-    }
-    return ret
-  }
-
-  /**
-   * minHeapify algorithm from a node.
-   * @param {*} root The node from which to min-heapify.
-   */
-  function minHeapify(root) {
-    const left = root.left();
-    const right = root.right();
-    var smallest = root;
-    if (left && extractDistance(left) < extractDistance(smallest)) {
-      smallest = left;
-    }
-    if (right && extractDistance(right) < extractDistance(smallest)) {
-      smallest = right;
-    }
-    if (smallest != root) {
-      const temp = smallest.value();
-      smallest.value(root.value());
-      root.value(temp);
-      minHeapify(smallest);
-    }
-
-  }
-
-  /**
-   * Helper function to extract the distance from the minheap tree.
-   * @param {*} node node whose distance is being extracted
-   * @returns the distance.
-   */
-  function extractDistance (node) {
-    return Number(node.value().match(/\d+/)[0])
-  }
-
-  function debugPrint(x) {
-    if (debug) {
-      console.log(x);
-    }
   }
 
 }(jQuery));
