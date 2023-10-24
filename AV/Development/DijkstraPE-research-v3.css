@@ -41,13 +41,13 @@
   stroke: #4ebd44;
   stroke-width: 16;
 }
-.jsavgraph .jsavnode {
+.jsavgraph .jsavnode, .jsavmatrix .jsavnode {
   background-color: #d1c39d;
 }
-.jsavgraph .jsavnode.fringe {
+.jsavgraph .jsavnode.fringe, .jsavmatrix .jsavnode.fringe {
   background-color: #d59f0d;
 }
-.jsavgraph .jsavnode.spanning {
+.jsavgraph .jsavnode.spanning, .jsavmatrix .jsavnode.spanning {
   background-color: #FFF050;
 }
 .jsavgraph .jsavnode.focusnode {
@@ -56,7 +56,7 @@
 
 /* Comparison operation in the model answer, used for
  * .jsavnode, .jsavindex, and span.compare in the narration text. */
-.compare, .jsavgraph .jsavnode.compare {
+.compare, .jsavgraph .jsavnode.compare, .jsavmatrix .jsavnode.compare {
   background-color: #4ebd44;
 }
 span.compare {
