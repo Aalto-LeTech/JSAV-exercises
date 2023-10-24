@@ -1,6 +1,7 @@
 /*
  * Research version of Dijkstra's algorithm JSAV exercise
- * Johanna Sänger, Artturi Tilanterä
+ * Johanna Sänger, Artturi Tilanterä (implementation)
+ * Ari Korhonen, Otto Seppälä, Juha Sorva (supervision)
  * johanna.sanger@kantisto.nl
  * artturi.tilantera@aalto.fi
  * 19 October 2023
@@ -577,24 +578,6 @@
       }
       mintree.layout();
       return ret
-    }
-
-    /**
-     * Helper function to insert the initial node after A into the heap.
-     * @param src source node
-     * @param dst destination node
-     */
-    function initialNode(src, dst) {
-      const edge = src.edgeTo(dst) ?? src.edgeFrom(dst);
-      edge.addClass("fringe")
-      const dstIndex = dst.value().charCodeAt(0) - "A".charCodeAt(0);
-      distances.value(dstIndex, 1, edge._weight);
-      distances.value(dstIndex, 2, src.value());
-      modelheapsize += 1;
-      const label = edge._weight + "<br>" + dst.value() + " (" + src.value() + ")";
-      mintree.root(label)
-      av.umsg(interpret("av_ms_update_distances"), {fill: {node: src.value()}})
-      av.step()
     }
 
     /**
