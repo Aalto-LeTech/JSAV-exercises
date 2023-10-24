@@ -318,10 +318,10 @@
     const row = findColByNode(dstLabel); // Do for all rows
     for (let col = 0; col < 3; col++) {
       if (setClass) {
-        table.addClass(col, row, cssClass)
+        table.addClass(col, row, cssClass);
       }
       else {
-        table.removeClass(col, row, cssClass)
+        table.removeClass(col, row, cssClass);
       }
     }
   }
@@ -1133,10 +1133,13 @@
 
       av.umsg(interpret("av_ms_add_edge"),
               {fill: {from: srcNode.value(), to: dstNode.value()}});
+      modifyStyleOfModelTable(label, "fringe", false);
+      modifyStyleOfModelTable(label, "spanning", true);
       edge.removeClass("fringe");
       if (!edge.hasClass("spanning")) {
         markEdge(edge, av);
       }
+
       const neighbours = dstNode.neighbors().filter(node =>
         !node.hasClass("spanning"));
       debugPrint("Neighbours of " + dstNode.value() + " before sorting");
@@ -1214,7 +1217,7 @@
       node.removeClass("compare");
       const tableIndex = node.value().charCodeAt(0) - "A".charCodeAt(0);
       distances.removeClass(tableIndex, true, "compare");
-      distances.removeClass(tableIndex, true, "updated");
+      distances.removeClass(tableIndex, true, "updated");      
       const treeNodeList = getTreeNodeList(mintree.root());
       const treeNode = treeNodeList.filter(treeNode =>
         treeNode.value().charAt(treeNode.value().length - 5)
@@ -1224,6 +1227,24 @@
         treeNode.removeClass("updated");
       }
     }
+
+    /**
+     * Modifies the style of table in model solution.
+     * 
+     * @param {string} dstLabel Label of destination node
+     * @param {string} cssClass Name of CSS class
+     * @param {boolean} setClass If true, set class, otherwise remove it.
+     */
+    function modifyStyleOfModelTable(dstLabel, cssClass, setClass) {
+      const col = findColByNode(dstLabel) - 1;
+      if (setClass) {
+        distances.addClass(col, true, cssClass)
+      }
+      else {
+        distances.removeClass(col, true, cssClass)
+      }
+    }
+
     /**
      * Helper function: returns the distance for the given index in the
      * JSAV distance matrix.
@@ -1399,15 +1420,10 @@
       dstNode.addClass("fringe")
 
       // Add fringe class to the corresponding column in the distance matrix
+      modifyStyleOfModelTable(dstLabel, "fringe", true);
 
-      /* distances.addClass(node.value().charCodeAt(0) - "A".charCodeAt(0),
-             true, "compare");
-        
-        the matrix has a function .addClass(row, col, className)
-      */
       const row = true; // Apply for all rows
-      const col = dstLabel - "A".charCodeAt(0)
-      table.addClass()
+      const col = dstLabel - "A".charCodeAt(0)    
        
       mintree.layout();
     }
