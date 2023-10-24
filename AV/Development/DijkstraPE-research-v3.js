@@ -583,13 +583,13 @@
     /**
      * Helper function to update the table. Sets dst's distance to distance
      * via parent src.
-     * @param dst destination node
-     * @param src source node
-     * @param distance distance to be inserted in the table.
+     * @param {JSAV Node} dst destination node
+     * @param {JSAV Node} src source node
+     * @param {number or string} distance distance to be inserted in the table.
      */
-    function updateTable (dst, src, distance) {
+    function updateModelTable (dst, src, distance) {
       const dstIndex = dst.value().charCodeAt(0) - "A".charCodeAt(0);
-      debugPrint("ADD:", dst.value(), distance, src.value())
+
       distances.value(dstIndex, 1, distance);
       distances.value(dstIndex, 2, src.value());
     }
@@ -624,7 +624,7 @@
 
         // Second step: highlight the update
         addNode(src.value(), neighbour.value(), distViaSrc);
-        updateTable(neighbour, src, distViaSrc);
+        updateModelTable(neighbour, src, distViaSrc);
         debugPrint("Model solution gradeable step: ADD ROUTE WITH DIST:",
           distViaSrc + neighbour.value());
         highlightUpdate(edge, neighbour);
@@ -643,7 +643,7 @@
 
         // Second step: highlight the update
         const oldEdge = updateNode(src.value(), neighbour.value(), distViaSrc);
-        updateTable(neighbour, src, distViaSrc);
+        updateModelTable(neighbour, src, distViaSrc);
         debugPrint("Model solution gradeable step:  UPDATE DISTANCE TO:",
          distViaSrc + neighbour.value());      
         highlightUpdate(edge, neighbour);
@@ -690,7 +690,7 @@
         node = node.parent();
       }
 
-      // Add queued class to the edge and node to emphasize that they are now
+      // Add fringe class to the edge and node to emphasize that they are now
       // in the fringe
       const srcNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === srcLabel)[0];
@@ -700,6 +700,17 @@
       edge.addClass("fringe");
       dstNode.addClass("fringe")
 
+      // Add fringe class to the corresponding column in the distance matrix
+
+      /* distances.addClass(node.value().charCodeAt(0) - "A".charCodeAt(0),
+             true, "compare");
+        
+        the matrix has a function .addClass(row, col, className)
+      */
+      const row = true; // Apply for all rows
+      const col = dstLabel - "A".charCodeAt(0)
+      table.addClass()
+       
       mintree.layout();
     }
 
@@ -843,11 +854,13 @@
    * @param dstLabel
    * @param newDist
    */
-  function updateTable (srcLabel, dstLabel, newDist) {
+  function updateStudentTable (srcLabel, dstLabel, newDist) {
     const dstIndex = findColByNode(dstLabel);
     table.value(1, dstIndex, newDist)
     table.value(2, dstIndex, srcLabel)
   }
+
+  
 
   /**
    * Event handler:
@@ -882,7 +895,7 @@
         });
     }
 
-    updateTable(srcLabel, dstLabel, newDist);
+    updateStudentTable(srcLabel, dstLabel, newDist);
     insertMinheap(srcLabel, dstLabel, newDist);
     debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
       dstLabel + " distance " + newDist);
@@ -919,7 +932,7 @@
       return;
     }
 
-    updateTable(srcLabel, dstLabel, newDist);
+    updateStudentTable(srcLabel, dstLabel, newDist);
     // Add class to the new edge
     event.data.edge.addClass("fringe")
     // remove class from the old edge
@@ -1058,7 +1071,7 @@
                  interpret("at_distance") + newDist + "</p>" + 
                  "<button type='button' id='enqueueButton'>" +
                  interpret("#enqueue") + "</button>&emsp;" +
-                 "<button type='button id='updateButton'>" +
+                 "<button type='button' id='updateButton'>" +
                  interpret("#update") + "</button>";
 
     const popup = JSAV.utils.dialog(html, options);
