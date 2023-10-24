@@ -307,6 +307,25 @@
     table.value(2, dstIndex, srcLabel)
   }
 
+  /**
+   * Modifies the style of table in student's solution.
+   * 
+   * @param {string} dstLabel Label of destination node
+   * @param {string} cssClass Name of CSS class
+   * @param {boolean} setClass If true, set class, otherwise remove it.
+   */
+  function modifyStyleOfStudentTable(dstLabel, cssClass, setClass) {
+    const row = findColByNode(dstLabel); // Do for all rows
+    for (let col = 0; col < 3; col++) {
+      if (setClass) {
+        table.addClass(col, row, cssClass)
+      }
+      else {
+        table.removeClass(col, row, cssClass)
+      }
+    }
+  }
+
   /************************************************************
    * Event handlers
    ************************************************************/
@@ -345,6 +364,7 @@
     }
 
     updateStudentTable(srcLabel, dstLabel, newDist);
+    modifyStyleOfStudentTable(dstLabel, "fringe", true);
     insertMinheap(srcLabel, dstLabel, newDist);
     debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
       dstLabel + " distance " + newDist);
@@ -382,6 +402,7 @@
     }
 
     updateStudentTable(srcLabel, dstLabel, newDist);
+
     // Add class to the new edge
     event.data.edge.addClass("fringe")
     // remove class from the old edge
@@ -396,7 +417,11 @@
     const oldEdge = graph.getEdge(oldNode, dstNode)
               ?? graph.getEdge(dstNode, oldNode);
     // Remove the queued class.
-    oldEdge.removeClass("fringe")
+    oldEdge.removeClass("fringe");
+
+    // Note: the coloring of the distance table does not need updating,
+    // because we just change the parent of a fringe node.
+
     if (window.JSAVrecorder) {
       window.JSAVrecorder.appendAnimationEventFields(
         {
@@ -445,6 +470,10 @@
         node.element[0].getAttribute("data-value") === srcLabel)[0];
     const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
     edge.removeClass("fringe");
+
+    modifyStyleOfStudentTable(nodeLabel, "fringe", false);
+    modifyStyleOfStudentTable(nodeLabel, "spanning", true);
+
     if (window.JSAVrecorder) {
       window.JSAVrecorder.appendAnimationEventFields(
         {
@@ -1437,3 +1466,4 @@
   }
 
 }(jQuery));
+
