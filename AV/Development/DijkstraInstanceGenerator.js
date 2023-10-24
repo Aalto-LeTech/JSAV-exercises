@@ -2,6 +2,8 @@
    * Scaffolded Dijkstra's algorithm exercise
    *
    * Preconfigured template for research
+   * 
+   * artturi.tilantera@aalto.fi
    */
 
   class DijkstraInstanceGenerator {
