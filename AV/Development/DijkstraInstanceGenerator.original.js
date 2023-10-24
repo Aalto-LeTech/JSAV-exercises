@@ -3,6 +3,10 @@
    *
    * Preconfigured template for research
    * 
+   * Uglifying:
+   * 1. uglifyjs DijkstraInstanceGenerator.js -m -o DijkstraInstanceGenerator-ugly.js
+   * 2. Manually replace method names (excluding generateInstance)
+   * 
    * artturi.tilantera@aalto.fi
    */
 
