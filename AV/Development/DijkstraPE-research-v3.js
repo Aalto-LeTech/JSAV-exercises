@@ -238,6 +238,402 @@
     }
   }
 
+  /**
+   * 1. Marks an edge as dequeued in the visualization (both student's and
+   *    model solutions).
+   * 2. Adds a dequeue operation into the operation sequence of either
+   *    student's or model solution. 
+   * @param {JSAV edge} edge  
+   * @param {*} av a JSAV algorithm visualization template.
+   *               If defined, mark an edge in the model solution.
+   *               If undefined, mark an edge in the student's solution.
+   */
+  function markEdge(edge, av) {
+    edge.addClass("spanning");
+    for (const node of [edge.startnode, edge.endnode]) {
+      node.removeClass("fringe");
+    }
+    edge.start().addClass("spanning");
+    edge.end().addClass("spanning");
+    storePqOperationStep('deq', edge, av);
+  }
+
+  /**
+   * 1. Stores a priority queue operation related to an edge into either the
+   *    student's or model solution's PqOperationSequence.
+   * 2. Generates a gradeable step in the JSAV representation.
+   * @param {*} operation: one of: {'enq', 'deq', 'upd'}
+   * @param {JSAVedge} av a JSAV algorithm visualization template.
+   *               If this is undefined, mark an edge in the model solution.
+   * @param {*} av a JSAV algorithm visualization template.
+   *               If defined, store the operation for the model solution.
+   *               Otherwise store the operation for the student's solution.
+   */
+  function storePqOperationStep(operation, edge, av) {
+    const v1 = edge.start().value();
+    const v2 = edge.end().value();
+    const pqOperation = new PqOperation(operation, v1 + v2);
+    if (av) {
+      // Tell JSAV that this is a gradeable step just to:
+      // (i) generate a step in the model solution;
+      // (ii) make JSAV Exercise Recorder to record this step.
+      av.gradeableStep();
+      // Add the operation to the priority queue operation sequence for
+      // custom grading.
+      modelPqOperations.push(pqOperation);
+      debugPrint('modelPqOperations: ' + modelPqOperations.toString());
+    }
+    else {
+      // Similar block but for student's solution
+      exercise.gradeableStep();
+      studentPqOperations.push(pqOperation);
+      debugPrint('studentPqOperations: ' + studentPqOperations.toString());
+    }
+  }
+
+  /*
+  * Artturi's debug print, because inspecting JSAV data structures in a
+  * JavaScript debugger is a pain (too complex).
+  *
+  * Parameters:
+  *
+  * distances: a JSAV Matrix containing the following columns:
+  *              label of node, distance, previous node.
+  *
+  * debugPrint()s the distance matrix values.
+  */
+  function logDistanceMatrix(distances) {
+    debugPrint("Distance matrix");
+    debugPrint("Label distance previous unused");
+    for (let i = 0; i < distances._arrays.length; i++) {
+      let row = [...distances._arrays[i]._values];
+      row.push(distances.hasClass(i, true, "unused"))
+      debugPrint(row.join("  "));
+    }
+  }
+
+  // Process About button: Pop up a message with an Alert
+  function about() {
+    window.alert(ODSA.AV.aboutstring(interpret(".avTitle"), interpret("av_Authors")));
+  }
+
+  function findColByNode (nodeLabel) {
+    for (var i = 1; i < 25; i++) {
+      if (nodeLabel === table.value(0, i)) {
+        return i;
+      }
+    }
+  }
+
+  /**
+   * Checks whether the node is in the spanning tree.
+   * 
+   * @param node node to be checked
+   * @returns true when node contains class 'spanning', else false
+   */
+  function inSpanningTree (node) {
+    return node.hasClass("spanning");
+  }
+
+
+  /**
+   * Preorder traversal to get node list of the tree
+   * Since there is no function for this in the JSAV library
+   * @param node the root node to start the traversal at
+   * @param arr array to store the nodes in. Optional parameterl
+   * an empty array is initialised if none is supplied.
+   * @returns an array containing the nodes of the tree.
+   */
+  function getTreeNodeList (node, arr) {
+    var nodeArr = arr || [];
+
+    if (node) {
+      nodeArr.push(node);
+      nodeArr = getTreeNodeList(node.left(), nodeArr);
+      nodeArr = getTreeNodeList(node.right(), nodeArr);
+    }
+    return nodeArr;
+  }
+
+
+  /**
+   * Calculate the new distance for the node. This is the source distance
+   * if there's none yet, otherwise it's the distance from the source node
+   * to A plus the pathweight from src node to dst node.
+   * @param srcLabel the source node's label
+   * @param pathWeight the weight of the path between source and destination
+   * @returns the new pathWeight
+   */
+  function getUpdatedDistance (srcLabel, pathWeight) {
+    const srcIndex = findColByNode(srcLabel);
+    const srcDist = Number(table.value(1, srcIndex))
+    return isNaN(srcDist) ? pathWeight : (pathWeight + srcDist)
+  }
+
+  /**
+   * Update the table: dstLabel's distance is set to newDist,
+   * with parent set to srcLabel
+   * @param srcLabel
+   * @param dstLabel
+   * @param newDist
+   */
+  function updateStudentTable (srcLabel, dstLabel, newDist) {
+    const dstIndex = findColByNode(dstLabel);
+    table.value(1, dstIndex, newDist)
+    table.value(2, dstIndex, srcLabel)
+  }
+
+  
+
+  /**
+   * Event handler:
+   * Add a node to the priority queue with label dstLabel and distance newDist.
+   * Update the table to indicate the distance newDist and parent srcLabel.
+   * @param event click event, which has the parameters srcLabel, dstLabel,
+   * newDist and popup.
+   * @param srcLabel the source node label
+   * @param dstLabel the destination node label
+   * @param newDist the new distance from A to destination
+   * @param popup the popup window, used to close the window before returning.
+   */
+  function enqueueClicked (event) {
+    const srcLabel = event.data.srcLabel;
+    const dstLabel = event.data.dstLabel;
+    const newDist = event.data.newDist;
+    const popup = event.data.popup;
+    const edge = event.data.edge;
+    debugPrint(edge)
+    edge.addClass("fringe");
+    for (const node of [edge.startnode, edge.endnode]) {
+      if (!inSpanningTree(node)) {
+        node.addClass("fringe");
+      }
+    }
+    
+    if (window.JSAVrecorder) {
+      window.JSAVrecorder.appendAnimationEventFields(
+        {
+          "pqOperation": "enqueue",
+          "pqIn": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
+        });
+    }
+
+    updateStudentTable(srcLabel, dstLabel, newDist);
+    insertMinheap(srcLabel, dstLabel, newDist);
+    debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
+      dstLabel + " distance " + newDist);
+    storePqOperationStep('enq', edge);
+    popup.close();
+  }
+
+  /**
+   * Event handler:
+   * Update the first instance of the node with label dstLabel. The updated
+   * node is moved up or down the tree as needed.
+   * @param event click event, which has the parameters srcLabel, dstLabel,
+   * newDist and popup.
+   * @param srcLabel the source node label
+   * @param dstLabel the destination node label
+   * @param newDist the new distance from A to destination
+   * @param popup the popup window, used to close the window before returning.
+   */
+  function updateClicked (event) {
+    const srcLabel = event.data.srcLabel;
+    const dstLabel = event.data.dstLabel;
+    const newDist = event.data.newDist;
+    const popup = event.data.popup;
+
+    const nodeArr = getTreeNodeList(minheap.root());
+    // Grab first node with the correct destination.
+    const updatedNode = nodeArr.filter(node =>
+            node.value().charAt(node.value().length - 5) === dstLabel)[0];
+
+    // If no node with the correct label exists, do nothing.
+    if (!updatedNode) {
+      popup.close();
+      window.alert(interpret("av_update_not_possible"));
+      return;
+    }
+
+    updateStudentTable(srcLabel, dstLabel, newDist);
+    // Add class to the new edge
+    event.data.edge.addClass("fringe")
+    // remove class from the old edge
+    // Have old label, find previous source node label
+    const oldLabel = updatedNode.value();
+    const oldSrcLabel = oldLabel.charAt(oldLabel.length - 2);
+    // Find node objects to grab the egde
+    const oldNode = graph.nodes().filter(node =>
+        node.element[0].getAttribute("data-value") === oldSrcLabel)[0];
+    const dstNode = graph.nodes().filter(node =>
+        node.element[0].getAttribute("data-value") === dstLabel)[0];
+    const oldEdge = graph.getEdge(oldNode, dstNode)
+              ?? graph.getEdge(dstNode, oldNode);
+    // Remove the queued class.
+    oldEdge.removeClass("fringe")
+    if (window.JSAVrecorder) {
+      window.JSAVrecorder.appendAnimationEventFields(
+        {
+          "pqOperation": "update",
+          "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge, "Edge"),
+          "pqOut": window.JSAVrecorder.jsavObjectToJaalID(oldEdge, "Edge")
+        });
+    }
+    const oldDist = oldLabel.match(/\d+/)[0];
+    const label = newDist + "<br>" + dstLabel + " (" + srcLabel + ")";
+    updatedNode.value(label);
+
+    if (newDist > oldDist) {
+      minHeapify(updatedNode)
+    } else {
+      var node = updatedNode;
+      while (node != minheap.root() &&
+             extractDistance(node) < extractDistance(node.parent())) {
+        const temp = node.parent().value();
+        node.parent().value(node.value());
+        node.value(temp);
+        node = node.parent();
+      }
+    }
+    debugPrint("Exercise gradeable step: update edge " + srcLabel + "-" +
+      dstLabel + " distance " + newDist);
+    storePqOperationStep('upd', event.data.edge);
+    popup.close();
+  }
+
+  /**
+   * Event handler: Dequeue button click of the priority queue.
+   */
+  function dequeueClicked() {
+    const deleted = minheapDelete(0);
+    if (!deleted) {
+      return;
+    }
+    // Format of node label: "x<br>D (S)", where x is the distance,
+    // D is the destination node label and S is the source node label
+    const nodeLabel = deleted.charAt(deleted.length - 5);
+    const node = graph.nodes().filter(node =>
+        node.element[0].getAttribute("data-value") === nodeLabel)[0];
+    const srcLabel = deleted.charAt(deleted.length - 2);
+    const srcNode = graph.nodes().filter(node =>
+        node.element[0].getAttribute("data-value") === srcLabel)[0];
+    const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
+    edge.removeClass("fringe");
+    if (window.JSAVrecorder) {
+      window.JSAVrecorder.appendAnimationEventFields(
+        {
+          "pqOperation": "dequeue",
+          "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
+        });
+    }
+    // Give the last removed node a wider border (2px instead of 1) to 
+    // emphasize that this is the last removed node.
+    if (focusedNodes.length > 0) {
+      focusedNodes[focusedNodes.length - 1].removeClass("focusnode");
+    }      
+    node.addClass("focusnode");
+    focusedNodes.push(node);
+    
+    // Debug print focusedNodes
+    let s = "focusedNodes:";
+    for (const x of focusedNodes) {
+      s += ' ' + x.value();
+    }
+    debugPrint(s);
+
+    minheap.layout();
+    // Call markEdge last, because it will also store the JSAV animation step
+    if (!edge.hasClass("spanning")) {
+      markEdge(edge);
+    }
+  }
+
+  /**
+   * The edge click listener creates a JSAV pop-up whenever an edge is
+   * clicked. The pop-up has two buttons: enqueue and update.
+   * Enqueue adds a node to the priority queue
+   * Update updates the value of a node in the priority queue.
+   * The edge click listener determines which edge is clicked,
+   * what the nodes on either end are, which one is to be updated
+   * into the queue and what the distance from A is. After that,
+   * the two buttons are created in the pop-up, and the corresponding
+   * event handlers attached.
+   */
+  function edgeClicked () {
+    const edge = $(this).data("edge");
+    const that = $(this);
+    const node1id = that[0].getAttribute("data-startnode");
+    const node2id = that[0].getAttribute("data-endnode");
+    const node1 = $("#" + node1id).data("node");
+    const node2 = $("#" + node2id).data("node");
+
+    const src =  inSpanningTree(node1) ? node1 : node2;
+    const dst = (src === node1) ? node2 : node1;
+    if (!src || !dst) {
+      console.warn("Either start or end is not defined. Start: ",
+                   src, "\tEnd:", dst);
+      return
+    }
+    const srcLabel = src.element[0].getAttribute("data-value");
+    const dstLabel = dst.element[0].getAttribute("data-value");
+    const pathWeight = edge._weight;
+    const newDist = getUpdatedDistance(srcLabel, pathWeight);
+    const label = dstLabel + interpret("at_distance") + newDist;
+
+    // Edge is listed in alphabetical order, regardless of which
+    // node is listed as the src or dst in JSAV.
+    const options = {
+      "title": interpret("edge") + " " + ((srcLabel < dstLabel)
+                                          ? (srcLabel + dstLabel)
+                                          : (dstLabel + srcLabel)),
+      "width": "200px",
+      "dialongRootElement": $(this)
+    }
+
+    const html = "<p>" + interpret("node") + ' ' + dstLabel +
+                 interpret("at_distance") + newDist + "</p>" + 
+                 "<button type='button' id='enqueueButton'>" +
+                 interpret("#enqueue") + "</button>&emsp;" +
+                 "<button type='button' id='updateButton'>" +
+                 interpret("#update") + "</button>";
+
+    const popup = JSAV.utils.dialog(html, options);
+
+    // Enqueue and update button event handlers
+    $("#enqueueButton").click({srcLabel, dstLabel, newDist, popup, edge},
+                              enqueueClicked);
+    $("#updateButton").click({srcLabel, dstLabel, newDist, popup, edge},
+                              updateClicked);
+  }
+
+  /**
+   * Edge click listeners are bound to the graph itself,
+   * so each time the graph is destroyed with reset, it needs
+   * to be added again. Therefore they are in a wrapper function.
+   */
+  function addEdgeClickListeners() {
+    $(".jsavgraph").on("click", ".jsavedge", edgeClicked);
+  }
+
+  $(".jsavcontainer").on("click", ".jsavnode", function () {
+    window.alert(interpret("av_please_click_edges"));
+  });
+
+  /**
+   * Shift down the binary tree and matrix to account for the extra space
+   * taken by the "credit not given for this instance" that is shown after
+   * the model answer has been opened.
+   */
+  $("input[name='answer']").on("click", function () {
+    debugPrint("Answer button clicked");
+    $(".jsavbinarytree").css("margin-top", "34px");
+    $(".jsavmatrix").css("margin-top", "34px");
+    $(".jsavcanvas").css("min-height", "910px");
+    $(".jsavmodelanswer .jsavcanvas").css("min-height", "770px");
+  })
+
+  $("#about").click(about);
+
   /*
    * Creates the model solution of the exercise.
    * Note: this function is called by the JSAV library.
@@ -334,59 +730,6 @@
     modeljsav.step();
 
     return [modelGraph, mintree];
-  }
-
-  /**
-   * 1. Marks an edge as dequeued in the visualization (both student's and
-   *    model solutions).
-   * 2. Adds a dequeue operation into the operation sequence of either
-   *    student's or model solution. 
-   * @param {JSAV edge} edge  
-   * @param {*} av a JSAV algorithm visualization template.
-   *               If defined, mark an edge in the model solution.
-   *               If undefined, mark an edge in the student's solution.
-   */
-  function markEdge(edge, av) {
-    edge.addClass("spanning");
-    for (const node of [edge.startnode, edge.endnode]) {
-      node.removeClass("fringe");
-    }
-    edge.start().addClass("spanning");
-    edge.end().addClass("spanning");
-    storePqOperationStep('deq', edge, av);
-  }
-
-  /**
-   * 1. Stores a priority queue operation related to an edge into either the
-   *    student's or model solution's PqOperationSequence.
-   * 2. Generates a gradeable step in the JSAV representation.
-   * @param {*} operation: one of: {'enq', 'deq', 'upd'}
-   * @param {JSAVedge} av a JSAV algorithm visualization template.
-   *               If this is undefined, mark an edge in the model solution.
-   * @param {*} av a JSAV algorithm visualization template.
-   *               If defined, store the operation for the model solution.
-   *               Otherwise store the operation for the student's solution.
-   */
-  function storePqOperationStep(operation, edge, av) {
-    const v1 = edge.start().value();
-    const v2 = edge.end().value();
-    const pqOperation = new PqOperation(operation, v1 + v2);
-    if (av) {
-      // Tell JSAV that this is a gradeable step just to:
-      // (i) generate a step in the model solution;
-      // (ii) make JSAV Exercise Recorder to record this step.
-      av.gradeableStep();
-      // Add the operation to the priority queue operation sequence for
-      // custom grading.
-      modelPqOperations.push(pqOperation);
-      debugPrint('modelPqOperations: ' + modelPqOperations.toString());
-    }
-    else {
-      // Similar block but for student's solution
-      exercise.gradeableStep();
-      studentPqOperations.push(pqOperation);
-      debugPrint('studentPqOperations: ' + studentPqOperations.toString());
-    }
   }
 
   /*
@@ -766,350 +1109,6 @@
      * End of function dijkstra() and its inner functions 
      *****************************************************/
   }
-
-
-  /*
-  * Artturi's debug print, because inspecting JSAV data structures in a
-  * JavaScript debugger is a pain (too complex).
-  *
-  * Parameters:
-  *
-  * distances: a JSAV Matrix containing the following columns:
-  *              label of node, distance, previous node.
-  *
-  * debugPrint()s the distance matrix values.
-  */
-  function logDistanceMatrix(distances) {
-    debugPrint("Distance matrix");
-    debugPrint("Label distance previous unused");
-    for (let i = 0; i < distances._arrays.length; i++) {
-      let row = [...distances._arrays[i]._values];
-      row.push(distances.hasClass(i, true, "unused"))
-      debugPrint(row.join("  "));
-    }
-  }
-
-  // Process About button: Pop up a message with an Alert
-  function about() {
-    window.alert(ODSA.AV.aboutstring(interpret(".avTitle"), interpret("av_Authors")));
-  }
-
-  function findColByNode (nodeLabel) {
-    for (var i = 1; i < 25; i++) {
-      if (nodeLabel === table.value(0, i)) {
-        return i;
-      }
-    }
-  }
-
-  /**
-   * Checks whether the node is in the spanning tree.
-   * 
-   * @param node node to be checked
-   * @returns true when node contains class 'spanning', else false
-   */
-  function inSpanningTree (node) {
-    return node.hasClass("spanning");
-  }
-
-
-  /**
-   * Preorder traversal to get node list of the tree
-   * Since there is no function for this in the JSAV library
-   * @param node the root node to start the traversal at
-   * @param arr array to store the nodes in. Optional parameterl
-   * an empty array is initialised if none is supplied.
-   * @returns an array containing the nodes of the tree.
-   */
-  function getTreeNodeList (node, arr) {
-    var nodeArr = arr || [];
-
-    if (node) {
-      nodeArr.push(node);
-      nodeArr = getTreeNodeList(node.left(), nodeArr);
-      nodeArr = getTreeNodeList(node.right(), nodeArr);
-    }
-    return nodeArr;
-  }
-
-
-  /**
-   * Calculate the new distance for the node. This is the source distance
-   * if there's none yet, otherwise it's the distance from the source node
-   * to A plus the pathweight from src node to dst node.
-   * @param srcLabel the source node's label
-   * @param pathWeight the weight of the path between source and destination
-   * @returns the new pathWeight
-   */
-  function getUpdatedDistance (srcLabel, pathWeight) {
-    const srcIndex = findColByNode(srcLabel);
-    const srcDist = Number(table.value(1, srcIndex))
-    return isNaN(srcDist) ? pathWeight : (pathWeight + srcDist)
-  }
-
-  /**
-   * Update the table: dstLabel's distance is set to newDist,
-   * with parent set to srcLabel
-   * @param srcLabel
-   * @param dstLabel
-   * @param newDist
-   */
-  function updateStudentTable (srcLabel, dstLabel, newDist) {
-    const dstIndex = findColByNode(dstLabel);
-    table.value(1, dstIndex, newDist)
-    table.value(2, dstIndex, srcLabel)
-  }
-
-  
-
-  /**
-   * Event handler:
-   * Add a node to the priority queue with label dstLabel and distance newDist.
-   * Update the table to indicate the distance newDist and parent srcLabel.
-   * @param event click event, which has the parameters srcLabel, dstLabel,
-   * newDist and popup.
-   * @param srcLabel the source node label
-   * @param dstLabel the destination node label
-   * @param newDist the new distance from A to destination
-   * @param popup the popup window, used to close the window before returning.
-   */
-  function enqueueClicked (event) {
-    const srcLabel = event.data.srcLabel;
-    const dstLabel = event.data.dstLabel;
-    const newDist = event.data.newDist;
-    const popup = event.data.popup;
-    const edge = event.data.edge;
-    debugPrint(edge)
-    edge.addClass("fringe");
-    for (const node of [edge.startnode, edge.endnode]) {
-      if (!inSpanningTree(node)) {
-        node.addClass("fringe");
-      }
-    }
-    
-    if (window.JSAVrecorder) {
-      window.JSAVrecorder.appendAnimationEventFields(
-        {
-          "pqOperation": "enqueue",
-          "pqIn": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
-        });
-    }
-
-    updateStudentTable(srcLabel, dstLabel, newDist);
-    insertMinheap(srcLabel, dstLabel, newDist);
-    debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
-      dstLabel + " distance " + newDist);
-    storePqOperationStep('enq', edge);
-    popup.close();
-  }
-
-  /**
-   * Event handler:
-   * Update the first instance of the node with label dstLabel. The updated
-   * node is moved up or down the tree as needed.
-   * @param event click event, which has the parameters srcLabel, dstLabel,
-   * newDist and popup.
-   * @param srcLabel the source node label
-   * @param dstLabel the destination node label
-   * @param newDist the new distance from A to destination
-   * @param popup the popup window, used to close the window before returning.
-   */
-  function updateClicked (event) {
-    const srcLabel = event.data.srcLabel;
-    const dstLabel = event.data.dstLabel;
-    const newDist = event.data.newDist;
-    const popup = event.data.popup;
-
-    const nodeArr = getTreeNodeList(minheap.root());
-    // Grab first node with the correct destination.
-    const updatedNode = nodeArr.filter(node =>
-            node.value().charAt(node.value().length - 5) === dstLabel)[0];
-
-    // If no node with the correct label exists, do nothing.
-    if (!updatedNode) {
-      popup.close();
-      window.alert(interpret("av_update_not_possible"));
-      return;
-    }
-
-    updateStudentTable(srcLabel, dstLabel, newDist);
-    // Add class to the new edge
-    event.data.edge.addClass("fringe")
-    // remove class from the old edge
-    // Have old label, find previous source node label
-    const oldLabel = updatedNode.value();
-    const oldSrcLabel = oldLabel.charAt(oldLabel.length - 2);
-    // Find node objects to grab the egde
-    const oldNode = graph.nodes().filter(node =>
-        node.element[0].getAttribute("data-value") === oldSrcLabel)[0];
-    const dstNode = graph.nodes().filter(node =>
-        node.element[0].getAttribute("data-value") === dstLabel)[0];
-    const oldEdge = graph.getEdge(oldNode, dstNode)
-              ?? graph.getEdge(dstNode, oldNode);
-    // Remove the queued class.
-    oldEdge.removeClass("fringe")
-    if (window.JSAVrecorder) {
-      window.JSAVrecorder.appendAnimationEventFields(
-        {
-          "pqOperation": "update",
-          "pqIn": window.JSAVrecorder.jsavObjectToJaalID(event.data.edge, "Edge"),
-          "pqOut": window.JSAVrecorder.jsavObjectToJaalID(oldEdge, "Edge")
-        });
-    }
-    const oldDist = oldLabel.match(/\d+/)[0];
-    const label = newDist + "<br>" + dstLabel + " (" + srcLabel + ")";
-    updatedNode.value(label);
-
-    if (newDist > oldDist) {
-      minHeapify(updatedNode)
-    } else {
-      var node = updatedNode;
-      while (node != minheap.root() &&
-             extractDistance(node) < extractDistance(node.parent())) {
-        const temp = node.parent().value();
-        node.parent().value(node.value());
-        node.value(temp);
-        node = node.parent();
-      }
-    }
-    debugPrint("Exercise gradeable step: update edge " + srcLabel + "-" +
-      dstLabel + " distance " + newDist);
-    storePqOperationStep('upd', event.data.edge);
-    popup.close();
-  }
-
-  /**
-   * Event handler: Dequeue button click of the priority queue.
-   */
-  function dequeueClicked() {
-    const deleted = minheapDelete(0);
-    if (!deleted) {
-      return;
-    }
-    // Format of node label: "x<br>D (S)", where x is the distance,
-    // D is the destination node label and S is the source node label
-    const nodeLabel = deleted.charAt(deleted.length - 5);
-    const node = graph.nodes().filter(node =>
-        node.element[0].getAttribute("data-value") === nodeLabel)[0];
-    const srcLabel = deleted.charAt(deleted.length - 2);
-    const srcNode = graph.nodes().filter(node =>
-        node.element[0].getAttribute("data-value") === srcLabel)[0];
-    const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
-    edge.removeClass("fringe");
-    if (window.JSAVrecorder) {
-      window.JSAVrecorder.appendAnimationEventFields(
-        {
-          "pqOperation": "dequeue",
-          "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
-        });
-    }
-    // Give the last removed node a wider border (2px instead of 1) to 
-    // emphasize that this is the last removed node.
-    if (focusedNodes.length > 0) {
-      focusedNodes[focusedNodes.length - 1].removeClass("focusnode");
-    }      
-    node.addClass("focusnode");
-    focusedNodes.push(node);
-    
-    // Debug print focusedNodes
-    let s = "focusedNodes:";
-    for (const x of focusedNodes) {
-      s += ' ' + x.value();
-    }
-    debugPrint(s);
-
-    minheap.layout();
-    // Call markEdge last, because it will also store the JSAV animation step
-    if (!edge.hasClass("spanning")) {
-      markEdge(edge);
-    }
-  }
-
-  /**
-   * The edge click listener creates a JSAV pop-up whenever an edge is
-   * clicked. The pop-up has two buttons: enqueue and update.
-   * Enqueue adds a node to the priority queue
-   * Update updates the value of a node in the priority queue.
-   * The edge click listener determines which edge is clicked,
-   * what the nodes on either end are, which one is to be updated
-   * into the queue and what the distance from A is. After that,
-   * the two buttons are created in the pop-up, and the corresponding
-   * event handlers attached.
-   */
-  function edgeClicked () {
-    const edge = $(this).data("edge");
-    const that = $(this);
-    const node1id = that[0].getAttribute("data-startnode");
-    const node2id = that[0].getAttribute("data-endnode");
-    const node1 = $("#" + node1id).data("node");
-    const node2 = $("#" + node2id).data("node");
-
-    const src =  inSpanningTree(node1) ? node1 : node2;
-    const dst = (src === node1) ? node2 : node1;
-    if (!src || !dst) {
-      console.warn("Either start or end is not defined. Start: ",
-                   src, "\tEnd:", dst);
-      return
-    }
-    const srcLabel = src.element[0].getAttribute("data-value");
-    const dstLabel = dst.element[0].getAttribute("data-value");
-    const pathWeight = edge._weight;
-    const newDist = getUpdatedDistance(srcLabel, pathWeight);
-    const label = dstLabel + interpret("at_distance") + newDist;
-
-    // Edge is listed in alphabetical order, regardless of which
-    // node is listed as the src or dst in JSAV.
-    const options = {
-      "title": interpret("edge") + " " + ((srcLabel < dstLabel)
-                                          ? (srcLabel + dstLabel)
-                                          : (dstLabel + srcLabel)),
-      "width": "200px",
-      "dialongRootElement": $(this)
-    }
-
-    const html = "<p>" + interpret("node") + ' ' + dstLabel +
-                 interpret("at_distance") + newDist + "</p>" + 
-                 "<button type='button' id='enqueueButton'>" +
-                 interpret("#enqueue") + "</button>&emsp;" +
-                 "<button type='button' id='updateButton'>" +
-                 interpret("#update") + "</button>";
-
-    const popup = JSAV.utils.dialog(html, options);
-
-    // Enqueue and update button event handlers
-    $("#enqueueButton").click({srcLabel, dstLabel, newDist, popup, edge},
-                              enqueueClicked);
-    $("#updateButton").click({srcLabel, dstLabel, newDist, popup, edge},
-                              updateClicked);
-  }
-
-  /**
-   * Edge click listeners are bound to the graph itself,
-   * so each time the graph is destroyed with reset, it needs
-   * to be added again. Therefore they are in a wrapper function.
-   */
-  function addEdgeClickListeners() {
-    $(".jsavgraph").on("click", ".jsavedge", edgeClicked);
-  }
-
-  $(".jsavcontainer").on("click", ".jsavnode", function () {
-    window.alert(interpret("av_please_click_edges"));
-  });
-
-  /**
-   * Shift down the binary tree and matrix to account for the extra space
-   * taken by the "credit not given for this instance" that is shown after
-   * the model answer has been opened.
-   */
-  $("input[name='answer']").on("click", function () {
-    debugPrint("Answer button clicked");
-    $(".jsavbinarytree").css("margin-top", "34px");
-    $(".jsavmatrix").css("margin-top", "34px");
-    $(".jsavcanvas").css("min-height", "910px");
-    $(".jsavmodelanswer .jsavcanvas").css("min-height", "770px");
-  })
-
-  $("#about").click(about);
 
   /*
    * Preconfigured template for research
