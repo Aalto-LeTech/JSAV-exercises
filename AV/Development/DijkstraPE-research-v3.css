@@ -56,7 +56,7 @@
 
 /* Comparison operation in the model answer, used for
  * .jsavnode, .jsavindex, and span.compare in the narration text. */
-.compare, .jsavgraph .jsavnode.compare {
+.compare, .jsavgraph .jsavnode.compare, .jsavmatrix .jsavnode.compare {
   background-color: #4ebd44;
 }
 span.compare {
