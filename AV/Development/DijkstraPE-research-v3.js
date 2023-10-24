@@ -74,6 +74,11 @@
 
   exercise.reset();
 
+  /************************************************************
+   * Exercise only functions
+   * (not used in the model answer)
+   ************************************************************/
+
   /*
    * Exercise initializer function.
    * This function is called every time the Reset button is clicked.
@@ -128,256 +133,102 @@
     return [graph, minheap];
   }
 
-  /*
-   * Copies edge and vertex data from a research instance graph into a JSAV
-   * graph.
-   *
-   * Parameters:
-   * riGraph: a research instance graph returned from
-   *          DijkstraInstanceGenerator.generateInstance().
-   * jsavGraph: a JSAV graph object.
-   * layoutSettings: Graph layout settings. The JSAV exercise uses this first
-   *                 to create a JSAV graph instance. The same settings are
-   *                 used here to communicate the pixel width and height of
-   *                 the graph layout.
-   *   layoutSettings = {
-   *     width: 500,       // pixels
-   *     height: 400,      // pixels
-   *     layout: "manual", // only for JSAV
-   *     directed: false   // only for JSAV
-   *   }
-   */
-  function researchInstanceToJsav(riGraph, jsavGraph, layoutSettings) {
-    // Compute coordinates of the vertices in the JSAV exercise
-    const gridStepX = Math.floor(layoutSettings.width / 6);
-    const gridStepY = Math.floor(layoutSettings.height / 4);
-    function rnd(x) {
-      // Returns a random integer between -x and x (both inclusive)
-      return Math.floor(JSAV.utils.rand.random() * (2 * x + 1)) //- x;
-    }
-
-    let vertexCoordinates = [];
-    for (let y = 0; y < 4; y++) {
-      for (let x = 0; x < 6; x++) {
-        vertexCoordinates.push({
-          left: Math.floor(x * gridStepX + rnd(10)),
-          top: Math.floor(y * gridStepY + rnd(10))
-        });
-      }
-    }
-    // Add the vertices as JSAV objects
-    for (let i = 0; i < riGraph.edges.length; i++) {
-      let label = riGraph.vertexLabels[i];
-      jsavGraph.addNode(riGraph.vertexLabels[i], vertexCoordinates[i]);
-    }
-    // Add the edges as JSAV objects
-    const gNodes  = jsavGraph.nodes();
-    let options = {};
-    for (let i = 0; i < riGraph.edges.length; i++) {
-      for (let e of riGraph.edges[i]) {
-        // i is the index of start node
-        // e[0] is the index of end node
-        // e[1] is the weight
-        options.weight = e[1];
-        jsavGraph.addEdge(gNodes[i], gNodes[e[0]], options);
-      }
-    }      
-  }
-
-  /**
-   * Custom grading function for the exercise.
-   */
-  function scaffoldedGrader() {
-    debugPrint('scaffoldedGrader():\n' +
-      'student: ' + studentPqOperations.toString() + '\n' +
-      'model  : ' + modelPqOperations.toString());
-    let grade = studentPqOperations.gradeAgainst(modelPqOperations);
-
-    let score = {
-      // Number of correct steps in student's solution
-      correct: grade.studentGrade,
-      // Continuous grading mode not used, therefore `fix` is zero
-      fix: 0,
-      // Number of total steps in student's solution
-      student: studentPqOperations.length(),
-      // Number of total steps in model solution
-      total: grade.maxGrade,
-      // Continuous grading mode not used, therefore `undo` is zero
-      undo: 0
-    }
-    this.score = score;
-  }
-
-  /**
-   * Custom undo function for the exercise.
-   * This is complementary to the function scaffoldedGrader().
-   */
-  function scaffoldedUndo() {
-    // Modified from original JSAV undo function; source:
-    // https://github.com/vkaravir/JSAV/blob/master/src/exercise.js#L402-L420
-    var oldFx = $.fx.off || false;
-    $.fx.off = true;
-    // undo last step
-    this.jsav.backward(); // the empty new step
-    this.jsav.backward(); // the new graded step
-    // Undo until the previous graded step.
-    // Note: difference to original JSAV undo function: we know that all
-    // student's steps are gradable in this exercise.
-    // (Frankly, this if-else block might be related to the continuous
-    // grading mode of other JSAV exercises and thus irrelevant with this
-    // exercise, but let's keep it just in case it makes JSAV do some magic at
-    // the background. ;)
-    if (this.jsav.backward()) {
-      // if such step was found, redo it
-      this.jsav.forward();
-      this.jsav.step({updateRelative: false});
-    } else {
-      // ..if not, the first student step was incorrent and we can rewind
-      // to beginning
-      this.jsav.begin();
-    }
-    this.jsav._redo = [];
-    $.fx.off = oldFx;
-    // End of modified JSAV undo code
-
-    const undoneOperation = studentPqOperations.undo();
-    debugPrint('studentPqOperations: ' + studentPqOperations.toString());
-    
-    if (undoneOperation && undoneOperation.operation === 'deq') {
-      // Remove the recently dequeued node from focusedNodes so that when the
-      // student performs the next dequeue operation, the correct graph node
-      // will lose its "focusedNode" CSS class.
-      focusedNodes.pop();
-      // Note: JSAV remembers all student's previous steps, including which
-      // node had the CSS class "focusnode" at each step. Therefore, we don't
-      // need to call .addClass("focusnode") for the previously focused node.
-      // Debug print focusedNodes
-      let s = "focusedNodes after an undo:";
-      for (const x of focusedNodes) {
-        s += ' ' + x.value();
-      }
-      debugPrint(s);
-    }
-    
-    
-  };
-
-  /**
-   * Custom reset function for this exercise.
-   * This is complementary to the function scaffoldedGrader().
-   */
-  function scaffoldedReset() {
-    exercise.protoReset();
-    studentPqOperations.clear();
-    modelPqOperations.clear();
-    focusedNodes = [];
-  }
-
-  /**
-   * From JSAV API: http://jsav.io/exercises/exercise/
-   *
-   * "A function that will fix the student’s solution to match the current step
-   * in model solution. Before this function is called, the previous incorrect
-   * step in student’s solution is undone. The function gets the model
-   * structures as a parameter."
-   *
-   * The exercise currently has fix button disabled.
-   */
-  function fixState(modelGraph) {
-    var graphEdges = graph.edges(),
-        modelEdges = modelGraph.edges();
-
-    // compare the edges between exercise and model
-    for (var i = 0; i < graphEdges.length; i++) {
-      var edge = graphEdges[i],
-          modelEdge = modelEdges[i];
-      if (modelEdge.hasClass("spanning") && !edge.hasClass("spanning")) {
-        // mark the edge that is marked in the model, but not in the exercise
-        markEdge(edge);
-        break;
-      }
-    }
-  }
-
-  /**
-   * 1. Marks an edge as dequeued in the visualization (both student's and
-   *    model solutions).
-   * 2. Adds a dequeue operation into the operation sequence of either
-   *    student's or model solution. 
-   * @param {JSAV edge} edge  
-   * @param {*} av a JSAV algorithm visualization template.
-   *               If defined, mark an edge in the model solution.
-   *               If undefined, mark an edge in the student's solution.
-   */
-  function markEdge(edge, av) {
-    edge.addClass("spanning");
-    for (const node of [edge.startnode, edge.endnode]) {
-      node.removeClass("fringe");
-    }
-    edge.start().addClass("spanning");
-    edge.end().addClass("spanning");
-    storePqOperationStep('deq', edge, av);
-  }
-
-  /**
-   * 1. Stores a priority queue operation related to an edge into either the
-   *    student's or model solution's PqOperationSequence.
-   * 2. Generates a gradeable step in the JSAV representation.
-   * @param {*} operation: one of: {'enq', 'deq', 'upd'}
-   * @param {JSAVedge} av a JSAV algorithm visualization template.
-   *               If this is undefined, mark an edge in the model solution.
-   * @param {*} av a JSAV algorithm visualization template.
-   *               If defined, store the operation for the model solution.
-   *               Otherwise store the operation for the student's solution.
-   */
-  function storePqOperationStep(operation, edge, av) {
-    const v1 = edge.start().value();
-    const v2 = edge.end().value();
-    const pqOperation = new PqOperation(operation, v1 + v2);
-    if (av) {
-      // Tell JSAV that this is a gradeable step just to:
-      // (i) generate a step in the model solution;
-      // (ii) make JSAV Exercise Recorder to record this step.
-      av.gradeableStep();
-      // Add the operation to the priority queue operation sequence for
-      // custom grading.
-      modelPqOperations.push(pqOperation);
-      debugPrint('modelPqOperations: ' + modelPqOperations.toString());
-    }
-    else {
-      // Similar block but for student's solution
-      exercise.gradeableStep();
-      studentPqOperations.push(pqOperation);
-      debugPrint('studentPqOperations: ' + studentPqOperations.toString());
-    }
-  }
-
-  /*
-  * Artturi's debug print, because inspecting JSAV data structures in a
-  * JavaScript debugger is a pain (too complex).
-  *
-  * Parameters:
-  *
-  * distances: a JSAV Matrix containing the following columns:
-  *              label of node, distance, previous node.
-  *
-  * debugPrint()s the distance matrix values.
-  */
-  function logDistanceMatrix(distances) {
-    debugPrint("Distance matrix");
-    debugPrint("Label distance previous unused");
-    for (let i = 0; i < distances._arrays.length; i++) {
-      let row = [...distances._arrays[i]._values];
-      row.push(distances.hasClass(i, true, "unused"))
-      debugPrint(row.join("  "));
-    }
-  }
-
   // Process About button: Pop up a message with an Alert
   function about() {
     window.alert(ODSA.AV.aboutstring(interpret(".avTitle"), interpret("av_Authors")));
   }
 
+  /**
+   * Edge click listeners are bound to the graph itself,
+   * so each time the graph is destroyed with reset, it needs
+   * to be added again. Therefore they are in a wrapper function.
+   */
+  function addEdgeClickListeners() {
+    $(".jsavgraph").on("click", ".jsavedge", edgeClicked);
+  }
+
+  $(".jsavcontainer").on("click", ".jsavnode", function () {
+    window.alert(interpret("av_please_click_edges"));
+  });
+
+  /**
+   * Shift down the binary tree and matrix to account for the extra space
+   * taken by the "credit not given for this instance" that is shown after
+   * the model answer has been opened.
+   */
+  $("input[name='answer']").on("click", function () {
+    debugPrint("Answer button clicked");
+    $(".jsavbinarytree").css("margin-top", "34px");
+    $(".jsavmatrix").css("margin-top", "34px");
+    $(".jsavcanvas").css("min-height", "910px");
+    $(".jsavmodelanswer .jsavcanvas").css("min-height", "770px");
+  })
+
+  $("#about").click(about);
+
+  /**
+   * Add the minheap to the student's JSAV instance.
+   *
+   * @param {int} x: position: pixels from left
+   * @param {int} y: position: pixels from top
+   */
+  function addMinheap(x, y) {
+    let previouslyExistingMinheap = false;
+    if (minheap) {
+      previouslyExistingMinheap = true;
+      minheap.clear();
+      $('.flexcontainer').remove();
+      $('#dequeueButton').remove();
+    }
+
+    $(".jsavcanvas").append("<div class='flexcontainer'></div>");
+    minheap = jsav.ds.binarytree({relativeTo: $(".flexcontainer"),
+      left: -180, top: 140});
+
+    if (!previouslyExistingMinheap) {
+      jsav.label(interpret("priority_queue"), {relativeTo: minheap,
+        top: -135});
+      }
+
+    // Add Dequeue button
+    const html = "<button type='button' id='dequeueButton'>" +
+    interpret("#dequeue") +"</button>";
+    $(".jsavtree").append(html);
+    $("#dequeueButton").click(dequeueClicked);
+    
+    heapsize = heapsize.value(0);
+
+    minheap.layout() 
+  }
+
+  /**
+   * Add the initial distance table to the JSAV.
+   * The table has distance for A as 0, '∞' for the rest
+   * Parent is '-' for all.
+   * @param riGraph the research instance graph.
+   */
+  function addTable (riGraph) {
+    if (table) {
+      table.clear()
+    }
+    const labelArr = [interpret("node"), ...(riGraph.vertexLabels.sort())];
+    const distanceArr = Array.from('∞'.repeat(riGraph.vertexLabels.length - 1));
+    distanceArr.unshift(interpret("distance"), 0);
+    const parentArr = Array.from('-'.repeat(riGraph.vertexLabels.length));
+    parentArr.unshift(interpret("parent"));
+    const width = String((riGraph.vertexLabels.length) * 30 + 100) + "px";
+    table = jsav.ds.matrix([labelArr, distanceArr, parentArr],
+                           {style: "table",
+                           width: width,
+                           left: 10,
+                           top: 780});
+  }
+
+  /**
+   * Finds the distance table column which has the given node label.
+   * @param {string} nodeLabel 
+   * @returns {number} index of the column, first = 1
+   */
   function findColByNode (nodeLabel) {
     for (var i = 1; i < 25; i++) {
       if (nodeLabel === table.value(0, i)) {
@@ -385,37 +236,6 @@
       }
     }
   }
-
-  /**
-   * Checks whether the node is in the spanning tree.
-   * 
-   * @param node node to be checked
-   * @returns true when node contains class 'spanning', else false
-   */
-  function inSpanningTree (node) {
-    return node.hasClass("spanning");
-  }
-
-
-  /**
-   * Preorder traversal to get node list of the tree
-   * Since there is no function for this in the JSAV library
-   * @param node the root node to start the traversal at
-   * @param arr array to store the nodes in. Optional parameterl
-   * an empty array is initialised if none is supplied.
-   * @returns an array containing the nodes of the tree.
-   */
-  function getTreeNodeList (node, arr) {
-    var nodeArr = arr || [];
-
-    if (node) {
-      nodeArr.push(node);
-      nodeArr = getTreeNodeList(node.left(), nodeArr);
-      nodeArr = getTreeNodeList(node.right(), nodeArr);
-    }
-    return nodeArr;
-  }
-
 
   /**
    * Calculate the new distance for the node. This is the source distance
@@ -432,6 +252,49 @@
   }
 
   /**
+   * Insert the new node into the minheap according to the
+   * insertMinheap algorithm.
+   * @param {string} srcLabel label of the source node
+   * @param {string} dstLabel label of the destination node
+   * @param {string} distance distance to be inserted.
+   */
+  function insertMinheap (srcLabel, dstLabel, distance) {
+    var i = heapsize.value();
+
+    heapsize.value(heapsize.value() + 1);
+
+    const label = distance + "<br>" + dstLabel + " (" + srcLabel + ")"
+    const newNode = minheap.newNode(label);
+    if (i === 0) {
+      minheap.root(newNode);
+    } else {
+      const parent = findParent(i, minheap);
+      (i % 2 === 1) ? parent.left(newNode) : parent.right(newNode);
+    }
+
+    // Heapify up
+    var node = newNode;
+    while (i > 0 && extractDistance(node.parent()) > distance) {
+      node.value(node.parent().value());
+      i = Math.floor((i-1)/2);
+      node.parent().value(label);
+      node = node.parent();
+    }
+
+    minheap.layout();
+  }
+
+  /**
+   * Checks whether the node is in the spanning tree.
+   * 
+   * @param node node to be checked
+   * @returns true when node contains class 'spanning', else false
+   */
+  function inSpanningTree (node) {
+    return node.hasClass("spanning");
+  }    
+
+  /**
    * Update the table: dstLabel's distance is set to newDist,
    * with parent set to srcLabel
    * @param srcLabel
@@ -444,7 +307,9 @@
     table.value(2, dstIndex, srcLabel)
   }
 
-  
+  /************************************************************
+   * Event handlers
+   ************************************************************/
 
   /**
    * Event handler:
@@ -666,93 +531,295 @@
     $("#updateButton").click({srcLabel, dstLabel, newDist, popup, edge},
                               updateClicked);
   }
-
-  /**
-   * Edge click listeners are bound to the graph itself,
-   * so each time the graph is destroyed with reset, it needs
-   * to be added again. Therefore they are in a wrapper function.
-   */
-  function addEdgeClickListeners() {
-    $(".jsavgraph").on("click", ".jsavedge", edgeClicked);
-  }
-
-  $(".jsavcontainer").on("click", ".jsavnode", function () {
-    window.alert(interpret("av_please_click_edges"));
-  });
-
-  /**
-   * Shift down the binary tree and matrix to account for the extra space
-   * taken by the "credit not given for this instance" that is shown after
-   * the model answer has been opened.
-   */
-  $("input[name='answer']").on("click", function () {
-    debugPrint("Answer button clicked");
-    $(".jsavbinarytree").css("margin-top", "34px");
-    $(".jsavmatrix").css("margin-top", "34px");
-    $(".jsavcanvas").css("min-height", "910px");
-    $(".jsavmodelanswer .jsavcanvas").css("min-height", "770px");
-  })
-
-  $("#about").click(about);
   
+  /************************************************************
+   * Grading-related functions
+   ************************************************************/
+
   /**
-   * Add the initial distance table to the JSAV.
-   * The table has distance for A as 0, '∞' for the rest
-   * Parent is '-' for all.
-   * @param riGraph the research instance graph.
+   * Custom grading function for the exercise.
    */
-  function addTable (riGraph) {
-    if (table) {
-      table.clear()
+  function scaffoldedGrader() {
+    debugPrint('scaffoldedGrader():\n' +
+      'student: ' + studentPqOperations.toString() + '\n' +
+      'model  : ' + modelPqOperations.toString());
+    let grade = studentPqOperations.gradeAgainst(modelPqOperations);
+
+    let score = {
+      // Number of correct steps in student's solution
+      correct: grade.studentGrade,
+      // Continuous grading mode not used, therefore `fix` is zero
+      fix: 0,
+      // Number of total steps in student's solution
+      student: studentPqOperations.length(),
+      // Number of total steps in model solution
+      total: grade.maxGrade,
+      // Continuous grading mode not used, therefore `undo` is zero
+      undo: 0
     }
-    const labelArr = [interpret("node"), ...(riGraph.vertexLabels.sort())];
-    const distanceArr = Array.from('∞'.repeat(riGraph.vertexLabels.length - 1));
-    distanceArr.unshift(interpret("distance"), 0);
-    const parentArr = Array.from('-'.repeat(riGraph.vertexLabels.length));
-    parentArr.unshift(interpret("parent"));
-    const width = String((riGraph.vertexLabels.length) * 30 + 100) + "px";
-    table = jsav.ds.matrix([labelArr, distanceArr, parentArr],
-                           {style: "table",
-                           width: width,
-                           left: 10,
-                           top: 780});
+    this.score = score;
   }
 
   /**
-   * Add the minheap to the student's JSAV instance.
-   *
-   * @param {int} x: position: pixels from left
-   * @param {int} y: position: pixels from top
+   * Custom undo function for the exercise.
+   * This is complementary to the function scaffoldedGrader().
    */
-  function addMinheap(x, y) {
-    let previouslyExistingMinheap = false;
-    if (minheap) {
-      previouslyExistingMinheap = true;
-      minheap.clear();
-      $('.flexcontainer').remove();
-      $('#dequeueButton').remove();
+  function scaffoldedUndo() {
+    // Modified from original JSAV undo function; source:
+    // https://github.com/vkaravir/JSAV/blob/master/src/exercise.js#L402-L420
+    var oldFx = $.fx.off || false;
+    $.fx.off = true;
+    // undo last step
+    this.jsav.backward(); // the empty new step
+    this.jsav.backward(); // the new graded step
+    // Undo until the previous graded step.
+    // Note: difference to original JSAV undo function: we know that all
+    // student's steps are gradable in this exercise.
+    // (Frankly, this if-else block might be related to the continuous
+    // grading mode of other JSAV exercises and thus irrelevant with this
+    // exercise, but let's keep it just in case it makes JSAV do some magic at
+    // the background. ;)
+    if (this.jsav.backward()) {
+      // if such step was found, redo it
+      this.jsav.forward();
+      this.jsav.step({updateRelative: false});
+    } else {
+      // ..if not, the first student step was incorrent and we can rewind
+      // to beginning
+      this.jsav.begin();
+    }
+    this.jsav._redo = [];
+    $.fx.off = oldFx;
+    // End of modified JSAV undo code
+
+    const undoneOperation = studentPqOperations.undo();
+    debugPrint('studentPqOperations: ' + studentPqOperations.toString());
+    
+    if (undoneOperation && undoneOperation.operation === 'deq') {
+      // Remove the recently dequeued node from focusedNodes so that when the
+      // student performs the next dequeue operation, the correct graph node
+      // will lose its "focusedNode" CSS class.
+      focusedNodes.pop();
+      // Note: JSAV remembers all student's previous steps, including which
+      // node had the CSS class "focusnode" at each step. Therefore, we don't
+      // need to call .addClass("focusnode") for the previously focused node.
+      // Debug print focusedNodes
+      let s = "focusedNodes after an undo:";
+      for (const x of focusedNodes) {
+        s += ' ' + x.value();
+      }
+      debugPrint(s);
+    }
+    
+    
+  };
+
+  /**
+   * Custom reset function for this exercise.
+   * This is complementary to the function scaffoldedGrader().
+   */
+  function scaffoldedReset() {
+    exercise.protoReset();
+    studentPqOperations.clear();
+    modelPqOperations.clear();
+    focusedNodes = [];
+  }
+
+  /**
+   * From JSAV API: http://jsav.io/exercises/exercise/
+   *
+   * "A function that will fix the student’s solution to match the current step
+   * in model solution. Before this function is called, the previous incorrect
+   * step in student’s solution is undone. The function gets the model
+   * structures as a parameter."
+   *
+   * The exercise currently has fix button disabled.
+   */
+  function fixState(modelGraph) {
+    var graphEdges = graph.edges(),
+        modelEdges = modelGraph.edges();
+
+    // compare the edges between exercise and model
+    for (var i = 0; i < graphEdges.length; i++) {
+      var edge = graphEdges[i],
+          modelEdge = modelEdges[i];
+      if (modelEdge.hasClass("spanning") && !edge.hasClass("spanning")) {
+        // mark the edge that is marked in the model, but not in the exercise
+        markEdge(edge);
+        break;
+      }
+    }
+  }
+
+
+  /**
+   * minheapDelete function, delete node at index.
+   * @param {number} index index of node to be deleted
+   * @returns value of the deleted node.
+   */
+  function minheapDelete(index) {
+    if (heapsize.value() === 0) {
+      return
     }
 
-    $(".jsavcanvas").append("<div class='flexcontainer'></div>");
-    minheap = jsav.ds.binarytree({relativeTo: $(".flexcontainer"),
-      left: -180, top: 140});
+    heapsize.value(heapsize.value() - 1);
 
-    if (!previouslyExistingMinheap) {
-      jsav.label(interpret("priority_queue"), {relativeTo: minheap,
-        top: -135});
+    // PLACEHOLDER: be able to remove other than min
+    const ret = (index === 0) ? minheap.root().value() : minheap.root().value();
+
+    // Parent of the last node in the heap
+    const parentLast = findParent(heapsize.value(), minheap);
+
+    // The last node in the heap (the one to be deleted)
+    const lastNode = (heapsize.value() % 2 === 1) ? parentLast.left()
+                                                  : parentLast.right();
+
+    if (lastNode) {
+      // Swap the values of the root and the last node
+      minheap.root().value(lastNode.value());
+      lastNode.value(ret);
+
+      lastNode.remove();
+
+      minHeapify(minheap.root());
+    } else {
+      minheap.root().remove();
+    }
+    return ret
+  }
+  
+  /***********************************************************************
+   * Generic functions
+   * Used by both the exercise view and the model answer
+   ***********************************************************************/
+
+  /*
+   * Copies edge and vertex data from a research instance graph into a JSAV
+   * graph.
+   *
+   * Parameters:
+   * riGraph: a research instance graph returned from
+   *          DijkstraInstanceGenerator.generateInstance().
+   * jsavGraph: a JSAV graph object.
+   * layoutSettings: Graph layout settings. The JSAV exercise uses this first
+   *                 to create a JSAV graph instance. The same settings are
+   *                 used here to communicate the pixel width and height of
+   *                 the graph layout.
+   *   layoutSettings = {
+   *     width: 500,       // pixels
+   *     height: 400,      // pixels
+   *     layout: "manual", // only for JSAV
+   *     directed: false   // only for JSAV
+   *   }
+   */
+  function researchInstanceToJsav(riGraph, jsavGraph, layoutSettings) {
+    // Compute coordinates of the vertices in the JSAV exercise
+    const gridStepX = Math.floor(layoutSettings.width / 6);
+    const gridStepY = Math.floor(layoutSettings.height / 4);
+    function rnd(x) {
+      // Returns a random integer between -x and x (both inclusive)
+      return Math.floor(JSAV.utils.rand.random() * (2 * x + 1)) //- x;
+    }
+
+    let vertexCoordinates = [];
+    for (let y = 0; y < 4; y++) {
+      for (let x = 0; x < 6; x++) {
+        vertexCoordinates.push({
+          left: Math.floor(x * gridStepX + rnd(10)),
+          top: Math.floor(y * gridStepY + rnd(10))
+        });
       }
+    }
+    // Add the vertices as JSAV objects
+    for (let i = 0; i < riGraph.edges.length; i++) {
+      let label = riGraph.vertexLabels[i];
+      jsavGraph.addNode(riGraph.vertexLabels[i], vertexCoordinates[i]);
+    }
+    // Add the edges as JSAV objects
+    const gNodes  = jsavGraph.nodes();
+    let options = {};
+    for (let i = 0; i < riGraph.edges.length; i++) {
+      for (let e of riGraph.edges[i]) {
+        // i is the index of start node
+        // e[0] is the index of end node
+        // e[1] is the weight
+        options.weight = e[1];
+        jsavGraph.addEdge(gNodes[i], gNodes[e[0]], options);
+      }
+    }      
+  }
 
-    // Add Dequeue button
-    const html = "<button type='button' id='dequeueButton'>" +
-    interpret("#dequeue") +"</button>";
-    $(".jsavtree").append(html);
-    $("#dequeueButton").click(dequeueClicked);
-    
-    heapsize = heapsize.value(0);
 
-    minheap.layout()
+  /**
+   * 1. Marks an edge as dequeued in the visualization (both student's and
+   *    model solutions).
+   * 2. Adds a dequeue operation into the operation sequence of either
+   *    student's or model solution. 
+   * @param {JSAV edge} edge  
+   * @param {*} av a JSAV algorithm visualization template.
+   *               If defined, mark an edge in the model solution.
+   *               If undefined, mark an edge in the student's solution.
+   */
+  function markEdge(edge, av) {
+    edge.addClass("spanning");
+    for (const node of [edge.startnode, edge.endnode]) {
+      node.removeClass("fringe");
+    }
+    edge.start().addClass("spanning");
+    edge.end().addClass("spanning");
+    storePqOperationStep('deq', edge, av);
+  }
 
-    
+  /**
+   * 1. Stores a priority queue operation related to an edge into either the
+   *    student's or model solution's PqOperationSequence.
+   * 2. Generates a gradeable step in the JSAV representation.
+   * @param {*} operation: one of: {'enq', 'deq', 'upd'}
+   * @param {JSAVedge} av a JSAV algorithm visualization template.
+   *               If this is undefined, mark an edge in the model solution.
+   * @param {*} av a JSAV algorithm visualization template.
+   *               If defined, store the operation for the model solution.
+   *               Otherwise store the operation for the student's solution.
+   */
+  function storePqOperationStep(operation, edge, av) {
+    const v1 = edge.start().value();
+    const v2 = edge.end().value();
+    const pqOperation = new PqOperation(operation, v1 + v2);
+    if (av) {
+      // Tell JSAV that this is a gradeable step just to:
+      // (i) generate a step in the model solution;
+      // (ii) make JSAV Exercise Recorder to record this step.
+      av.gradeableStep();
+      // Add the operation to the priority queue operation sequence for
+      // custom grading.
+      modelPqOperations.push(pqOperation);
+      debugPrint('modelPqOperations: ' + modelPqOperations.toString());
+    }
+    else {
+      // Similar block but for student's solution
+      exercise.gradeableStep();
+      studentPqOperations.push(pqOperation);
+      debugPrint('studentPqOperations: ' + studentPqOperations.toString());
+    }
+  }
+
+  /**
+   * Preorder traversal to get node list of the tree
+   * Since there is no function for this in the JSAV library
+   * @param node the root node to start the traversal at
+   * @param arr array to store the nodes in. Optional parameterl
+   * an empty array is initialised if none is supplied.
+   * @returns an array containing the nodes of the tree.
+   */
+  function getTreeNodeList (node, arr) {
+    var nodeArr = arr || [];
+
+    if (node) {
+      nodeArr.push(node);
+      nodeArr = getTreeNodeList(node.left(), nodeArr);
+      nodeArr = getTreeNodeList(node.right(), nodeArr);
+    }
+    return nodeArr;
   }
 
   /**
@@ -797,39 +864,6 @@
     av.label(interpret("node_explanation"),
             {left: x + hpos[2], top: y + 166})
         .addClass("legendtext");
-}
-
-  /**
-   * Insert the new node into the minheap according to the
-   * insertMinheap algorithm.
-   * @param {string} srcLabel label of the source node
-   * @param {string} dstLabel label of the destination node
-   * @param {string} distance distance to be inserted.
-   */
-  function insertMinheap (srcLabel, dstLabel, distance) {
-    var i = heapsize.value();
-
-    heapsize.value(heapsize.value() + 1);
-
-    const label = distance + "<br>" + dstLabel + " (" + srcLabel + ")"
-    const newNode = minheap.newNode(label);
-    if (i === 0) {
-      minheap.root(newNode);
-    } else {
-      const parent = findParent(i, minheap);
-      (i % 2 === 1) ? parent.left(newNode) : parent.right(newNode);
-    }
-
-    // Heapify up
-    var node = newNode;
-    while (i > 0 && extractDistance(node.parent()) > distance) {
-      node.value(node.parent().value());
-      i = Math.floor((i-1)/2);
-      node.parent().value(label);
-      node = node.parent();
-    }
-
-    minheap.layout();
   }
 
   /**
@@ -856,42 +890,6 @@
     }
 
     return parent_node;
-  }
-
-  /**
-   * minheapDelete function, delete node at index.
-   * @param {number} index index of node to be deleted
-   * @returns value of the deleted node.
-   */
-  function minheapDelete(index) {
-    if (heapsize.value() === 0) {
-      return
-    }
-
-    heapsize.value(heapsize.value() - 1);
-
-    // PLACEHOLDER: be able to remove other than min
-    const ret = (index === 0) ? minheap.root().value() : minheap.root().value();
-
-    // Parent of the last node in the heap
-    const parentLast = findParent(heapsize.value(), minheap);
-
-    // The last node in the heap (the one to be deleted)
-    const lastNode = (heapsize.value() % 2 === 1) ? parentLast.left()
-                                                  : parentLast.right();
-
-    if (lastNode) {
-      // Swap the values of the root and the last node
-      minheap.root().value(lastNode.value());
-      lastNode.value(ret);
-
-      lastNode.remove();
-
-      minHeapify(minheap.root());
-    } else {
-      minheap.root().remove();
-    }
-    return ret
   }
 
   /**
@@ -926,9 +924,35 @@
     return Number(node.value().match(/\d+/)[0])
   }
 
+  /**
+   * Debug printer
+   * 
+   * @param {string} x text to be displayed with console.log
+   */
   function debugPrint(x) {
     if (debug) {
       console.log(x);
+    }
+  }
+
+  /*
+  * Artturi's debug print, because inspecting JSAV data structures in a
+  * JavaScript debugger is a pain (too complex).
+  *
+  * Parameters:
+  *
+  * distances: a JSAV Matrix containing the following columns:
+  *              label of node, distance, previous node.
+  *
+  * debugPrint()s the distance matrix values.
+  */
+  function logDistanceMatrix(distances) {
+    debugPrint("Distance matrix");
+    debugPrint("Label distance previous unused");
+    for (let i = 0; i < distances._arrays.length; i++) {
+      let row = [...distances._arrays[i]._values];
+      row.push(distances.hasClass(i, true, "unused"))
+      debugPrint(row.join("  "));
     }
   }
 
@@ -1029,6 +1053,10 @@
 
     return [modelGraph, mintree];
   }
+
+  /************************************************************************
+   * Model answer functions
+   ************************************************************************/
 
   /*
    * Dijkstra's algorithm which creates the model solution used in grading
