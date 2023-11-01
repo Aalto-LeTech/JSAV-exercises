@@ -331,7 +331,7 @@
    ************************************************************/
 
   /**
-   * Event handler:
+   * Event handler for student's UI:
    * Add a node to the priority queue with label dstLabel and distance newDist.
    * Update the table to indicate the distance newDist and parent srcLabel.
    * @param event click event, which has the parameters srcLabel, dstLabel,
@@ -369,11 +369,12 @@
     debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
       dstLabel + " distance " + newDist);
     storePqOperationStep('enq', edge);
+    exercise.gradeableStep();
     popup.close();
   }
 
   /**
-   * Event handler:
+   * Event handler for student's UI:
    * Update the first instance of the node with label dstLabel. The updated
    * node is moved up or down the tree as needed.
    * @param event click event, which has the parameters srcLabel, dstLabel,
@@ -449,11 +450,13 @@
     debugPrint("Exercise gradeable step: update edge " + srcLabel + "-" +
       dstLabel + " distance " + newDist);
     storePqOperationStep('upd', event.data.edge);
+    exercise.gradeableStep();
     popup.close();
   }
 
   /**
-   * Event handler: Dequeue button click of the priority queue.
+   * Event handler for student's UI:
+   * Dequeue button click of the priority queue.
    */
   function dequeueClicked() {
     const deleted = minheapDelete(0);
@@ -501,6 +504,7 @@
     if (!edge.hasClass("spanning")) {
       markEdge(edge);
     }
+    exercise.gradeableStep();
   }
 
   /**
@@ -675,6 +679,7 @@
       if (modelEdge.hasClass("spanning") && !edge.hasClass("spanning")) {
         // mark the edge that is marked in the model, but not in the exercise
         markEdge(edge);
+        exercise.gradeableStep();
         break;
       }
     }
@@ -800,9 +805,8 @@
   }
 
   /**
-   * 1. Stores a priority queue operation related to an edge into either the
-   *    student's or model solution's PqOperationSequence.
-   * 2. Generates a gradeable step in the JSAV representation.
+   * Stores a priority queue operation related to an edge into either the
+   * student's or model solution's PqOperationSequence.
    * @param {*} operation: one of: {'enq', 'deq', 'upd'}
    * @param {JSAVedge} av a JSAV algorithm visualization template.
    *               If this is undefined, mark an edge in the model solution.
@@ -815,10 +819,7 @@
     const v2 = edge.end().value();
     const pqOperation = new PqOperation(operation, v1 + v2);
     if (av) {
-      // Tell JSAV that this is a gradeable step just to:
-      // (i) generate a step in the model solution;
-      // (ii) make JSAV Exercise Recorder to record this step.
-      av.gradeableStep();
+
       // Add the operation to the priority queue operation sequence for
       // custom grading.
       modelPqOperations.push(pqOperation);
@@ -826,7 +827,6 @@
     }
     else {
       // Similar block but for student's solution
-      exercise.gradeableStep();
       studentPqOperations.push(pqOperation);
       debugPrint('studentPqOperations: ' + studentPqOperations.toString());
     }
@@ -1139,6 +1139,7 @@
       if (!edge.hasClass("spanning")) {
         markEdge(edge, av);
       }
+      av.gradeableStep();
 
       const neighbours = dstNode.neighbors().filter(node =>
         !node.hasClass("spanning"));
@@ -1348,6 +1349,7 @@
           distViaSrc + neighbour.value());
         highlightUpdate(edge, neighbour);
         storePqOperationStep('enq', edge, av);
+        av.gradeableStep();
       }
       else if (distViaSrc < currNeighbourDist) {
         // Case 2: neighbour's distance is shorter through node `src`.
@@ -1368,6 +1370,8 @@
         highlightUpdate(edge, neighbour);
         oldEdge.removeClass("fringe")
         storePqOperationStep('upd', edge, av);
+        av.gradeableStep();
+
       } else {
         // Case 3: neighbour's distance is equal or longer through node `src`.
         // No not update the priority queue.
