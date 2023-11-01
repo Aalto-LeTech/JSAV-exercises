@@ -27,28 +27,28 @@
 }
 .jsavgraph .jsavedge, .legend-edge {
   stroke-width: 10;
-  stroke: #d1c39d;
+  stroke: #e2d5ae;
 }
 .jsavgraph .jsavedge.fringe, .legend-fringe {
   stroke-width: 10;
-  stroke: #d59f0d;
+  stroke: #d7a939;
 }
 .jsavgraph .jsavedge.spanning, .legend-spanning {
   stroke-width: 16;
-  stroke: #ffe000;;
+  stroke: #78c679;
 }
 .jsavgraph .jsavedge.compare {
-  stroke: #4ebd44;
+  stroke: #d9bd73;
   stroke-width: 16;
 }
 .jsavgraph .jsavnode, .jsavmatrix .jsavnode {
-  background-color: #d1c39d;
+  background-color: #e2d5ae;
 }
 .jsavgraph .jsavnode.fringe, .jsavmatrix .jsavnode.fringe {
   background-color: #d59f0d;
 }
 .jsavgraph .jsavnode.spanning, .jsavmatrix .jsavnode.spanning {
-  background-color: #FFF050;
+  background-color: #78c679;
 }
 .jsavgraph .jsavnode.focusnode {
   border: 2px solid;
@@ -57,7 +57,7 @@
 /* Comparison operation in the model answer, used for
  * .jsavnode, .jsavindex, and span.compare in the narration text. */
 .compare, .jsavgraph .jsavnode.compare, .jsavmatrix .jsavnode.compare {
-  background-color: #4ebd44;
+  background-color: #d9bd73;
 }
 span.compare {
   padding: 3px;
