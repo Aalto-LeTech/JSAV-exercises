@@ -1,6 +1,7 @@
 #container {
   width: 900px;
   height: 950px;
+  background-color: white;
 }
 .jsavline {
   height: 45px;
@@ -38,8 +39,7 @@
   stroke: #78c679;
 }
 .jsavgraph .jsavedge.compare {
-  stroke: #d9bd73;
-  stroke-width: 16;
+  stroke: #808080;  
 }
 .jsavgraph .jsavnode, .jsavmatrix .jsavnode {
   background-color: #e2d5ae;
@@ -57,13 +57,20 @@
 /* Comparison operation in the model answer, used for
  * .jsavnode, .jsavindex, and span.compare in the narration text. */
 .compare, .jsavgraph .jsavnode.compare, .jsavmatrix .jsavnode.compare {
-  background-color: #d9bd73;
+  color: white;
+  background-color: #606060;
 }
 span.compare {
   padding: 3px;
 }
+span.action {
+  padding: 3px;
+  background: black;
+  color: white;
+  font-weight: bold;
+}
 
-.jsavindex.updated {
+.jsavmatrix .jsavnode.updated {
   color: white;
   background-color: black;
   font-weight: bold;

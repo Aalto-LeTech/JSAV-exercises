@@ -1277,8 +1277,8 @@
       // Then set selected message, and step the av.
       const nodeLabel = ret.charAt(ret.length - 5)
       distances.addClass(nodeLabel.charCodeAt(0) - "A".charCodeAt(0), true, "unused")
-      // av.umsg(interpret("av_ms_select_node"),
-      //         {fill: {node: nodeLabel}});
+      av.umsg(interpret("av_ms_select_node"),
+               {fill: {node: nodeLabel}});
       av.step();
 
       // Parent node of last node in the heap
@@ -1324,8 +1324,6 @@
      * @param srcDist distance to source
      */
     function visitNeighbour (src, neighbour, srcDist) {
-      debugPrint("visitNeighbour: src = " + src.value() + ", neighbour = " +
-        neighbour.value());
       const edge = src.edgeTo(neighbour) ?? src.edgeFrom(neighbour);
       const neighbourIndex = neighbour.value().charCodeAt(0) - "A".charCodeAt(0);
       const currNeighbourDist = getDistance(neighbourIndex);
@@ -1336,17 +1334,16 @@
         // Add node to the priority queue.
 
         // First step: highlight the comparison
-        av.umsg(interpret("av_ms_visit_neighbor_compare") + ' ' +
-                interpret("av_ms_visit_neighbor_add"),
+        av.umsg(interpret("av_ms_visit_neighbor_compare"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
-        av.step()
+        av.step();
 
         // Second step: highlight the update
+        av.umsg(interpret("av_ms_visit_neighbor_add"),
+          {fill: {node: src.value(), neighbor: neighbour.value()}});          
         addNode(src.value(), neighbour.value(), distViaSrc);
         updateModelTable(neighbour, src, distViaSrc);
-        debugPrint("Model solution gradeable step: ADD ROUTE WITH DIST:",
-          distViaSrc + neighbour.value());
         highlightUpdate(edge, neighbour);
         storePqOperationStep('enq', edge, av);
         av.gradeableStep();
@@ -1356,17 +1353,16 @@
         // Update node in the priority queue.
 
         // First step: highlight the comparison
-        av.umsg(interpret("av_ms_visit_neighbor_compare") + ' ' +
-                interpret("av_ms_visit_neighbor_update"),
+        av.umsg(interpret("av_ms_visit_neighbor_compare"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
         av.step(); 
 
         // Second step: highlight the update
+        av.umsg(interpret("av_ms_visit_neighbor_update"),
+          {fill: {node: src.value(), neighbor: neighbour.value()}});      
         const oldEdge = updateNode(src.value(), neighbour.value(), distViaSrc);
-        updateModelTable(neighbour, src, distViaSrc);
-        debugPrint("Model solution gradeable step:  UPDATE DISTANCE TO:",
-         distViaSrc + neighbour.value());      
+        updateModelTable(neighbour, src, distViaSrc);   
         highlightUpdate(edge, neighbour);
         oldEdge.removeClass("fringe")
         storePqOperationStep('upd', edge, av);
@@ -1375,9 +1371,6 @@
       } else {
         // Case 3: neighbour's distance is equal or longer through node `src`.
         // No not update the priority queue.
-        debugPrint("KEEP DISTANCE THE SAME:",
-                        currNeighbourDist + neighbour.value())
-
         av.umsg(interpret("av_ms_visit_neighbor_compare") + ' ' +
                 interpret("av_ms_visit_neighbor_no_action"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
