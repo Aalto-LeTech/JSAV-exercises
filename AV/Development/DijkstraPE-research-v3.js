@@ -331,7 +331,7 @@
    ************************************************************/
 
   /**
-   * Event handler:
+   * Event handler for student's UI:
    * Add a node to the priority queue with label dstLabel and distance newDist.
    * Update the table to indicate the distance newDist and parent srcLabel.
    * @param event click event, which has the parameters srcLabel, dstLabel,
@@ -369,11 +369,12 @@
     debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
       dstLabel + " distance " + newDist);
     storePqOperationStep('enq', edge);
+    exercise.gradeableStep();
     popup.close();
   }
 
   /**
-   * Event handler:
+   * Event handler for student's UI:
    * Update the first instance of the node with label dstLabel. The updated
    * node is moved up or down the tree as needed.
    * @param event click event, which has the parameters srcLabel, dstLabel,
@@ -449,11 +450,13 @@
     debugPrint("Exercise gradeable step: update edge " + srcLabel + "-" +
       dstLabel + " distance " + newDist);
     storePqOperationStep('upd', event.data.edge);
+    exercise.gradeableStep();
     popup.close();
   }
 
   /**
-   * Event handler: Dequeue button click of the priority queue.
+   * Event handler for student's UI:
+   * Dequeue button click of the priority queue.
    */
   function dequeueClicked() {
     const deleted = minheapDelete(0);
@@ -501,6 +504,7 @@
     if (!edge.hasClass("spanning")) {
       markEdge(edge);
     }
+    exercise.gradeableStep();
   }
 
   /**
@@ -675,6 +679,7 @@
       if (modelEdge.hasClass("spanning") && !edge.hasClass("spanning")) {
         // mark the edge that is marked in the model, but not in the exercise
         markEdge(edge);
+        exercise.gradeableStep();
         break;
       }
     }
@@ -800,9 +805,8 @@
   }
 
   /**
-   * 1. Stores a priority queue operation related to an edge into either the
-   *    student's or model solution's PqOperationSequence.
-   * 2. Generates a gradeable step in the JSAV representation.
+   * Stores a priority queue operation related to an edge into either the
+   * student's or model solution's PqOperationSequence.
    * @param {*} operation: one of: {'enq', 'deq', 'upd'}
    * @param {JSAVedge} av a JSAV algorithm visualization template.
    *               If this is undefined, mark an edge in the model solution.
@@ -815,10 +819,7 @@
     const v2 = edge.end().value();
     const pqOperation = new PqOperation(operation, v1 + v2);
     if (av) {
-      // Tell JSAV that this is a gradeable step just to:
-      // (i) generate a step in the model solution;
-      // (ii) make JSAV Exercise Recorder to record this step.
-      av.gradeableStep();
+
       // Add the operation to the priority queue operation sequence for
       // custom grading.
       modelPqOperations.push(pqOperation);
@@ -826,7 +827,6 @@
     }
     else {
       // Similar block but for student's solution
-      exercise.gradeableStep();
       studentPqOperations.push(pqOperation);
       debugPrint('studentPqOperations: ' + studentPqOperations.toString());
     }
@@ -849,50 +849,6 @@
       nodeArr = getTreeNodeList(node.right(), nodeArr);
     }
     return nodeArr;
-  }
-
-  /**
-   * Creates a legend box which explains the edge colors.
-   * This is used for both the student's view and the model answer.
-   * 
-   * @param {JSAV} av A JSAV algorithm visualization template
-   * @param {number} x Location: pixels from left in *av*
-   * @param {number} y Location: pixels from top in *av*
-   * @param {function(string)} interpret A JSAV interpreter function
-   */
-  function createLegend(av, x, y, interpret) {
-    // Center on a pixel to produce crisp edges
-    x = Math.floor(x) + 0.5;
-    y = Math.floor(y) + 0.5;
-    const width = 250; // pixels
-    const height = 250; // pixels
-    av.g.rect(x, y, width, height, {
-        "stroke-width": 1,
-        fill: "white",
-    }).addClass("legendbox");
-    av.label(interpret("legend"), {left: x + 100, top: y - 35});
-
-    const hpos = [26, 76, 90]; // line start, line end, text start (pixels)
-    const vpos = [30, 80, 130]; // vertical position for each three edge types
-    const edgeClass = ["legend-edge", "legend-fringe", "legend-spanning"];
-    const edgeText = ["legend_unvisited", "legend_fringe", 
-        "legend_spanning_tree"];
-    const textvadjust = -22;
-    for (let i = 0; i < 3; i++) {
-        av.g.line(x + hpos[0], y + vpos[i],
-                x + hpos[1], y + vpos[i]).addClass(edgeClass[i]);
-        av.label(interpret(edgeText[i]), {left: x + hpos[2],
-                top: y + vpos[i] + textvadjust,
-                "text-align": "center"})
-            .addClass("legendtext")            
-    }
-    av.g.circle(x + 51, y + 201, 22);    
-    av.label("5<br>C (B)", {left: x + 35, top: y + 166})
-        .addClass("legendtext")
-        .addClass("textcentering");
-    av.label(interpret("node_explanation"),
-            {left: x + hpos[2], top: y + 166})
-        .addClass("legendtext");
   }
 
   /**
@@ -1139,6 +1095,7 @@
       if (!edge.hasClass("spanning")) {
         markEdge(edge, av);
       }
+      av.gradeableStep();
 
       const neighbours = dstNode.neighbors().filter(node =>
         !node.hasClass("spanning"));
@@ -1276,8 +1233,8 @@
       // Then set selected message, and step the av.
       const nodeLabel = ret.charAt(ret.length - 5)
       distances.addClass(nodeLabel.charCodeAt(0) - "A".charCodeAt(0), true, "unused")
-      // av.umsg(interpret("av_ms_select_node"),
-      //         {fill: {node: nodeLabel}});
+      av.umsg(interpret("av_ms_select_node"),
+               {fill: {node: nodeLabel}});
       av.step();
 
       // Parent node of last node in the heap
@@ -1323,8 +1280,6 @@
      * @param srcDist distance to source
      */
     function visitNeighbour (src, neighbour, srcDist) {
-      debugPrint("visitNeighbour: src = " + src.value() + ", neighbour = " +
-        neighbour.value());
       const edge = src.edgeTo(neighbour) ?? src.edgeFrom(neighbour);
       const neighbourIndex = neighbour.value().charCodeAt(0) - "A".charCodeAt(0);
       const currNeighbourDist = getDistance(neighbourIndex);
@@ -1335,45 +1290,43 @@
         // Add node to the priority queue.
 
         // First step: highlight the comparison
-        av.umsg(interpret("av_ms_visit_neighbor_compare") + ' ' +
-                interpret("av_ms_visit_neighbor_add"),
+        av.umsg(interpret("av_ms_visit_neighbor_compare"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
-        av.step()
+        av.step();
 
         // Second step: highlight the update
+        av.umsg(interpret("av_ms_visit_neighbor_add"),
+          {fill: {node: src.value(), neighbor: neighbour.value()}});          
         addNode(src.value(), neighbour.value(), distViaSrc);
         updateModelTable(neighbour, src, distViaSrc);
-        debugPrint("Model solution gradeable step: ADD ROUTE WITH DIST:",
-          distViaSrc + neighbour.value());
         highlightUpdate(edge, neighbour);
         storePqOperationStep('enq', edge, av);
+        av.gradeableStep();
       }
       else if (distViaSrc < currNeighbourDist) {
         // Case 2: neighbour's distance is shorter through node `src`.
         // Update node in the priority queue.
 
         // First step: highlight the comparison
-        av.umsg(interpret("av_ms_visit_neighbor_compare") + ' ' +
-                interpret("av_ms_visit_neighbor_update"),
+        av.umsg(interpret("av_ms_visit_neighbor_compare"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});
         highlight(edge, neighbour);
         av.step(); 
 
         // Second step: highlight the update
+        av.umsg(interpret("av_ms_visit_neighbor_update"),
+          {fill: {node: src.value(), neighbor: neighbour.value()}});      
         const oldEdge = updateNode(src.value(), neighbour.value(), distViaSrc);
-        updateModelTable(neighbour, src, distViaSrc);
-        debugPrint("Model solution gradeable step:  UPDATE DISTANCE TO:",
-         distViaSrc + neighbour.value());      
+        updateModelTable(neighbour, src, distViaSrc);   
         highlightUpdate(edge, neighbour);
         oldEdge.removeClass("fringe")
         storePqOperationStep('upd', edge, av);
+        av.gradeableStep();
+
       } else {
         // Case 3: neighbour's distance is equal or longer through node `src`.
         // No not update the priority queue.
-        debugPrint("KEEP DISTANCE THE SAME:",
-                        currNeighbourDist + neighbour.value())
-
         av.umsg(interpret("av_ms_visit_neighbor_compare") + ' ' +
                 interpret("av_ms_visit_neighbor_no_action"),
                 {fill: {node: src.value(), neighbor: neighbour.value()}});

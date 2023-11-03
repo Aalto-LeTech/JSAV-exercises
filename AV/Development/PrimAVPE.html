@@ -3,10 +3,12 @@
   <head>
     <title>Prim's Algorithm Proficiency Exercise</title>
     <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
     <link rel="stylesheet" href="../../JSAV/css/JSAV.css" type="text/css" />
     <link rel="stylesheet" href="../../lib/odsaAV-min.css" type="text/css" />
     <link rel="stylesheet" href="../../lib/odsaStyle-min.css" type="text/css" />
-    <link rel="stylesheet" href="PrimAVPE.css" />
+    <link rel="stylesheet" href="GraphAlgorithms.css" type="text/css" />
+    <link rel="stylesheet" href="PrimAVPE.css" type="text/css" />
   </head>
   <body>
     <div id="container">
@@ -25,9 +27,15 @@
         </tr>
       </table>
       <form class="avcontainer">
+        <p class="instructLabel"></p>
+        <p class="instructions"></p>
+        <!-- This class of codeblock with child of class code are used to float
+        the pseudocode to the left side of the screen. The inner class code is
+        needed, as JSAV can only append to something, not add inside :) -->
+        <div class="codeblock" style="float: left;">
+          <div class="code"></div>
+        </div>
         <div class="jsavcanvas">
-          <p class="instructLabel"></p>
-          <p class="instructions"></p>
           <p id="procontrols">
             <span class="jsavscore"></span>
           </p>

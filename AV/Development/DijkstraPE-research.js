@@ -31,9 +31,9 @@
   }
 
    //Add the legend to the exercise
-   const edge = '<path d="M25,30L75,30" class="edge"></path>'
+   const edge = '<path d="M25,30L75,30" class="legend-edge"></path>'
               +'<text x="90" y="35">' + interpret("graph_edge") + '</text>'
-    const spanningEdge = '<path d="M25,80L75,80" class="edge spanning">' 
+    const spanningEdge = '<path d="M25,80L75,80" class="legend-spanning">' 
                        + '</path><text x="90" y="85">'
                        + interpret("spanning_edge") + '</text>'
     const legend = "<div class='subheading'><center><strong>" 
@@ -63,7 +63,7 @@
     // window.JSAVrecorder.addMetadata('roleMap', exerciseInstance['roleMap']);
 
     graph.layout();
-    graph.nodes()[exerciseInstance.startIndex].addClass("marked"); // mark the 'A' node
+    graph.nodes()[exerciseInstance.startIndex].addClass("spanning"); // mark the 'A' node
     jsav.displayInit();
     // Remove the initially calculated min-width to ensure that the graph is 
     // to the right of the code block. 
@@ -134,7 +134,7 @@
     for (var i = 0; i < graphEdges.length; i++) {
       var edge = graphEdges[i],
           modelEdge = modelEdges[i];
-      if (modelEdge.hasClass("marked") && !edge.hasClass("marked")) {
+      if (modelEdge.hasClass("spanning") && !edge.hasClass("spanning")) {
         // mark the edge that is marked in the model, but not in the exercise
         markEdge(edge);
         break;
@@ -198,7 +198,7 @@
     });
 
     // Mark the initial node
-    modelNodes[exerciseInstance.startIndex].addClass("marked");
+    modelNodes[exerciseInstance.startIndex].addClass("spanning");
 
     modeljsav.displayInit();
 
@@ -214,7 +214,7 @@
     // hide all edges that are not part of the spanning tree
     var modelEdges = modelGraph.edges();
     for (i = 0; i < modelGraph.edges().length; i++) {
-      if (!modelEdges[i].hasClass("marked")) {
+      if (!modelEdges[i].hasClass("spanning")) {
         modelEdges[i].hide();
       }
     }
@@ -225,9 +225,9 @@
   }
 
   function markEdge(edge, av) {
-    edge.addClass("marked");
-    edge.start().addClass("marked");
-    edge.end().addClass("marked");
+    edge.addClass("spanning");
+    edge.start().addClass("spanning");
+    edge.end().addClass("spanning");
     if (av) {
       av.gradeableStep();
     } else {
@@ -361,7 +361,7 @@
   }
 
   exercise = jsav.exercise(model, init, {
-    compare: { class: "marked" },
+    compare: { class: "spanning" },
     controls: $('.jsavexercisecontrols'),
     modelDialog: {width: "800px"},
     resetButtonTitle: interpret("reset"),
@@ -371,7 +371,7 @@
 
   $(".jsavcontainer").on("click", ".jsavedge", function () {
     var edge = $(this).data("edge");
-    if (!edge.hasClass("marked")) {
+    if (!edge.hasClass("spanning")) {
       markEdge(edge);
     }
   });

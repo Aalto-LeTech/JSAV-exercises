@@ -4,6 +4,8 @@
   var exercise,
       graph,
       config = ODSA.UTILS.loadConfig(),
+      code = config.code, 
+      pseudo,
       interpret = config.interpreter,
       settings = config.getSettings(),
       jsav = new JSAV($('.avcontainer'), {settings: settings});
@@ -11,6 +13,29 @@
   var debug = false; // produces debug prints to console
 
   jsav.recorded();
+
+  //Add the code block to the exercise. 
+
+  if (code) {
+    pseudo = jsav.code($.extend({after: {element: $(".code")}}, code));
+    pseudo.highlight(8)
+  } else {
+    pseudo = jsav.code();
+  }
+
+  //Add the legend to the exercise
+  const edge = '<path d="M25,30L75,30" class="legend-edge"></path>'
+               +'<text x="90" y="35">' + interpret("graph_edge") + '</text>'
+  const spanningEdge = '<path d="M25,80L75,80" class="legend-spanning">' 
+                      + '</path><text x="90" y="85">'
+                      + interpret("spanning_edge") + '</text>'
+  const legend = "<div class='subheading'><center><strong>" 
+                + interpret("legend")
+                + "</center></strong></div>" 
+                + "<div class='legend'><svg version='1.1' xmlns='http://www.w3.org/2000/svg'> "
+                + edge + spanningEdge
+                + " </svg></div>"
+  $(".codeblock").append(legend)
 
   function init_old() {
     // create the graph
@@ -26,7 +51,7 @@
     graphUtils.generate(graph, {weighted: true}); // Randomly generate the graph with weights
     graph.layout();
     // mark the 'A' node
-    graph.nodes()[0].addClass("marked");
+    graph.nodes()[0].addClass("spanning");
 
     jsav.displayInit();
     return graph;
@@ -90,8 +115,9 @@
     });
     graphUtils.nlToJsav(nlGraph, graph);
     graph.layout();
-    graph.nodes()[0].addClass("marked"); // mark the 'A' node
+    graph.nodes()[0].addClass("spanning"); // mark the 'A' node
     jsav.displayInit();
+    $(".jsavcanvas").css("min-width", "")
     return graph;
   }
 
@@ -103,7 +129,7 @@
     for (var i = 0; i < graphEdges.length; i++) {
       var edge = graphEdges[i],
           modelEdge = modelEdges[i];
-      if (modelEdge.hasClass("marked") && !edge.hasClass("marked")) {
+      if (modelEdge.hasClass("spanning") && !edge.hasClass("spanning")) {
         // mark the edge that is marked in the model, but not in the exercise
         markEdge(edge);
         break;
@@ -143,7 +169,7 @@
     });
 
     // Mark the 'A' node
-    modelNodes[0].addClass("marked");
+    modelNodes[0].addClass("spanning");
 
     modeljsav.displayInit();
 
@@ -154,7 +180,7 @@
     // hide all edges that are not part of the spanning tree
     var modelEdges = modelGraph.edges();
     for (i = 0; i < modelGraph.edges().length; i++) {
-      if (!modelEdges[i].hasClass("marked")) {
+      if (!modelEdges[i].hasClass("spanning")) {
         modelEdges[i].hide();
       }
     }
@@ -165,9 +191,9 @@
   }
 
   function markEdge(edge, av) {
-    edge.addClass("marked");
-    edge.start().addClass("marked");
-    edge.end().addClass("marked");
+    edge.addClass("spanning");
+    edge.start().addClass("spanning");
+    edge.end().addClass("spanning");
     if (av) {
       av.gradeableStep();
     } else {
@@ -375,15 +401,16 @@
   }
 
   exercise = jsav.exercise(model, init, {
-    compare: { class: "marked" },
+    compare: { class: "spanning" },
     controls: $('.jsavexercisecontrols'),
+    resetButtonTitle: interpret("reset"),
     fix: fixState
   });
   exercise.reset();
 
   $(".jsavcontainer").on("click", ".jsavedge", function () {
     var edge = $(this).data("edge");
-    if (!edge.hasClass("marked")) {
+    if (!edge.hasClass("spanning")) {
       markEdge(edge);
     }
   });

@@ -84,7 +84,7 @@
     for (var i = 0; i < graphEdges.length; i++) {
       var edge = graphEdges[i],
           modelEdge = modelEdges[i];
-      if (modelEdge.hasClass("marked") && !edge.hasClass("marked")) {
+      if (modelEdge.hasClass("spanning") && !edge.hasClass("spanning")) {
         // mark the edge that is marked in the model, but not in the exercise
         markEdge(edge);
         break;
@@ -142,7 +142,7 @@
     modeljsav.umsg(interpret("av_ms_mst"));
     // hide all edges that are not part of the spanning tree
     for (i = 0; i < modelGraph.edges().length; i++) {
-      if (!modelEdges[i].hasClass("marked")) {
+      if (!modelEdges[i].hasClass("spanning")) {
         modelEdges[i].hide();
       }
     }
@@ -210,8 +210,8 @@
         //Add to MST
         modeljsav.umsg(interpret("av_ms_adding"), {preserve: true});
         addEdge(currentEdge);
-        edgeMatrix.addClass(index, 0, "marked");
-        edgeMatrix.addClass(index, 1, "marked");
+        edgeMatrix.addClass(index, 0, "spanning");
+        edgeMatrix.addClass(index, 1, "spanning");
         markEdge(currentEdge, modeljsav);
       } else {
         modeljsav.umsg(interpret("av_ms_dismiss"), {preserve: true});
@@ -224,9 +224,9 @@
   }
 
   function markEdge(edge, av) {
-    edge.addClass("marked");
-    edge.start().addClass("marked");
-    edge.end().addClass("marked");
+    edge.addClass("spanning");
+    edge.start().addClass("spanning");
+    edge.end().addClass("spanning");
     if (av) {
       av.gradeableStep();
     } else {
@@ -262,15 +262,16 @@
   }
 
   exercise = jsav.exercise(model, init, {
-    compare: {class: "marked"},
+    compare: {class: "spanning"},
     controls: $(".jsavexercisecontrols"),
+    resetButtonTitle: interpret("reset"),
     fix: fixState
   });
   exercise.reset();
 
   $(".jsavcontainer").on("click", ".jsavedge", function() {
     var edge = $(this).data("edge");
-    if (!edge.hasClass("marked")) {
+    if (!edge.hasClass("spanning")) {
       markEdge(edge);
     }
   });
