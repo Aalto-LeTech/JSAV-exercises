@@ -33,7 +33,7 @@
     graphUtils.generate(graph); // Randomly generate the graph without weights
     graph.layout();
     // mark the 'A' node
-    graph.nodes()[0].addClass("marked");
+    graph.nodes()[0].addClass("visited");
 
     jsav.displayInit();
     return graph;
@@ -70,7 +70,7 @@
     });
     graphUtils.nlToJsav(nlGraph, graph);
     graph.layout();
-    graph.nodes()[0].addClass("marked"); // mark the 'A' node
+    graph.nodes()[0].addClass("visited"); // mark the 'A' node
     jsav.displayInit();
     // Remove the initially calculated size so that the graph sits next 
     // to the code. 
@@ -114,7 +114,7 @@
     for (var i = 0; i < graphEdges.length; i++) {
       var edge = graphEdges[i],
           modelEdge = modelEdges[i];
-      if (modelEdge.hasClass("marked") && !edge.hasClass("marked")) {
+      if (modelEdge.hasClass("visited") && !edge.hasClass("visited")) {
         // mark the edge that is marked in the model, but not in the exercise
         markEdge(edge);
         break;
@@ -137,7 +137,7 @@
     var modelNodes = modelGraph.nodes();
 
     // Mark the 'A' node
-    modelNodes[0].addClass("marked");
+    modelNodes[0].addClass("visited");
 
     modeljsav.displayInit();
 
@@ -148,7 +148,7 @@
     // hide all edges that are not part of the search tree
     var modelEdges = modelGraph.edges();
     for (i = 0; i < modelGraph.edges().length; i++) {
-      if (!modelEdges[i].hasClass("marked")) {
+      if (!modelEdges[i].hasClass("visited")) {
         modelEdges[i].hide();
       }
     }
@@ -159,9 +159,9 @@
   }
 
   function markEdge(edge, av) {
-    edge.addClass("marked");
-    edge.start().addClass("marked");
-    edge.end().addClass("marked");
+    edge.addClass("visited");
+    edge.start().addClass("visited");
+    edge.end().addClass("visited");
     if (av) {
       av.gradeableStep();
     } else {
@@ -177,7 +177,7 @@
     });
     for (var next = adjacent.next(); next; next = adjacent.next()) {
       av.umsg(interpret("av_ms_process_edge"), {fill: {from: start.value(), to: next.value()}});
-      if (next.hasClass("marked")) {
+      if (next.hasClass("visited")) {
         av.umsg(interpret("av_ms_already_visited"), {
           preserve: true,
           fill: {
@@ -186,7 +186,7 @@
         });
       }
       av.step();
-      if (!next.hasClass("marked")) {
+      if (!next.hasClass("visited")) {
         markEdge(start.edgeTo(next), av);
         dfs(next, av);
       }
@@ -200,7 +200,7 @@
   }
 
   exercise = jsav.exercise(model, init, {
-    compare: { class: "marked" },
+    compare: { class: "visited" },
     controls: $('.jsavexercisecontrols'),
     resetButtonTitle: interpret("reset"),
     fix: fixState
@@ -209,7 +209,7 @@
 
   $(".jsavcontainer").on("click", ".jsavedge", function () {
     var edge = $(this).data("edge");
-    if (!edge.hasClass("marked")) {
+    if (!edge.hasClass("visited")) {
       markEdge(edge);
     }
   });
