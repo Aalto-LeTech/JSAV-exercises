@@ -145,7 +145,9 @@
     addEdgeClickListeners();
     addMinheap(100, 530);
     if (!exerciseLegendCreated) {
-      createLegend(jsav, 520, 508, interpret);
+      const minheapBox = minheap.bounds();
+      createLegend(jsav, minheapBox.left + minheapBox.width + 20,
+                         minheapBox.top + 1, interpret);
       exerciseLegendCreated = true;
     }
 
@@ -1220,7 +1222,7 @@
                            {style: "table",
                            width: width,
                            left: 150,
-                           top: 750});
+                           top: 780});
   }
 
   /**
