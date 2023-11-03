@@ -1,6 +1,11 @@
 #container {
-  width: 1200px;
-  min-height: 595px;
+  width: 1100px;
+  min-height: 700px;
+}
+
+.jsavgraph {
+  min-width: 500px;
+  min-height: 500px;
 }
 
 .legend {
