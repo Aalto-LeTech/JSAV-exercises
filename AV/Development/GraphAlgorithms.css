@@ -161,7 +161,8 @@ margin: 10px;
 #dequeueButton {
     float: right;
     position: relative;
-    margin: 15px;
+    margin: 15px;    
+    z-index: 110;
 }
 
 .jsavbinarytree {
