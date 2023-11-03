@@ -1,0 +1,15 @@
+#container {
+  width: 1000px;
+  height: 950px;
+}
+
+.flex {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+.flex > div {
+  margin-left: 20px;
+  margin-right: 20px;
+}

@@ -1,37 +1,20 @@
 #container {
-  width: 800px;
-  height: 595px;
-}
-.jsavline {
-  height: 45px;
-  margin: 0 0 0 20px;
+  width: 1100px;
+  min-height: 700px;
 }
 
-#procontrols {
-  text-align: center;
+.jsavgraph {
+  min-width: 500px;
+  min-height: 500px;
 }
 
-.jsavgraph svg {
-  z-index: 0;
+.legend {
+  background-color: #FFFFFF; 
+  /* border: 1px solid; */
+  height: 115px;
+  margin-left: 40px;
 }
 
-.jsavnode.marked {
-  background-color: #FFF050;
-}
-.jsavgraph .jsavedge {
-  stroke-width: 10;
-  stroke: #d59f0d;
-}
-.jsavgraph .jsavedge.marked {
-  stroke-width: 16;
-  stroke: #ffe000;
-}
-.jsavgraph .jsavedgelabel {
-  font-size: 16px;
-  background-color: transparent;
-  text-shadow: 0 0 5px #fff;
-}
-.jsavautoresize .jsavnode {
-  min-width: 45px;
-  min-height: 45px;
+.subheading {
+  margin-left: 40px;
 }
