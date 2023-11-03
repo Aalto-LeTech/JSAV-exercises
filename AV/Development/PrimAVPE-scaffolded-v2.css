@@ -2,7 +2,7 @@
   width: 900px;
   height: 950px;
 }
-
+/* 
 .jsavline {
   height: 45px;
   margin: 0 0 0 20px;
@@ -130,6 +130,7 @@
 .edge.queued {
   stroke: #d59f0d;
 }
+*/
 
 .flex {
   display: flex;
@@ -140,10 +141,4 @@
 .flex > div {
   margin-left: 20px;
   margin-right: 20px;
-}
-
-
-.green {
-  color: #4ebd44;
-  font-weight: bold;
 }

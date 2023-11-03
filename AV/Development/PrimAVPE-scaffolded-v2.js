@@ -21,6 +21,9 @@
   // queue as a binary heap
   var minheap;
 
+  // Legend box in the exercise view;
+  var exerciseLegendCreated = false;
+
   // JSAV Visualization
   var jsav = new JSAV($('.avcontainer'), {settings: settings});
 
@@ -49,7 +52,7 @@
 
   // JSAV Exercise
   var exercise = jsav.exercise(model, init, {
-    compare: [{ class: "marked" }],
+    compare: [{ class: "spanning" }],
     controls: $('.jsavexercisecontrols'),
     resetButtonTitle: interpret("reset"),
     modelDialog: {width: "960px"},
@@ -140,10 +143,15 @@
     })
     graphUtils.nlToJsav(nlGraph, graph);
     addEdgeClickListeners();
-    addMinheap();
+    addMinheap(100, 530);
+    if (!exerciseLegendCreated) {
+      createLegend(jsav, 520, 508, interpret);
+      exerciseLegendCreated = true;
+    }
+
     addTable();
     graph.layout();
-    graph.nodes()[0].addClass("marked"); // mark the 'A' node
+    graph.nodes()[0].addClass("spanning"); // mark the 'A' node
     jsav.displayInit();
     return [graph, minheap];
   }
@@ -255,7 +263,7 @@
     for (var i = 0; i < graphEdges.length; i++) {
       var edge = graphEdges[i],
           modelEdge = modelEdges[i];
-      if (modelEdge.hasClass("marked") && !edge.hasClass("marked")) {
+      if (modelEdge.hasClass("spanning") && !edge.hasClass("spanning")) {
         // mark the edge that is marked in the model, but not in the exercise
         markEdge(edge);
         break;
@@ -295,7 +303,7 @@
     });
 
     // Mark the 'A' node
-    modelNodes[0].addClass("marked");
+    modelNodes[0].addClass("spanning");
 
     const mintree = modeljsav.ds.binarytree();
     mintree.layout();
@@ -309,7 +317,7 @@
     // hide all edges that are not part of the spanning tree
     var modelEdges = modelGraph.edges();
     for (i = 0; i < modelGraph.edges().length; i++) {
-      if (!modelEdges[i].hasClass("marked")) {
+      if (!modelEdges[i].hasClass("spanning")) {
         modelEdges[i].hide();
       }
     }
@@ -330,9 +338,9 @@
    *               If undefined, mark an edge in the student's solution.
    */
   function markEdge(edge, av) {
-    edge.addClass("marked");
-    edge.start().addClass("marked");
-    edge.end().addClass("marked");
+    edge.addClass("spanning");
+    edge.start().addClass("spanning");
+    edge.end().addClass("spanning");
     storePqOperationStep('deq', edge, av);
   }
 
@@ -408,12 +416,12 @@
       
       av.umsg(interpret("av_ms_add_edge"),
               {fill: {from: srcNode.value(), to: dstNode.value()}});
-      edge.removeClass("queued");
-      if (!edge.hasClass("marked")) {
+      edge.removeClass("fringe");
+      if (!edge.hasClass("spanning")) {
         markEdge(edge, av);
       }
       const neighbours = dstNode.neighbors().filter(node =>
-        !node.hasClass("marked"));
+        !node.hasClass("spanning"));
       debugPrint("Neighbours of " + dstNode.value() + " before sorting");
       sortNeighbours(neighbours);
       neighbours.forEach(node => visitNeighbour(dstNode, node))
@@ -573,7 +581,7 @@
       const dstNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === dstLabel)[0];
       const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode);
-      edge.addClass("queued")
+      edge.addClass("fringe")
 
       mintree.layout();
     }
@@ -603,14 +611,14 @@
       const dstNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === dstLabel)[0];
       const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode)
-      edge.addClass("queued")
+      edge.addClass("fringe")
       // Remove queued class from the old edge
       const oldLabel = updatedNode.value();
       const oldSrcLabel = oldLabel.charAt(oldLabel.length - 2);
       const oldSrcNode = nodes.filter(node =>
           node.element[0].getAttribute("data-value") === oldSrcLabel)[0];
       const oldEdge = dstNode.edgeFrom(oldSrcNode) ?? dstNode.edgeTo(oldSrcNode)
-      oldEdge.removeClass("queued");
+      oldEdge.removeClass("fringe");
       updatedNode.value(label);
       // Inline while loop to move the value up if needed.
       // Because if you pass a node along as a parameter, it does not like
@@ -943,7 +951,7 @@
    * @returns true when node contains class 'marked', else false
    */
   function isMarked (node) {
-    return node.element[0].classList.contains("marked")
+    return node.element[0].classList.contains("spanning")
   }
 
   function findColByNode (nodeLabel) {
@@ -972,7 +980,7 @@
     const dist = event.data.dist;
     const popup = event.data.popup;
     debugPrint(event.data.edge)
-    event.data.edge.addClass("queued");
+    event.data.edge.addClass("fringe");
     if (window.JSAVrecorder) {
       window.JSAVrecorder.appendAnimationEventFields(
         {
@@ -1020,7 +1028,7 @@
 
     updateTable(srcLabel, dstLabel, dist);
     // Add class to the new edge
-    event.data.edge.addClass("queued")
+    event.data.edge.addClass("fringe")
     // Remove class from the old edge
     // Have old label, find previous source node label
     const oldLabel = updatedNode.value();
@@ -1033,7 +1041,7 @@
     const oldEdge = graph.getEdge(oldNode, dstNode)
               ?? graph.getEdge(dstNode, oldNode);
     // Remove the queued class.
-    oldEdge.removeClass("queued");
+    oldEdge.removeClass("fringe");
     if (window.JSAVrecorder) {
       window.JSAVrecorder.appendAnimationEventFields(
         {
@@ -1075,6 +1083,57 @@
   }
 
   /**
+   * Event handler for student's UI:
+   * Dequeue button click of the priority queue.
+   */
+  function dequeueClicked() {
+    const deleted = minheapDelete(0);
+    if (!deleted) {
+      return;
+    }
+    // Format of node label: "x<br>D (S)", where x is the distance,
+    // D is the destination node label and S is the source node label
+    const nodeLabel = deleted.charAt(deleted.length - 5);
+    const node = graph.nodes().filter(node =>
+        node.element[0].getAttribute("data-value") === nodeLabel)[0];
+    const srcLabel = table.value(2, findColByNode(nodeLabel));
+    const srcNode = graph.nodes().filter(node =>
+        node.element[0].getAttribute("data-value") === srcLabel)[0];
+    const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
+    edge.removeClass("fringe");
+
+    if (window.JSAVrecorder) {
+      window.JSAVrecorder.appendAnimationEventFields(
+        {
+          "pqOperation": "dequeue",
+          "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
+        });
+    }
+
+    // Give the last removed node a wider border (2px instead of 1) to
+    // emphasize that this is the last removed node.
+    if (focusedNodes.length > 0) {
+      focusedNodes[focusedNodes.length - 1].removeClass("focusnode");
+    }      
+    node.addClass("focusnode");
+    focusedNodes.push(node);
+    
+    // Debug print focusedNodes
+    let s = "focusedNodes:";
+    for (const x of focusedNodes) {
+      s += ' ' + x.value();
+    }
+    debugPrint(s);
+
+    minheap.layout();
+    // Call markEdge last, because it will also store the JSAV animation step
+    if (!edge.hasClass("spanning")) {
+      markEdge(edge);
+    }
+
+  }
+
+  /**
    * Preorder traversal to get node list of the tree
    * Since there is no function for this in the JSAV library
    * @param node the root node to start the traversal at
@@ -1107,102 +1166,39 @@
   }
 
   /**
-   * Add the minheap to the JSAV instance.
-   * The function adds a dummy div with class 'bintree' to center the minheap.
+   * Add the minheap to the student's JSAV instance.
+   *
+   * @param {int} x: position: pixels from left
+   * @param {int} y: position: pixels from top
    */
-  function addMinheap () {
-    if (minheap) {
-      minheap.clear();
-      $(".prioqueue").remove();
-      $(".bintree").remove();
-      $(".flex").remove();
-    }
-    heapsize = heapsize.value(0);
-    const edge = '<path d="M25,30L75,30" class="edge"></path>'
-               +'<text x="90" y="35">' + interpret("graph_edge") + '</text>'
-    const queuedEdge = '<path d="M25,80L75,80" class="edge queued">'
-                     + '</path><text x="90" y="85">'
-                     + interpret("enqueued_edge") + '</text>'
-    const spanningEdge = '<path d="M25,130L75,130" class="edge spanning">' 
-                       + '</path><text x="90" y="135">'
-                       + interpret("spanning_edge") + '</text>'
-    const node = '<circle cx="50" cy="200" r="22" fill="none" stroke="black" />'
-               + '<text x="45" y="195">5</text>'
-               + '<text x="35" y="213"> C (B)</text>'
-               + '<text x="90" y="190">' + interpret("node_explanation") + '</text>'
-    const legend = "<div><div class='prioqueue'><strong>" 
-                 + interpret("legend")
-                 + "</strong></div>" 
-                 + "<div class='legend'><svg version='1.1' xmlns='http://www.w3.org/2000/svg'> "
-                 + edge + queuedEdge + spanningEdge + node
-                 + " </svg></div></div>"
-    $(".jsavcanvas").append("<div class='flex'>"
-        + "<div class='left'><div class='prioqueue'><strong>"
-        + interpret("priority_queue")
-        + "</strong></div><div class='bintree'></div></div>" 
-        + legend
-        + "</div>");
-
-    // Explicitly set the size of this one, otherwise it defaults to
-    // the size that the graph has. 
-    $(".legend > svg").css({'height': '250px', 'width': '250px'})
-    minheap = jsav.ds.binarytree({relativeTo: $(".bintree"),
-                                  myAnchor: "center center"});
-    minheap.layout()
-    const html = "<button type='button' id='removeButton'>"+ interpret("#dequeue") +"</button>";
-    $(".jsavtree").append(html)
-    $("#removeButton").css({"float": "right",
-                            "position": "relative",
-                            "margin": "1em"});
-
-    // Add remove button
-    $("#removeButton").click(function() {
-      const deleted = minheapDelete(0);
-      if (!deleted) {
-        return;
+    function addMinheap(x, y) {
+      let previouslyExistingMinheap = false;
+      if (minheap) {
+        previouslyExistingMinheap = true;
+        minheap.clear();
+        $('.flexcontainer').remove();
+        $('#dequeueButton').remove();
       }
-      // Format of node label: "x<br>D (S)", where x is the distance,
-      // D is the destination node label and S is the source node label
-      const nodeLabel = deleted.charAt(deleted.length - 5);
-      const node = graph.nodes().filter(node =>
-          node.element[0].getAttribute("data-value") === nodeLabel)[0];
-      const srcLabel = table.value(2, findColByNode(nodeLabel));
-      const srcNode = graph.nodes().filter(node =>
-          node.element[0].getAttribute("data-value") === srcLabel)[0];
-      const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
-      edge.removeClass("queued");
-
-      if (window.JSAVrecorder) {
-        window.JSAVrecorder.appendAnimationEventFields(
-          {
-            "pqOperation": "dequeue",
-            "pqOut": window.JSAVrecorder.jsavObjectToJaalID(edge, "Edge")
-          });
-      }
-
-      // Give the last removed node a wider border (2px instead of 1) to
-      // emphasize that this is the last removed node.
-      if (focusedNodes.length > 0) {
-        focusedNodes[focusedNodes.length - 1].removeClass("focusnode");
-      }      
-      node.addClass("focusnode");
-      focusedNodes.push(node);
+  
+      $(".jsavcanvas").append("<div class='flexcontainer'></div>");
+      minheap = jsav.ds.binarytree({relativeTo: $(".flexcontainer"),
+        left: -180, top: 140});
+  
+      if (!previouslyExistingMinheap) {
+        jsav.label(interpret("priority_queue"), {relativeTo: minheap,
+          top: -135});
+        }
+  
+      // Add a Dequeue button
+      const html = "<button type='button' id='dequeueButton'>" +
+      interpret("#dequeue") +"</button>";
+      $(".jsavtree").append(html);
+      $("#dequeueButton").click(dequeueClicked);
       
-      // Debug print focusedNodes
-      let s = "focusedNodes:";
-      for (const x of focusedNodes) {
-        s += ' ' + x.value();
-      }
-      debugPrint(s);
-
-      minheap.layout();
-      // Call markEdge last, because it will also store the JSAV animation step
-      if (!edge.hasClass("marked")) {
-        markEdge(edge);
-      }
-
-    })
-  }
+      heapsize = heapsize.value(0);
+  
+      minheap.layout() 
+    }
 
   /**
    * Add the initial distance table to the JSAV.
@@ -1223,9 +1219,8 @@
     table = jsav.ds.matrix([labelArr, distanceArr, parentArr],
                            {style: "table",
                            width: width,
-                           relativeTo: $(".flex"),
-                           myAnchor: "center top",
-                           top: "150px"}); //Place below the bin tree
+                           left: 150,
+                           top: 750});
   }
 
   /**
