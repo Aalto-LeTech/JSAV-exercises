@@ -9,6 +9,23 @@
  * @param {number} x Location: pixels from left in *av*
  * @param {number} y Location: pixels from top in *av*
  * @param {function(string)} interpret A JSAV interpreter function
+ *
+ * Note: This function uses the JSAV graphics API to produce a legend.
+ * It seems the correct way to be able to draw a legend also a model answer.
+ * However, JSAV graphics API uses the Raphaël library to produce SVG, which
+ * means that all JSAV graphics API calls will end up in a single SVG element
+ * over the .jsavcanvas <div>. This means that if one wants to position the
+ * legend relative to some other element in the JSAV exercise, they need to
+ * compute the absolute coordinates for the legend. That, in other hand, can
+ * be done by calling the .bounds() method for an already created JSAV element.
+ * 
+ * Example from PrimAVPE-scaffolded-v2.js:
+ * 
+ * const minheap = jsav.ds.binarytree({relativeTo: $(".flexcontainer"),
+ *                 left: -180, top: 140});
+ * const minheapBox = minheap.bounds();
+ * createLegend(jsav, minheapBox.left + minheapBox.width + 20,
+ *                    minheapBox.top + 1, interpret);
  */
 function createLegend(av, x, y, interpret) {
     // Center on a pixel to produce crisp edges
