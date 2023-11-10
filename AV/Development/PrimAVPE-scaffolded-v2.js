@@ -41,7 +41,7 @@
       interpret = config.interpreter,
       settings = config.getSettings();
   
-  var debug = false; // produces debug prints to console
+  var debug = true; // produces debug prints to console
 
   // Storage of priority queue operations from student's answer to implement
   // custom grading. From PqOperationSequence.js
@@ -418,6 +418,8 @@
       
       av.umsg(interpret("av_ms_add_edge"),
               {fill: {from: srcNode.value(), to: dstNode.value()}});
+      modifyStyleOfModelTable(label, "fringe", false);
+      modifyStyleOfModelTable(label, "spanning", true);
       edge.removeClass("fringe");
       if (!edge.hasClass("spanning")) {
         markEdge(edge, av);
@@ -584,6 +586,10 @@
           node.element[0].getAttribute("data-value") === dstLabel)[0];
       const edge = dstNode.edgeFrom(srcNode) ?? dstNode.edgeTo(srcNode);
       edge.addClass("fringe")
+      dstNode.addClass("fringe")
+
+      // Add fringe class to the corresponding column in the distance matrix
+      modifyStyleOfModelTable(dstLabel, "fringe", true);
 
       mintree.layout();
     }
@@ -662,26 +668,26 @@
 
     function highlight(edge, node) {
       // Mark current edge as highlighted
-      edge.addClass("highlighted");
+      edge.addClass("compare");
       // Mark current node being visited as highlighted
-      node.addClass("highlighted");
+      node.addClass("compare");
       // Mark current node being visited in the table
       distances.addClass(node.value().charCodeAt(0) - "A".charCodeAt(0),
-                         true, "highlighted");
+                         true, "compare");
       // Mark current node being visited in the mintree
       const treeNodeList = getTreeNodeList(mintree.root());
       const treeNode = treeNodeList.filter(treeNode =>
           treeNode.value().charAt(treeNode.value().length - 5)
           === node.value())[0];
       if (treeNode) {
-        treeNode.addClass("highlighted")
+        treeNode.addClass("compare")
       }
     }
 
     function highlightUpdate(edge, node) {
       // Mark current node being updated in the table
       const tableRow = node.value().charCodeAt(0) - "A".charCodeAt(0);
-      distances.removeClass(tableRow, true, "highlighted");
+      distances.removeClass(tableRow, true, "compare");
       distances.addClass(tableRow, true, "updated");
       // Mark current node being visited in the mintree
       const treeNodeList = getTreeNodeList(mintree.root());
@@ -689,25 +695,42 @@
           treeNode.value().charAt(treeNode.value().length - 5)
           === node.value())[0];
       if (treeNode) {
-        treeNode.removeClass("highlighted")
+        treeNode.removeClass("compare")
         treeNode.addClass("updated")
       }
     }
       
 
     function removeHighlight(edge, node) {
-      edge.removeClass("highlighted");
-      node.removeClass("highlighted");
+      edge.removeClass("compare");
+      node.removeClass("compare");
       const tableIndex = node.value().charCodeAt(0) - "A".charCodeAt(0);
-      distances.removeClass(tableIndex, true, "highlighted");
+      distances.removeClass(tableIndex, true, "compare");
       distances.removeClass(tableIndex, true, "updated");      
       const treeNodeList = getTreeNodeList(mintree.root());
       const treeNode = treeNodeList.filter(treeNode =>
         treeNode.value().charAt(treeNode.value().length - 5)
         === node.value())[0];
       if (treeNode) {
-        treeNode.removeClass("highlighted");
+        treeNode.removeClass("compare");
         treeNode.removeClass("updated");
+      }
+    }
+
+    /**
+     * Modifies the style of table in model solution.
+     * 
+     * @param {string} dstLabel Label of destination node
+     * @param {string} cssClass Name of CSS class
+     * @param {boolean} setClass If true, set class, otherwise remove it.
+     */
+    function modifyStyleOfModelTable(dstLabel, cssClass, setClass) {
+      const col = findColByNode(dstLabel) - 1;
+      if (setClass) {
+        distances.addClass(col, true, cssClass)
+      }
+      else {
+        distances.removeClass(col, true, cssClass)
       }
     }
 
@@ -965,6 +988,29 @@
   }
 
   /**
+   * Modifies the style of table in student's solution.
+   * 
+   * @param {string} dstLabel Label of destination node
+   * @param {string} cssClass Name of CSS class
+   * @param {boolean} setClass If true, set class, otherwise remove it.
+   */
+  function modifyStyleOfStudentTable(dstLabel, cssClass, setClass) {
+    const row = findColByNode(dstLabel); // Do for all rows
+    for (let col = 0; col < 3; col++) {
+      if (setClass) {
+        table.addClass(col, row, cssClass);
+      }
+      else {
+        table.removeClass(col, row, cssClass);
+      }
+    }
+  }
+
+  /************************************************************
+   * Event handlers
+   ************************************************************/
+
+  /**
    * Add a node to the priority queue with label dstLabel and distance newDist.
    * Update the table to indicate the distance newDist and parent srcLabel.
    * @param event click event, which has the parameters srcLabel, dstLabel,
@@ -992,7 +1038,8 @@
         });
     }
 
-    updateTable(srcLabel, dstLabel, dist);
+    updateStudentTable(srcLabel, dstLabel, dist);
+    modifyStyleOfStudentTable(dstLabel, "fringe", true);
     insertMinheap(srcLabel, dstLabel, dist);
     debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
       dstLabel + " distance " + dist);
@@ -1028,7 +1075,7 @@
       return;
     }
 
-    updateTable(srcLabel, dstLabel, dist);
+    updateStudentTable(srcLabel, dstLabel, dist);
     // Add class to the new edge
     event.data.edge.addClass("fringe")
     // Remove class from the old edge
@@ -1104,6 +1151,9 @@
     const edge = graph.getEdge(node, srcNode) ?? graph.getEdge(srcNode, node);
     edge.removeClass("fringe");
 
+    modifyStyleOfStudentTable(nodeLabel, "fringe", false);
+    modifyStyleOfStudentTable(nodeLabel, "spanning", true);
+
     if (window.JSAVrecorder) {
       window.JSAVrecorder.appendAnimationEventFields(
         {
@@ -1161,7 +1211,7 @@
    * @param dstLabel
    * @param newDist
    */
-  function updateTable (srcLabel, dstLabel, newDist) {
+  function updateStudentTable (srcLabel, dstLabel, newDist) {
     const dstIndex = findColByNode(dstLabel);
     table.value(1, dstIndex, newDist)
     table.value(2, dstIndex, srcLabel)
