@@ -125,25 +125,32 @@
   }
 
   function model(modeljsav) {
-    // create the model
     const modelGraph = modeljsav.ds.graph({
       width: 500,
       height: 400,
       layout: "automatic",
       directed: false
     });
-
+    // Model queue is placed top left relative to model graph.
+    const modelQueue = modeljsav.ds.list({
+      center: false,
+      relativeTo: modelGraph,
+      anchor: "left top",
+    })
+    
     // copy the graph and its weights
     graphUtils.copy(graph, modelGraph, {weights: true});
     const modelNodes = modelGraph.nodes();
 
-    // Mark the "A" node
+    // Mark the "A" node and add it to visible queue.
     modelNodes[0].addClass("visited");
+    modelQueue.addFirst(modelNodes[0].value())
 
     modeljsav.displayInit();
 
-    // start the algorithm
-    bfs(modelNodes[0], modeljsav);
+    // Start the algorithm.
+    // Algorithm records the steps to modeljsav.
+    bfs(modelNodes[0], modeljsav, modelQueue);
 
     modeljsav.umsg(interpret("av_ms_final"));
     // hide all edges that are not part of the search tree
@@ -170,11 +177,12 @@
     }
   }
 
-  function bfs(start, av) {
+  function bfs(start, av, modelQueue) {
     var queue = [start],
         node,
         neighbor,
         adjacent;
+
     function nodeSort(a, b) {
       return a.value().charCodeAt(0) - b.value().charCodeAt(0);
     }
@@ -182,10 +190,15 @@
     while (queue.length) {
       // dequeue node
       node = queue.pop();
+      node.addClass("focusnode") // add highlighting to recently dequeued node
+      modelQueue.removeLast()
+      modelQueue.layout()
+
       // get neighbors and sort them in alphabetical order
       adjacent = node.neighbors();
       adjacent.sort(nodeSort);
       av.umsg(interpret("av_ms_dequeue"), {fill: {node: node.value()}});
+      
       av.step();
 
       // Check if all neighbors have already been visited
@@ -197,8 +210,11 @@
           neighbor = adjacent.next();
           av.umsg(interpret("av_ms_process_edge"), {fill: {from: node.value(), to: neighbor.value()}});
           if (!neighbor.hasClass("visited")) {
-            // enqueue and visit node
+            // enqueue node
             queue.unshift(neighbor);
+            modelQueue.addFirst(neighbor.value())
+            modelQueue.layout()
+            // visit node
             markEdge(node.edgeTo(neighbor), av);
           } else {
             av.umsg(interpret("av_ms_already_visited"), {
@@ -214,10 +230,10 @@
         av.umsg(interpret("av_ms_all_neighbors_visited"), {fill: {node: node.value()}});
         av.step();
       }
+      node.removeClass("focusnode") // remove highlighting of recently dequeued node
     }
   }
-
-
+  
   // Process About button: Pop up a message with an Alert
   function about() {
     window.alert(ODSA.AV.aboutstring(interpret(".avTitle"), interpret("av_Authors")));
