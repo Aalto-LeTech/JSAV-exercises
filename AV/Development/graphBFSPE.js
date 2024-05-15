@@ -125,9 +125,8 @@
   }
 
   function model(modeljsav) {
-    var i;
     // create the model
-    var modelGraph = modeljsav.ds.graph({
+    const modelGraph = modeljsav.ds.graph({
       width: 500,
       height: 400,
       layout: "automatic",
@@ -136,7 +135,7 @@
 
     // copy the graph and its weights
     graphUtils.copy(graph, modelGraph, {weights: true});
-    var modelNodes = modelGraph.nodes();
+    const modelNodes = modelGraph.nodes();
 
     // Mark the "A" node
     modelNodes[0].addClass("visited");
@@ -148,8 +147,8 @@
 
     modeljsav.umsg(interpret("av_ms_final"));
     // hide all edges that are not part of the search tree
-    var modelEdges = modelGraph.edges();
-    for (i = 0; i < modelGraph.edges().length; i++) {
+    const modelEdges = modelGraph.edges();
+    for (let i = 0; i < modelEdges.length; i++) {
       if (!modelEdges[i].hasClass("visited")) {
         modelEdges[i].hide();
       }
