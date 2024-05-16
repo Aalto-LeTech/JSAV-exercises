@@ -117,7 +117,7 @@
       var edge = graphEdges[i],
           modelEdge = modelEdges[i];
       if (modelEdge.hasClass("visited") && !edge.hasClass("visited")) {
-        // mark the edge that is marked in the model, but not in the exercise
+        // mark the edge that is marked in the model, but not in the exercisemodeljsav
         markEdge(edge);
         break;
       }
@@ -125,31 +125,36 @@
   }
 
   function model(modeljsav) {
-    var i;
-    // create the model
-    var modelGraph = modeljsav.ds.graph({
+    const modelGraph = modeljsav.ds.graph({
       width: 500,
       height: 400,
+      left: 150,
+      top: 50, // to give space for queue
       layout: "automatic",
       directed: false
     });
-
+    const modelQueue = modeljsav.ds.list({
+      left: 150,
+    })
+    
     // copy the graph and its weights
     graphUtils.copy(graph, modelGraph, {weights: true});
-    var modelNodes = modelGraph.nodes();
+    const modelNodes = modelGraph.nodes();
 
-    // Mark the "A" node
+    // Mark the "A" node and add it to visible queue.
     modelNodes[0].addClass("visited");
+    modelQueue.addFirst(modelNodes[0].value())
 
     modeljsav.displayInit();
 
-    // start the algorithm
-    bfs(modelNodes[0], modeljsav);
+    // Start the algorithm.
+    // Algorithm records the steps to modeljsav.
+    bfs(modelNodes[0], modeljsav, modelQueue);
 
     modeljsav.umsg(interpret("av_ms_final"));
     // hide all edges that are not part of the search tree
-    var modelEdges = modelGraph.edges();
-    for (i = 0; i < modelGraph.edges().length; i++) {
+    const modelEdges = modelGraph.edges();
+    for (let i = 0; i < modelEdges.length; i++) {
       if (!modelEdges[i].hasClass("visited")) {
         modelEdges[i].hide();
       }
@@ -171,11 +176,23 @@
     }
   }
 
-  function bfs(start, av) {
-    var queue = [start],
+  /**
+   * Performs a breadth-first search algorithm on a JSAV graph for the model
+   * answer. Adds steps to the JSAV slideshow (JSAV algorithm visualization
+   * template).
+   * 
+   * @param {start} JSAVnode start node for the BFS algorithm
+   * @param {av} av JSAV algorithm visualization template
+   * @param {modelQueue} JSAVlist horizontal linked list which represents a
+   *                              queue in the model answer.
+   * 
+   */
+  function bfs(start, av, modelQueue) {
+    var queue = [start], // queue used to run BFS
         node,
         neighbor,
         adjacent;
+
     function nodeSort(a, b) {
       return a.value().charCodeAt(0) - b.value().charCodeAt(0);
     }
@@ -183,10 +200,15 @@
     while (queue.length) {
       // dequeue node
       node = queue.pop();
+      node.addClass("focusnode") // add highlighting to recently dequeued node
+      modelQueue.removeLast()
+      modelQueue.layout()
+
       // get neighbors and sort them in alphabetical order
       adjacent = node.neighbors();
       adjacent.sort(nodeSort);
       av.umsg(interpret("av_ms_dequeue"), {fill: {node: node.value()}});
+      
       av.step();
 
       // Check if all neighbors have already been visited
@@ -198,8 +220,11 @@
           neighbor = adjacent.next();
           av.umsg(interpret("av_ms_process_edge"), {fill: {from: node.value(), to: neighbor.value()}});
           if (!neighbor.hasClass("visited")) {
-            // enqueue and visit node
+            // enqueue node
             queue.unshift(neighbor);
+            modelQueue.addFirst(neighbor.value())
+            modelQueue.layout()
+            // visit node
             markEdge(node.edgeTo(neighbor), av);
           } else {
             av.umsg(interpret("av_ms_already_visited"), {
@@ -215,14 +240,14 @@
         av.umsg(interpret("av_ms_all_neighbors_visited"), {fill: {node: node.value()}});
         av.step();
       }
+      node.removeClass("focusnode") // remove highlighting of recently dequeued node
     }
   }
-
 
   // Process About button: Pop up a message with an Alert
   function about() {
     window.alert(ODSA.AV.aboutstring(interpret(".avTitle"), interpret("av_Authors")));
-  }
+  }modeljsav
 
   exercise = jsav.exercise(model, init, {
     compare: {class: "visited"},
