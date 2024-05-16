@@ -128,14 +128,13 @@
     const modelGraph = modeljsav.ds.graph({
       width: 500,
       height: 400,
+      left: 150,
+      top: 50, // to give space for queue
       layout: "automatic",
       directed: false
     });
-    // Model queue is placed top left relative to model graph.
     const modelQueue = modeljsav.ds.list({
-      center: false,
-      relativeTo: modelGraph,
-      anchor: "left top",
+      left: 150,
     })
     
     // copy the graph and its weights
@@ -233,7 +232,7 @@
       node.removeClass("focusnode") // remove highlighting of recently dequeued node
     }
   }
-  
+
   // Process About button: Pop up a message with an Alert
   function about() {
     window.alert(ODSA.AV.aboutstring(interpret(".avTitle"), interpret("av_Authors")));
