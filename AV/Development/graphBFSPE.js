@@ -117,7 +117,7 @@
       var edge = graphEdges[i],
           modelEdge = modelEdges[i];
       if (modelEdge.hasClass("visited") && !edge.hasClass("visited")) {
-        // mark the edge that is marked in the model, but not in the exercise
+        // mark the edge that is marked in the model, but not in the exercisemodeljsav
         markEdge(edge);
         break;
       }
@@ -176,8 +176,19 @@
     }
   }
 
+  /**
+   * Performs a breadth-first search algorithm on a JSAV graph for the model
+   * answer. Adds steps to the JSAV slideshow (JSAV algorithm visualization
+   * template).
+   * 
+   * @param {start} JSAVnode start node for the BFS algorithm
+   * @param {av} av JSAV algorithm visualization template
+   * @param {modelQueue} JSAVlist horizontal linked list which represents a
+   *                              queue in the model answer.
+   * 
+   */
   function bfs(start, av, modelQueue) {
-    var queue = [start],
+    var queue = [start], // queue used to run BFS
         node,
         neighbor,
         adjacent;
@@ -236,7 +247,7 @@
   // Process About button: Pop up a message with an Alert
   function about() {
     window.alert(ODSA.AV.aboutstring(interpret(".avTitle"), interpret("av_Authors")));
-  }
+  }modeljsav
 
   exercise = jsav.exercise(model, init, {
     compare: {class: "visited"},
