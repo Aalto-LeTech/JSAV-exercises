@@ -247,7 +247,7 @@
   // Process About button: Pop up a message with an Alert
   function about() {
     window.alert(ODSA.AV.aboutstring(interpret(".avTitle"), interpret("av_Authors")));
-  }modeljsav
+  }
 
   exercise = jsav.exercise(model, init, {
     compare: {class: "visited"},
