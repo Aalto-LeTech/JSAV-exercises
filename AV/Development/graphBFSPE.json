@@ -2,7 +2,7 @@
   "translations" :{
     "en": {
       ".avTitle": "Breadth-First Search Proficiency Exercise",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Artturi Tilanterä",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Artturi Tilanterä, Teemu Taivainen",
       ".instructLabel": "Instructions:",
       ".instructions": "Reproduce the behavior of the BFS algorithm for the graph below. Just click on the <strong>edges</strong> in the order that they will be traversed by the BFS algorithm. Start with Node A. If there is more than one node that could be visited next, choose the one that comes first in alphabetical order.",
       "av_ms_final": "Final BFS tree",
@@ -10,13 +10,14 @@
       "av_ms_process_edge": "Process edge ({from}, {to}).",
       "av_ms_already_visited": " Node {node} already visited",
       "av_ms_all_neighbors_visited": "All the neighbors of {node} have already been visited.\n",
+      "av_ms_queue_empty": "The queue is empty and there are no unvisited neighbors. The algorithm finishes execution.",
       "#help": "Help",
       "#about": "About",
       "reset": "New Exercise"
     },
     "fi": {
       ".avTitle": "Leveyssuuntainen haku",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Artturi Tilanterä",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Artturi Tilanterä, Teemu Taivainen",
       ".instructLabel": "Ohjeet:",
       ".instructions": "Käy läpi verkko BFS-järjestyksessä. Aloita läpikäynti solmusta A. Klikkaa <strong>särmiä</strong> samassa järjestyksessä kuin BFS-algoritmi käy ne läpi. Solmun naapurit käydään läpi aakkosjärjestyksessä.",
       "av_ms_final": "Lopullinen leveyshaun tuottama puu",
@@ -24,6 +25,7 @@
       "av_ms_process_edge": "Käsitellään särmä ({from}, {to}).",
       "av_ms_already_visited": " Solmussa {node} on jo käyty.",
       "av_ms_all_neighbors_visited": "Kaikki {node}:n naapurit on käyty läpi.\n",
+      "av_ms_queue_empty": "Jono on tyhjä ja kaikki naapurit on käyty läpi. Algoritmin suoritus päättyy.",
       "#help": "Ohje",
       "#about": "Lisätietoa",
       "reset": "Uusi tehtävä"
