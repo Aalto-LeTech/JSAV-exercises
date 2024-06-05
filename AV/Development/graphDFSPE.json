@@ -2,9 +2,9 @@
   "translations" :{
     "en": {
       ".avTitle": "Depth-First Search Proficiency Exercise",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Artturi Tilanterä",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Artturi Tilanterä, Teemu Taivainen",
       ".instructLabel": "Instructions:",
-      ".instructions": "Reproduce the behavior of the DFS algorithm for the graph below. Just click on the <strong>edges</strong> in the order that they will be traversed by the DFS algorithm. Start with Node A. If there is more than one node that could be visited next, choose the one that comes first in alphabetical order.",
+      ".instructions": "Reproduce the behavior of the DFS algorithm for the graph below. Click on the <strong>edges</strong> in the order that their target nodes will be visited by the DFS algorithm. The corresponding code line is highlighted. Start from Node A, which is already marked visited. If there is more than one node that could be visited next, choose the one that comes first in alphabetical order.",
       "av_ms_final": "Final DFS graph",
       "av_ms_process_edge": "Process edge ({from}, {to}).",
       "av_ms_already_visited": " Node {node} already visited",
@@ -14,9 +14,9 @@
     },
     "fi": {
       ".avTitle": "Syvyyssuuntainen haku",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Artturi Tilanterä",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Artturi Tilanterä, Teemu Taivainen",
       ".instructLabel": "Ohjeet:",
-      ".instructions": "Käy läpi verkko DFS-järjestyksessä. Aloita läpikäynti solmusta A. Klikkaa <strong>särmiä</strong> samassa järjestyksessä kuin DFS-algoritmi käy ne läpi. Solmun naapurit käydään läpi aakkosjärjestyksessä.",
+      ".instructions": "Käy läpi verkko DFS-järjestyksessä. Klikkaa <strong>särmiä</strong> samassa järjestyksessä kuin DFS-algoritmi käy niiden kohdesolmut läpi. Operaatiota vastaava koodirivi on korostettu. Aloita solmusta A, joka on jo merkitty läpi käydyksi. Solmun naapurit käydään läpi aakkosjärjestyksessä.",
       "av_ms_final": "Lopullinen syvyyshaun tuottama puu",
       "av_ms_process_edge": "Käsitellään särmä ({from}, {to}).",
       "av_ms_already_visited": " Solmussa {node} on jo käyty.",
