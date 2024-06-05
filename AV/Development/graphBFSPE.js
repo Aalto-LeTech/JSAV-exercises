@@ -11,13 +11,13 @@
   jsav.recorded();
 
   // Add the code block to the exercise. 
-  var config = ODSA.UTILS.loadConfig({'av_container': 'jsavcontainer'}),
-    code = config.code, 
-    pseudo;
+  const code = ODSA.UTILS.loadConfig({'av_container': 'jsavcontainer'}).code; // fetch code
+
   if (code) {
-    pseudo = jsav.code($.extend({after: {element: $(".code")}}, code));
+    jsav.code($.extend({after: {element: $(".code")}}, code)) // add pseudocode to exercise
+      .highlight(12); // highlight row that marks node visited
   } else {
-    pseudo = jsav.code();
+    jsav.code(); // pseudo is just blank if code is not defined
   }
 
   function init_old() {
