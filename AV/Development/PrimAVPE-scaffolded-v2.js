@@ -7,9 +7,14 @@
  */
 
 // Make sure to include all relevant JavaScript files before this one to have access to global variables.
-/* global graphUtils, MinHeapInterface, PqOperationSequence, PqOperation, createLegend */
+/* global graphUtils, MinHeapInterface, PqOperationSequence, PqOperation, createLegend, createAdjacencyList*/
 (function() {
   "use strict";
+
+  const EDGE_WEIGHT_UPPER_BOUND = 16; // exclusive
+  // Target score and max number of trials when generating the exercise graph.
+  const TARGET_SCORE = 5;
+  const MAX_TRIALS = 120;
 
   // JSAV Graph instance for the student's solution.
   var graph;
@@ -22,6 +27,9 @@
   /** @type {MinHeapInterface} */
   let minHeapInterface;
 
+  // JSAV pseudocode object
+  let adjacencyList;
+
   // Legend box in the exercise view;
   var exerciseLegendCreated = false;
 
@@ -32,8 +40,6 @@
 
   // JSAV Visualization
   var jsav = new JSAV($(".avcontainer"), {settings: settings});
-
-  // Number of elements in the binary heap
 
   // A list of JSAV graph nodes to keeps track of what node has been focused
   // after a dequeue operation. This is make sure that the class can be removed
@@ -56,9 +62,9 @@
     controls: $(".jsavexercisecontrols"),
     resetButtonTitle: interpret("reset"),
     modelDialog: {width: "960px"},
-    grader: scaffoldedGrader,
     fix: fixState
   });
+
   /* Set custom undo and reset function because we also have a custom
    * grader. Save the default prototype functions into separate variables,
    * because we also want to call them. */
@@ -90,7 +96,7 @@
         bestNlGraph,
         bestResult = {score: 0},
         trials = 0;
-    const targetScore = 5, maxTrials = 100;
+
     let sumStats = {
       relaxations: 0,
       singleClosest: 0,
@@ -99,10 +105,13 @@
       unreachable: 0};
 
     let result = {score: 0};
-    while (result.score < targetScore && trials < maxTrials) {
+    while (result.score < TARGET_SCORE && trials < MAX_TRIALS) {
+      trials++;
       nlGraph = graphUtils.generatePlanarNl(nVertices, nEdges, weighted,
-                                            directed, width, height);
-      result = testPrim(nlGraph);
+                                            directed, width, height, EDGE_WEIGHT_UPPER_BOUND);
+      // Score the graph candidate
+      result = scoreGraphCandidate(nlGraph);
+      debugPrint("Score of the graph candidate: " + result.score);
       if (result.score > bestResult.score) {
         bestNlGraph = nlGraph;
         bestResult = result;
@@ -112,7 +121,6 @@
           sumStats[k]++;
         }
       }
-      trials++;
     }
     nlGraph = bestNlGraph;
 
@@ -123,11 +131,21 @@
     }
     debugPrint(statsText);
 
+    // Clear adjacency list if it already exist (when reset is clicked).
+    adjacencyList?.clear();
+
+    // NOTE: Adjacency list should be created before the graph!
+    // This automatically makes the graph move to the right == alignment goes well.
+
+    adjacencyList = createAdjacencyList(nlGraph, jsav, {
+      lineNumbers: false,
+      left: 120
+    });
+
+    // Clear graph if it already exist (when reset is clicked).
+    graph?.clear();
     // Create a JSAV graph instance
-    if (graph) {
-      graph.clear();
-    }
-    graph = jsav.ds.graph({//    Condition:
+    graph = jsav.ds.graph({
       width: width,
       height: height,
       layout: "manual",
@@ -141,10 +159,11 @@
       vertex.x = vertex.x - 30;
       vertex.y = vertex.y - 30;
     });
+
     graphUtils.nlToJsav(nlGraph, graph);
     addEdgeClickListeners();
 
-    // Creates instance of MinHeapInterface and adds visible priority queue with deque button.
+    // Creates instance of MinHeapInterface and adds visible priority queue with dequeue button.
     addPriorityQueue();
 
     if (!exerciseLegendCreated) {
@@ -159,30 +178,6 @@
     graph.nodes()[0].addClass("spanning"); // mark the 'A' node
     jsav.displayInit();
     return [graph, minHeapInterface.btree]; // Don't know if btree is really used to grading.
-  }
-
-  /**
-   * Custom grading function for the exercise.
-   */
-  function scaffoldedGrader() {
-    debugPrint("scaffoldedGrader():\n" +
-      "student: " + studentPqOperations.toString() + "\n" +
-      "model  : " + modelPqOperations.toString());
-    let grade = studentPqOperations.gradeAgainst(modelPqOperations);
-
-    let score = {
-      // Number of correct steps in student's solution
-      correct: grade.studentGrade,
-      // Continuous grading mode not used, therefore `fix` is zero
-      fix: 0,
-      // Number of total steps in student's solution
-      student: studentPqOperations.length(),
-      // Number of total steps in model solution
-      total: grade.maxGrade,
-      // Continuous grading mode not used, therefore `undo` is zero
-      undo: 0
-    };
-    this.score = score;
   }
 
   /**
@@ -679,9 +674,9 @@
      *****************************************************/
   }
 
-  function testPrim(graphToTest) {
-    const nVertices = graphToTest.vertices.length;
-    let stats = {
+  function scoreGraphCandidate(graphToEvaluate) {
+    const nVertices = graphToEvaluate.vertices.length;
+    const stats = {
       relaxations: 0,
       singleClosest: 0,
       multipleClosest: 0,
@@ -693,8 +688,8 @@
     // shortest path from the initial vertex to each other vertex.
     // Array 'visited' stores the visitedness of each vertex. A visited vertex
     // has their minimum distance decided permanently.
-    var distance = Array(nVertices);
-    var visited = Array(nVertices);
+    const distance = Array(nVertices);
+    const visited = Array(nVertices);
     for (let i = 0; i < nVertices; i++) {
       distance[i] = Infinity;
       visited[i] = false;
@@ -702,13 +697,13 @@
     distance[0] = 0;
 
     for (let i = 0; i < nVertices; i++) {
-      var v = primMinVertex(distance, visited, stats);
+      const v = primMinVertex(distance, visited, stats);
       visited[v] = true;
       if (distance[v] === Infinity) {
         stats.unreachable++;
         break;
       }
-      for (let e of graphToTest.edges[v]) {
+      for (let e of graphToEvaluate.edges[v]) {
         let d = distance[e.v];
         if (e.weight < d) {
           // Update distance
@@ -1137,12 +1132,12 @@
       style: "table",
       width: width,
       left: 150,
-      top: 780});
+      top: 820});
   }
 
-  function debugPrint(x) {
+  function debugPrint(...args) {
     if (debug) {
-      console.log(x);
+      console.log(...args);
     }
   }
 }());

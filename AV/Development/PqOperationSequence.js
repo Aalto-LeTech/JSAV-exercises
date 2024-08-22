@@ -172,7 +172,7 @@ class PqOperationSequence {
    * Assumes that this sequence is the student's solution and the
    * another sequence is the model solution.
    * 
-   * @param {PqOperation} modelAnswer Model solution
+   * @param {PqOperationSequence} modelAnswer Model solution
    * @returns {studentGrade: x, maxGrade: y}
    *       Grade of x / y, x and y are integers.
    */
