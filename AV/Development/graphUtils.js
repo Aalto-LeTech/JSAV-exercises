@@ -1,6 +1,8 @@
 (function() {
   "use strict";
 
+  const DEFAULT_MAX_EDGE_WEIGHT = 10; // exclusive
+
   function generateRandomEdges(nNodes, nEdges, weighted) {
     var edges = new Array(nEdges),
         adjacencyMatrix,
@@ -127,8 +129,7 @@
    * e[i][j] === e[j][i].
    */
   function generatePlanarGraphNl(nVertices, nEdges, weighted, directed, width,
-    height)
-  {
+    height, maxEdgeWeight = DEFAULT_MAX_EDGE_WEIGHT) {
     // Place nodes in a square grid:
     //   A---B---C---D
     //   |   |   |   |
@@ -137,8 +138,9 @@
     //   I---J
     //
     let totalVertices = 0;
-    for (let v of nVertices)
+    for (let v of nVertices) {
       totalVertices += v;
+    }
 
     const gridWidth = Math.ceil(Math.sqrt(totalVertices));
     const gridHeight = Math.ceil(totalVertices / gridWidth);
@@ -160,8 +162,7 @@
     // Create set of candidate edges
     let candEdges = candidateEdges(nVertices, gridWidth, gridHeight);
 
-    let component = verticesToComponents(nVertices, gridWidth, gridHeight,
-      candEdges);
+    let component = verticesToComponents(nVertices, gridWidth, gridHeight, candEdges);
 
     // Select nEdges[i] from candEdges for each component i.
     candEdges = edgesToComponents(candEdges, component, nEdges);
@@ -190,7 +191,7 @@
       let v1 = e[0];
       let v2 = e[1];
       if (weighted) {
-        weight = 1 + Math.floor((JSAV.utils.rand.random() * 9));
+        weight = JSAV.utils.rand.numKey(1, maxEdgeWeight);
       }
       // JSAV implementation
       g.edges[v1].push({v: v2, weight: weight});
@@ -201,7 +202,7 @@
 
     // Sort edges by start vertex, end vertex.
     for (let n of g.edges) {
-      n.sort(function(e1, e2) { return e1.v - e2.v });
+      n.sort(function(e1, e2) { return e1.v - e2.v; });
     }
     return g;
   }
@@ -217,7 +218,7 @@
    * Parameters:
    * nVertices [V1, V2, ...]: number of vertices for each connected component
    * gridWidth: width of the grid in nodes
-   * gridHeight: height of the frid in nodes
+   * gridHeight: height of the grid in nodes
    *
    * Returns:
    * [e1, e2, ..., eN], where each entry is of form [u, v], where u < v.
