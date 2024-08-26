@@ -38,9 +38,6 @@ text-align: center;
 .jsavcodeline {
     background-color: #eee;
 }
-.jsavcodeline.action {
-    background-color: #f9cc38;
-}
 
 /* Unvisited  */
 .jsavgraph .jsavnode, .jsavmatrix .jsavnode {
