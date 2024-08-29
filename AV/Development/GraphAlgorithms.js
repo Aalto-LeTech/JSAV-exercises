@@ -65,7 +65,8 @@ function createLegend(av, x, y, interpret) {
  * Function to create and display an adjacency list representation of a graph.
  * Uses JSAV pseudocode API.
  * @param {Object} nlGraph - neighbour list representation of a graph as returned by
- * function generatePlanarGraphNl from file graphUtils.js
+ * function generatePlanarGraphNl from file graphUtils.js or just any object with
+ * edges property as returned by generatePlanarGraphNl.
  * @param {JSAV_object} jsav - the JSAV instance to which the neighbour list will be added
  * @param {Object} options - options that will be passed to JSAV method code that displays
  * the adjacency list as pseudo code, defaults to blank

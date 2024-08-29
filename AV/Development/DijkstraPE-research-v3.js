@@ -8,7 +8,8 @@
  */
 
 // Make sure to include all relevant JavaScript files before this one to have access to global variables.
-/* global jQuery, JSAV, ODSA, graphUtils, MinHeapInterface, PqOperationSequence, PqOperation, DijkstraInstanceGenerator, createLegend */
+/* global jQuery, JSAV, ODSA, graphUtils, MinHeapInterface, PqOperationSequence, PqOperation,
+createAdjacencyList, DijkstraInstanceGenerator, createLegend */
 
 (function ($) {
   "use strict";
@@ -23,6 +24,9 @@
   // Implements the priority queue as min-heap and displays it as a binary tree.
   /** @type {MinHeapInterface} */
   let minHeapInterface;
+
+  // JSAV pseudocode object
+  let adjacencyList;
 
   // Legend box in the exercise view;
   var exerciseLegendCreated = false;
@@ -60,7 +64,6 @@
     controls: $(".jsavexercisecontrols"),
     modelDialog: {width: "960px"},
     resetButtonTitle: interpret("reset"),
-    grader: scaffoldedGrader,
     fix: fixState
   });
   /* Set custom undo and reset function because we also have a custom
@@ -94,28 +97,42 @@
     // purpose
     // JSAV.utils.rand.seedrandom("1");
 
-    // Create a JSAV graph instance
-    if (graph) {
-      graph.clear();
-    }
+    // Clear the old elements is reset is clicked.
+    graph?.clear();
+    adjacencyList?.clear();
+
+    // Generate a new exercise instance
+    exerciseInstance = generator.generateInstance();
+
+    // Create a JSAV graph instance for the student's solution.
     const layoutSettings = {
       width: 700,      // pixels
       height: 400,     // pixels
       layout: "manual",
-      directed: false
+      directed: false,
+      left: 150
     };
     graph = jsav.ds.graph(layoutSettings);
-    
-    exerciseInstance = generator.generateInstance();
+    researchInstanceToJsav(exerciseInstance.graph, graph, layoutSettings);
 
+    // Convert graph to compatible format for createAdjacencyList.
+    const graphAdjList = researchInstanceToAdjList(exerciseInstance.graph);
+    // Add visible adjacency list to the exercise.
+    // Pass the graphAdjList as an object with edges property to match the
+    // expected parameter format.
+    adjacencyList = createAdjacencyList({edges: graphAdjList}, jsav, {
+      lineNumbers: false,
+      left: 10
+    });
+
+    // Do other initializations.
     studentPqOperations = new PqOperationSequence();
     modelPqOperations = new PqOperationSequence();
-    researchInstanceToJsav(exerciseInstance.graph, graph, layoutSettings);
     addEdgeClickListeners();
 
     addPriorityQueue();
     if (!exerciseLegendCreated) {
-      createLegend(jsav, 520, 530, interpret);
+      createLegend(jsav, 570, 548, interpret);
       exerciseLegendCreated = true;
     }
     addTable(exerciseInstance.graph);
@@ -129,7 +146,11 @@
     // mark the 'A' node
     graph.nodes()[exerciseInstance.startIndex].addClass("spanning");
     jsav.displayInit();
-    return [graph, minHeapInterface._btree]; // Don't know if btree is really used to grading.
+    // Return the objects used to grade the exercise.
+    // Including the binary tree for grading is probably the same as
+    // including the class 'fringe' in the compare parameter of the exercise object
+    // as fringe nodes are in the priority queue.
+    return [graph, minHeapInterface._btree];
   }
 
   // Process About button: Pop up a message with an Alert
@@ -181,8 +202,7 @@
     }
 
     $(".jsavcanvas").append("<div class='flexcontainer'></div>");
-    
-    minHeapInterface = new MinHeapInterface(jsav, {relativeTo: $(".flexcontainer"), left: -180, top: 140});
+    minHeapInterface = new MinHeapInterface(jsav, {relativeTo: $(".flexcontainer"), left: -90, top: 520});
 
     if (!previouslyExistingMinheap) {
       jsav.label(interpret("priority_queue"), {relativeTo: minHeapInterface._btree,
@@ -202,7 +222,7 @@
    * Parent is '-' for all.
    * @param riGraph the research instance graph.
    */
-  function addTable (riGraph) {
+  function addTable(riGraph) {
     if (table) {
       table.clear();
     }
@@ -216,7 +236,7 @@
       {style: "table",
         width: width,
         left: 10,
-        top: 780});
+        top: 800});
   }
 
   /**
@@ -513,32 +533,8 @@
   }
   
   /************************************************************
-   * Grading-related functions
+   * Functions to handle the state changes of the priority queue.
    ************************************************************/
-
-  /**
-   * Custom grading function for the exercise.
-   */
-  function scaffoldedGrader() {
-    debugPrint("scaffoldedGrader():\n" +
-      "student: " + studentPqOperations.toString() + "\n" +
-      "model  : " + modelPqOperations.toString());
-    let grade = studentPqOperations.gradeAgainst(modelPqOperations);
-
-    let score = {
-      // Number of correct steps in student's solution
-      correct: grade.studentGrade,
-      // Continuous grading mode not used, therefore `fix` is zero
-      fix: 0,
-      // Number of total steps in student's solution
-      student: studentPqOperations.length(),
-      // Number of total steps in model solution
-      total: grade.maxGrade,
-      // Continuous grading mode not used, therefore `undo` is zero
-      undo: 0
-    };
-    this.score = score;
-  }
 
   /**
    * Custom undo function for the exercise.
@@ -687,9 +683,41 @@
         options.weight = e[1];
         jsavGraph.addEdge(gNodes[i], gNodes[e[0]], options);
       }
-    }      
+    }
   }
+  /**
+   * Converts the research instance graph to a suitable format for the
+   * createAdjacencyList function.
+   * @param {object} riGraph The research instance graph as returned by
+   *                        DijkstraInstanceGenerator.generateInstance().
+   * @returns {Array<Array<{v: number, weight: number}>>} The adjacency list representation of the graph.
+   */
+  function researchInstanceToAdjList(riGraph) {
+    // Helper that maps index of a vertex in the research instance graph to
+    // an index in the adjacency list so that in the adjacency list A is 0, B is 1, etc.
+    function mapIndex(vertexIdx) {
+      const vertexLabel = riGraph.vertexLabels[vertexIdx];
+      return vertexLabel.charCodeAt(0) - "A".charCodeAt(0);
+    }
+    // Create empty adjacency list where index 0 is A, 1 is B, etc.
+    const adjList = riGraph.vertexLabels.map(() => []);
 
+    // Iterate over the edges of each vertex and add them to the adjacency list.
+    riGraph.edges.forEach((edge, vertexIdx) => {
+      // Add neighbors to the adjacency list.
+      edge.forEach(([neighborIdx, weight]) => {
+        // Ensuring that the neighbors are added exactly in the same
+        // format as in the util function generatePlanarGraphNl.
+        // Remember to map the indices!
+        adjList[mapIndex(vertexIdx)].push({v: mapIndex(neighborIdx), weight: weight});
+      });
+    });
+    // Sort the neighbors by the index of the neighbor to have student process neighbors in the
+    // same order as the model solution (alphabetical order).
+    adjList.forEach(neighbors =>
+      neighbors.sort((a, b) => a.v - b.v));
+    return adjList;
+  }
 
   /**
    * 1. Marks an edge as dequeued in the visualization (both student's and
