@@ -307,7 +307,10 @@
     modelNodes[0].addClass("spanning");
 
     // Create model solution min-heap
-    const modelMinHeapInterface = new MinHeapInterface(modeljsav, {});
+    const modelMinHeapInterface = new MinHeapInterface(modeljsav, {
+      relativeTo: modelGraph, left: -150, top: 291}
+    );
+    createLegend(modeljsav, 550, 400, interpret);
 
     modeljsav.displayInit();
 

@@ -15,8 +15,8 @@
       "#about": "About",
       "reset": "New Exercise",
       "legend": "Legend",
-      "graph_edge": "Unvisited",
-      "spanning_edge": "Spanning tree"
+      "legend_unvisited": "Other",
+      "legend_spanning_tree": "Spanning tree"
     },
     "fi": {
       ".avTitle": "Dijkstran algoritmi",
@@ -33,8 +33,8 @@
       "#about": "Lisätietoa",
       "reset": "Uusi tehtävä",
       "legend": "Selite",
-      "graph_edge": "Tuntematon",
-      "spanning_edge": "Virityspuu"
+      "legend_unvisited": "Muu",
+      "legend_spanning_tree": "Virityspuu"
     }
   },
   "params": {

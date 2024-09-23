@@ -8,6 +8,8 @@
  * @param {number} x Location: pixels from left in *av*
  * @param {number} y Location: pixels from top in *av*
  * @param {function(string)} interpret A JSAV interpreter function
+ * @param {boolean} [pqExercise=true] If true, include fringe color and
+ * pq node explanation.
  *
  * Note: This function uses the JSAV graphics API to produce a legend.
  * It seems the correct way to be able to draw a legend also a model answer.
@@ -26,12 +28,14 @@
  * createLegend(jsav, minheapBox.left + minheapBox.width + 20,
  *                    minheapBox.top + 1, interpret);
  */
-function createLegend(av, x, y, interpret) {
+function createLegend(av, x, y, interpret, pqExercise = true) {
   // Center on a pixel to produce crisp edges
   const xAdjusted = Math.floor(x) + 0.5;
   const yAdjusted = Math.floor(y) + 0.5;
+
   const width = 250; // pixels
-  const height = 250; // pixels
+  const height = pqExercise ? 250 : 130; // pixels
+
   av.g.rect(xAdjusted, yAdjusted, width, height, {
     "stroke-width": 1,
     fill: "white"
@@ -39,26 +43,36 @@ function createLegend(av, x, y, interpret) {
   av.label(interpret("legend"), {left: xAdjusted + 100, top: yAdjusted - 35});
 
   const hpos = [26, 76, 90]; // line start, line end, text start (pixels)
-  const vpos = [30, 80, 130]; // vertical position for each three edge types
-  const edgeClass = ["legend-edge", "legend-fringe", "legend-spanning"];
-  const edgeText = ["legend_unvisited", "legend_fringe",
-                    "legend_spanning_tree"];
-  const textvadjust = -22;
-  for (let i = 0; i < 3; i++) {
-    av.g.line(xAdjusted + hpos[0], yAdjusted + vpos[i],
-              xAdjusted + hpos[1], yAdjusted + vpos[i]).addClass(edgeClass[i]);
+  // Vertical position of the upper left corner of each color sample rectangle
+  const vpos = [30, 80, 130]; // only first two are used if pqExercise is false
+
+  const edgeClass = pqExercise ? ["legend-spanning", "legend-fringe", "legend-other"] :
+    ["legend-spanning", "legend-other"];
+
+  const edgeText = pqExercise ? ["legend_spanning_tree", "legend_fringe", "legend_unvisited"] :
+    ["legend_spanning_tree", "legend_unvisited"]; // other = unvisited
+
+  const textvadjust = -11;
+  const upperLimit = pqExercise ? 3 : 2;
+  // Create the legend for colors.
+  for (let i = 0; i < upperLimit; i++) {
+    // Takes upper left corner x, y, width, height.
+    av.g.rect(xAdjusted + hpos[0], yAdjusted + vpos[i], hpos[1] - hpos[0], 25)
+      .addClass(edgeClass[i]);
+
     av.label(interpret(edgeText[i]), {left: xAdjusted + hpos[2],
                                       top: yAdjusted + vpos[i] + textvadjust,
-                                      "text-align": "center"})
+                                      "text-align": "center"}).addClass("legendtext");
+  }
+  // Add node explanation if this is for a priority queue exercise.
+  if (pqExercise) {
+    av.g.circle(xAdjusted + 51, yAdjusted + 201, 22);
+    av.label("5<br>C (B)", {left: xAdjusted + 35, top: yAdjusted + 166})
+      .addClass("legendtext")
+      .addClass("textcentering");
+    av.label(interpret("node_explanation"), {left: xAdjusted + hpos[2], top: yAdjusted + 166})
       .addClass("legendtext");
   }
-  av.g.circle(xAdjusted + 51, yAdjusted + 201, 22);
-  av.label("5<br>C (B)", {left: xAdjusted + 35, top: yAdjusted + 166})
-    .addClass("legendtext")
-    .addClass("textcentering");
-  av.label(interpret("node_explanation"),
-           {left: xAdjusted + hpos[2], top: yAdjusted + 166})
-    .addClass("legendtext");
 }
 
 /**
