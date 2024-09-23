@@ -5,7 +5,7 @@
  * 5 November 2021
  */
 
-/* global ODSA, graphUtils */
+/* global ODSA, graphUtils createLegend*/
 (function ($) {
   "use strict";
   var exercise,
@@ -24,26 +24,14 @@
   jsav.recorded();
 
   if (code) {
-    pseudo = jsav.code($.extend({after: {element: $(".code")}}, code));
-    pseudo.highlight(8)
+    pseudo = jsav.code($.extend({left: 10}, code))
+    pseudo.highlight(8);
   } else {
     pseudo = jsav.code();
   }
 
-   //Add the legend to the exercise
-   const edge = '<path d="M25,30L75,30" class="legend-edge"></path>'
-              +'<text x="90" y="35">' + interpret("graph_edge") + '</text>'
-    const spanningEdge = '<path d="M25,80L75,80" class="legend-spanning">' 
-                       + '</path><text x="90" y="85">'
-                       + interpret("spanning_edge") + '</text>'
-    const legend = "<div class='subheading'><center><strong>" 
-                 + interpret("legend")
-                 + "</center></strong></div>" 
-                 + "<div class='legend'>"
-                 + "<svg version='1.1' xmlns='http://www.w3.org/ 2000/svg'> "
-                 + edge + spanningEdge
-                 + " </svg></div>"
-    $(".codeblock").append(legend)
+  //Add the legend to the exercise
+  createLegend(jsav, 375, 350, interpret, false);
 
   function init() {
     // Create a JSAV graph instance
@@ -54,8 +42,9 @@
       width: 500,      // pixels
       height: 400,     // pixels
       layout: "manual",
-      directed: false
-    }
+      directed: false,
+      left: 700
+    };
     graph = jsav.ds.graph(layoutSettings);
     
     exerciseInstance = generator.generateInstance();
@@ -65,9 +54,6 @@
     graph.layout();
     graph.nodes()[exerciseInstance.startIndex].addClass("spanning"); // mark the 'A' node
     jsav.displayInit();
-    // Remove the initially calculated min-width to ensure that the graph is 
-    // to the right of the code block. 
-    $(".jsavcanvas").css("min-width", "")
     return graph;
   }
 
