@@ -5,7 +5,7 @@ initialization, model solution, fix state and that can be passed for
 JSAV exercise object.
 */
 
-/* global graphUtils createAdjacencyList*/
+/* global graphUtils createAdjacencyList, LinkedQueue*/
 
 /**
  * Calculate the spanning tree for the nlGraph. This is used to ensure
@@ -104,32 +104,32 @@ class TraversalExerciseBuilder {
 
   /**
    * Builds the model solution function for the exercise.
-   * @param {Function} algorithm - The algorithm to be used (BFS or DFS).
-   * @param {Function} interpret - The interpret function for messages.
-   * @param {boolean} [addQueue=false] - Whether to add a queue for BFS.
-   * @returns {Function} The model solution function.
+   * @param {function} algorithm - The algorithm to be used (BFS or DFS).
+   * @param {function} interpret - The interpret function for messages.
+   * @param {object} modelGraphOptions - The options for the model graph.
+   * @param {object} [modelQueueOptions=null] - The options for the model queue.
+   * If null, the model queue is not added to the model solution (pass {} if you want queue without options).
+   * @returns {function} The model solution function.
    */
-  buildModel(algorithm, interpret, addQueue = false) {
+  buildModel(algorithm, interpret, modelGraphOptions, modelQueueOptions = null) {
     // This is again arrow function so that this is inherited.
     const modelSolution = (modeljsav) => {
-      const modelGraph = modeljsav.ds.graph({
-        width: 500,
-        height: 400,
-        left: 150,
-        top: 50, // to give space for queue
-        layout: "automatic",
-        directed: false
-      });
-
-      const modelQueue = addQueue ? modeljsav.ds.list({left: 150}) : null;
-
+      // Create a model graph instance.
+      const modelGraph = modeljsav.ds.graph(modelGraphOptions);
       // copy the graph and its weights
       graphUtils.copy(this.graph, modelGraph, {weights: true});
       const modelNodes = modelGraph.nodes();
-
       // Mark the "A" node and add it to visible queue.
       modelNodes[0].addClass("visited");
-      modelQueue?.addFirst(modelNodes[0].value());
+
+
+      const modelQueue = modelQueueOptions ? new LinkedQueue(modeljsav, modelQueueOptions) : null;
+      if (modelQueue) {
+        // Code specific to BFS.
+        modelQueue.enqueue(modelNodes[0].value());
+        const queueLabelLeft = modelQueueOptions.left || 80;
+        modeljsav.label(interpret("queue_label"), {left: queueLabelLeft});
+      }
 
       modeljsav.displayInit();
 
