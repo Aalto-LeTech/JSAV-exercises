@@ -1,4 +1,4 @@
-/* global TraversalExerciseBuilder */
+/* global TraversalExerciseBuilder, LinkedQueue */
 (function() {
   "use strict";
   var exercise,
@@ -35,9 +35,9 @@
    * answer. Adds steps to the JSAV slideshow (JSAV algorithm visualization
    * template).
    *
-   * @param {start} JSAVnode start node for the BFS algorithm
-   * @param {av} av JSAV algorithm visualization template
-   * @param {modelQueue} JSAVlist horizontal linked list which represents a
+   * @param {JSAV_node} start start node for the BFS algorithm
+   * @param {JSAV_object} av JSAV algorithm visualization template
+   * @param {LinkedQueue} modelQueue horizontal linked list which represents a
    *                              queue in the model answer.
    *
    */
@@ -55,8 +55,7 @@
       // dequeue node
       node = queue.pop();
       node.addClass("focusnode"); // add highlighting to recently dequeued node
-      modelQueue.removeLast();
-      modelQueue.layout();
+      modelQueue.dequeue(); // updates layout automatically
 
       // get neighbors and sort them in alphabetical order
       adjacent = node.neighbors();
@@ -76,8 +75,7 @@
           if (!neighbor.hasClass("visited")) {
             // enqueue node
             queue.unshift(neighbor);
-            modelQueue.addFirst(neighbor.value());
-            modelQueue.layout();
+            modelQueue.enqueue(neighbor.value()); // updates layout automatically
             // visit node
             markEdge(node.edgeTo(neighbor), av);
           } else {
@@ -103,7 +101,19 @@
   const builder = new TraversalExerciseBuilder();
 
   const init = builder.buildInit(jsav);
-  const modelSolution = builder.buildModel(bfs, interpret, true);
+
+  const modelGraphOptions = {
+    width: 500,
+    height: 400,
+    left: 30,
+    top: 150,
+    layout: "automatic",
+    directed: false
+  };
+  const modelQueueOptions = {left: 100, top: 100};
+  // Model queue label position is defined in the buildModel method.
+  const modelSolution = builder.buildModel(bfs, interpret, modelGraphOptions, modelQueueOptions);
+
   const fixState = builder.buildFixState(exercise);
   const aboutAlert = builder.buildAboutAlert(interpret);
 
@@ -111,6 +121,10 @@
     compare: {class: "visited"},
     controls: $(".jsavexercisecontrols"),
     resetButtonTitle: interpret("reset"),
+    modelDialog: {
+      width: 700,
+      height: 900
+    },
     fix: fixState
   });
   exercise.reset();

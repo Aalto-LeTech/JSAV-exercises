@@ -57,7 +57,15 @@
 
   const init = builder.buildInit(jsav);
   const fixState = builder.buildFixState(exercise);
-  const modelSolution = builder.buildModel(dfs, interpret, false);
+
+  const modelGraphOptions = {
+    width: 500,
+    height: 400,
+    left: 150,
+    layout: "automatic",
+    directed: false
+  };
+  const modelSolution = builder.buildModel(dfs, interpret, modelGraphOptions);
   const aboutAlert = builder.buildAboutAlert(interpret);
 
   exercise = jsav.exercise(modelSolution, init, {
