@@ -4,7 +4,7 @@
       ".avTitle": "Dijkstra's Algorithm Proficiency Exercise",
       "av_Authors": "Mohammed Fawzi, Kasper Hellström, Ari Korhonen, Johanna Sänger, Artturi Tilanterä",
       ".instructLabel": "Instructions:",
-      ".instructions": "Simulate the behavior of Dijkstra’s Algorithm for the given graph below. Click on an <strong>edge</strong> (parent, node) to enqueue or update a node in the Priority Queue (PQ). Click <strong>Dequeue</strong> to remove the node from PQ, and to add a node to the spanning tree. Begin from node A. The table contains the known shortest distance from A to each node alongside its parent node.",
+      ".instructions": "Simulate the execution of Dijkstra’s algorithm for the given graph below. Click on an <strong>edge</strong> (u, v) to either enqueue a corresponding element to the priority queue (PQ) or to update its priority in the PQ. To determine the correct order to process neighbours of each node, use the given adjacency list representation of the graph. Click <strong>Dequeue</strong> to remove the highest priority element from the PQ, and to add the corresponding edge to the spanning tree. Begin from the node A. The table at the bottom keeps track of the known shortest distance from A to each node and the parent node through which this shortest distance is achieved.",
       "av_ms_shortest": "Shortest paths from A.",
       "av_ms_select_a": "Start by selecting node A.",
       "av_ms_select_node": "Select {node}, since it has the shortest distance from A.",
@@ -31,7 +31,7 @@
       "edge": "Edge",
       "legend": "Legend",
       "node_explanation": "C has distance 5 from A<br>with parent B",
-      "legend_unvisited": "Unvisited",
+      "legend_unvisited": "Other",
       "legend_fringe": "Fringe",
       "legend_spanning_tree": "Spanning tree"
     },
@@ -39,7 +39,7 @@
       ".avTitle": "Dijkstran algoritmi",
       "av_Authors": "Mohammed Fawzi, Kasper Hellström, Ari Korhonen, Johanna Sänger, Artturi Tilanterä",
       ".instructLabel": "Ohjeet:",
-      ".instructions": "Simuloi Dijkstran algoritmin toimintaa annetulle verkolle. Klikkaa <strong>särmää</strong> (vanhempi, solmu) lisätäksesi tai päivittääksesi solmun prioriteettijonoon (PJ). Klikkaa <strong>Poista</strong> poistaaksesi solmun PJ:sta ja lisätäksesi solmun virityspuuhun. Aloita solmusta A. Taulukossa on lyhyin tunnettu etäisyys A:sta kullekin solmulle sen vanhempisolmun kautta.",
+      ".instructions": "Simuloi Dijkstran algoritmin suoritusta alla olevalle verkolle. Klikkaa <strong>särmää</strong> (u, v) joko lisätäksesi sitä vastaavan elementin prioriteettijonoon tai päivittääksesi tämän elementin prioriteettia. Määritä oikea järjestys kunkin solmun naapurien läpikäymiseksi käyttämällä annettua verkon seuraajaluetteloesitystä. Klikkaa <strong>Poista</strong> poistaaksesi korkeimman prioriteetin elementin priotiteettijonosta ja lisätäksesi vastaavan särmän virityspuuhun. Aloita solmusta A. Alimmaisena oleva taulukko pitää kirjaa lyhyimmästä tunnetusta etäisyydestä A:sta kullekin solmulle sekä vanhemmista, joiden kautta kulkemalla tämä lyhyin etäisyys saavutetaan.",
       "av_ms_shortest": "Lyhyimmät reitit A:sta.",
       "av_ms_select_a": "Aloita valitsemalla solmu A.",
       "av_ms_select_node": "Valitse {node}, koska sillä on lyhyin etäisyys A:han.",
@@ -66,7 +66,7 @@
       "edge": "Särmä",
       "legend": "Selite",
       "node_explanation": "C:n etäisyys A:sta on 5<br>vanhemman B kautta",
-      "legend_unvisited": "Tuntematon",
+      "legend_unvisited": "Muu",
       "legend_fringe": "Reunus",
       "legend_spanning_tree": "Virityspuu"
     }
