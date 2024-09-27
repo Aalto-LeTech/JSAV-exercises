@@ -58,7 +58,7 @@
 
   // JSAV Exercise
   var exercise = jsav.exercise(model, init, {
-    compare: [{class: "spanning"}],
+    compare: [{class: ["spanning", "fringe"]}],
     controls: $(".jsavexercisecontrols"),
     resetButtonTitle: interpret("reset"),
     modelDialog: {width: "960px"},
@@ -177,7 +177,11 @@
     graph.layout();
     graph.nodes()[0].addClass("spanning"); // mark the 'A' node
     jsav.displayInit();
-    return [graph, minHeapInterface.btree]; // Don't know if btree is really used to grading.
+    // Return the objects used to grade the exercise.
+    // Including the binary tree for grading is probably the same as
+    // including the class 'fringe' in the compare parameter of the exercise object
+    // as fringe nodes are in the priority queue.
+    return [graph, minHeapInterface.btree];
   }
 
   /**
@@ -303,7 +307,10 @@
     modelNodes[0].addClass("spanning");
 
     // Create model solution min-heap
-    const modelMinHeapInterface = new MinHeapInterface(modeljsav, {});
+    const modelMinHeapInterface = new MinHeapInterface(modeljsav, {
+      relativeTo: modelGraph, left: -150, top: 291}
+    );
+    createLegend(modeljsav, 550, 400, interpret);
 
     modeljsav.displayInit();
 
@@ -943,6 +950,14 @@
 
     updateStudentTable(srcLabel, dstLabel, dist);
     modifyStyleOfStudentTable(dstLabel, "fringe", true);
+
+    // Mark the destination node as fringe. Destination is not in the spanning tree.
+    // This is the same logic as in scaffolded dijkstra enqueue event handler.
+    for (const node of [event.data.edge.startnode, event.data.edge.endnode]) {
+      if (!node.hasClass("spanning")) {
+        node.addClass("fringe");
+      }
+    }
 
     minHeapInterface.insert(srcLabel, dstLabel, dist);
     debugPrint("Exercise gradeable step: enqueue edge " + srcLabel + "-" +
