@@ -581,11 +581,53 @@
     return destination;
   }
 
+  /**
+   * Creates an array of edges from a graph in neighbour list format.
+   * @param {object} nlGraph Graph in neighbour list (adjacency list) format as returned by generatePlanarGraphNl
+   * @param {boolean} isDirected Whether the graph is directed or not
+   * @returns {Array<{u: number, v: number, w: number}>} Array of edges as objects
+   */
+  function nlToEdgeArr(nlGraph, isDirected) {
+    const adjList = nlGraph.edges;
+
+    const edgeList = [];
+    const addedEdges = new Set();
+
+    for (let startVertexIdx = 0; startVertexIdx < adjList.length; startVertexIdx++) {
+      const edges = adjList[startVertexIdx];
+      for (const edge of edges) {
+        const endVertexIdx = edge.v;
+        const weight = edge.weight;
+
+        // Form edge key based on start and end vertex indices.
+        const edgeKeyArr = [startVertexIdx, endVertexIdx];
+        if (!isDirected) {
+          // If the graph is undirected, the order of vertices does not matter.
+          edgeKeyArr.sort();
+        }
+        const edgeKey = edgeKeyArr.join("-"); // e.g. "0-1"
+
+        // Add the edge to the list if it has not been added yet.
+        if (!addedEdges.has(edgeKey)) {
+          edgeList.push({
+            u: startVertexIdx,
+            v: endVertexIdx,
+            w: weight
+          });
+          addedEdges.add(edgeKey);
+        }
+      }
+    }
+
+    return edgeList;
+  }
+
   // Map public functions to graphUtils object with the following public names
   window.graphUtils = {
     generate: generateGraph,
     generatePlanarNl: generatePlanarGraphNl,
     nlToJsav: nlToJsav,
     copy: copyGraph,
+    nlToEdgeArr: nlToEdgeArr
   };
 })();
