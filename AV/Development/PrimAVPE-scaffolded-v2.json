@@ -2,7 +2,7 @@
   "translations" :{
     "en": {
       ".avTitle": "Prim's Algorithm Proficiency Exercise",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Artturi Tilanterä",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Ari Korhonen, Artturi Tilanterä, Teemu Taivainen",
       ".instructLabel": "Instructions:",
       ".instructions": "Simulate the execution of Prim’s algorithm for the given graph below. Click on an <strong>edge</strong> (u, v) to either enqueue a corresponding element to the priority queue (PQ) or update its priority in the PQ. To determine the correct order to process neighbours of each node, use the given adjacency list representation of the graph. Click <strong>Dequeue</strong> to remove the highest priority element from the PQ, and to add the corresponding edge to the minimum spanning tree (MST). Begin from the node A. The table at the bottom keeps track of the known minimum edge weights connecting each node to the MST and the parent nodes that provide this connection. ",
       "av_ms_mst": "Complete minimum spanning tree",
@@ -35,7 +35,7 @@
     },
     "fi": {
       ".avTitle": "Primin algoritmi",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Ari Korhonen",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Ari Korhonen, Artturi Tilanterä, Teemu Taivainen",
       ".instructLabel": "Ohjeet:",
       ".instructions": "Simuloi Primin algoritmin suoritusta alla olevalle verkolle. Klikkaa <strong>särmää</strong> (u, v) joko lisätäksesi särmää vastaavan elementin prioriteettijonoon tai päivittääksesi tämän elementin prioriteettia. Määritä oikea järjestys kunkin solmun naapurien läpikäymiseksi käyttämällä annettua verkon seuraajaluetteloesitystä. Klikkaa <strong>Poista</strong> poistaaksesi korkeimman prioriteetin elementin priotiteettijonosta ja lisätäksesi vastaavan särmän pienimpään virityspuuhun. Aloita solmusta A. Alimmaisena oleva taulukko pitää kirjaa kunkin solmun lyhimmästä tiedetystä etäisyydestä pienimmästä virityspuusta sekä vanhemmista, joiden kautta tämä lyhin etäisyys on löydetty.",
       "av_ms_mst": "Verkon pienin virityspuu",
