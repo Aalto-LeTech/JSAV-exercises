@@ -120,7 +120,6 @@
 }
 
 .jsavcodeline {
-  margin-bottom: 1px;
   font-size: 14px;
   line-height: 16px;
 }
@@ -143,7 +142,7 @@
 }
 
 .jsavcodeline.jsavhighlight {
-  background-color: #ccc !important;
+  background-color: yellow !important;
 }
 
 .jsavcodeline:hover {

@@ -2,9 +2,9 @@
   "translations" :{
     "en": {
       ".avTitle": "Dijkstra's Algorithm Proficiency Exercise",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Teemu Taivainen",
       ".instructLabel": "Instructions:",
-      ".instructions": "Reproduce the behavior of Dijkstra's Algorithm for the given graph below. Click on the <strong>edges</strong> in the order they are traversed by the algorithm. Start with Node A.",
+      ".instructions": "Simulate the execution of Dijkstra's algorithm for the given graph below. Click on the <strong>edges</strong> (u, v) in the order that nodes v are removed from the priority queue and added to the spanning tree. Start from the Node A.",
       "av_ms_shortest": "Shortest paths from A.",
       "av_ms_select_a": "Start by selecting node A",
       "av_ms_select_node": "Select {node}, since it has the shortest distance from A.",
@@ -20,9 +20,9 @@
     },
     "fi": {
       ".avTitle": "Dijkstran algoritmi",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Teemu Taivainen",
       ".instructLabel": "Ohjeet:",
-      ".instructions": "Lisää särmät virityspuuhun Dijkstran algoritmin antamassa järjestyksessä. Aloita läpikäynti solmusta A. Klikkaa <strong>särmiä</strong> lisätäksesi ne virityspuuhun.",
+      ".instructions": "Simuloi Dijkstran algoritmin suoritusta alla olevalle verkolle. Klikkaa <strong>särmiä</strong> (u, v) samassa järjestyksessä kuin algoritmi poistaa solmut v prioriteettijonosta ja lisää ne virityspuuhun. Aloita läpikäynti solmusta A.",
       "av_ms_shortest": "Lyhyin reitti A:sta.",
       "av_ms_select_a": "Aloita valitsemalla solmu A.",
       "av_ms_select_node": "Valitse {node}, koska sillä on lyhyin etäisyys A:han.",

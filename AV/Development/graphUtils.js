@@ -2,6 +2,7 @@
   "use strict";
 
   const DEFAULT_MAX_EDGE_WEIGHT = 10; // exclusive
+  const DEFAULT_MIN_EDGE_WEIGHT = 1; // inclusive
 
   function generateRandomEdges(nNodes, nEdges, weighted) {
     var edges = new Array(nEdges),
@@ -10,7 +11,7 @@
         index2,
         i, j;
 
-    // Utility funciton to check whether the edge already exists
+    // Utility function to check whether the edge already exists
     function isEligibleEdge(startIndex, endIndex) {
       if ((startIndex === endIndex) ||
           (adjacencyMatrix[startIndex][endIndex] === 1) ||
@@ -129,7 +130,7 @@
    * e[i][j] === e[j][i].
    */
   function generatePlanarGraphNl(nVertices, nEdges, weighted, directed, width,
-    height, maxEdgeWeight = DEFAULT_MAX_EDGE_WEIGHT) {
+    height, minEdgeWeight = DEFAULT_MIN_EDGE_WEIGHT, maxEdgeWeight = DEFAULT_MAX_EDGE_WEIGHT) {
     // Place nodes in a square grid:
     //   A---B---C---D
     //   |   |   |   |
@@ -154,7 +155,8 @@
       for (let x = 0; x < gridWidth && i < totalVertices; x++, i++) {
         g.vertices[i] = {
           x: Math.floor((x + 0.5) * gridStepX + rnd(10)),
-          y: Math.floor((y + 0.5) * gridStepY + rnd(10)) };
+          y: Math.floor((y + 0.5) * gridStepY + rnd(10))
+        };
       }
     }
     const nConnectedComponents = nVertices.length;
@@ -191,7 +193,7 @@
       let v1 = e[0];
       let v2 = e[1];
       if (weighted) {
-        weight = JSAV.utils.rand.numKey(1, maxEdgeWeight);
+        weight = JSAV.utils.rand.numKey(minEdgeWeight, maxEdgeWeight);
       }
       // JSAV implementation
       g.edges[v1].push({v: v2, weight: weight});
@@ -582,6 +584,43 @@
   }
 
   /**
+   * Checks whether all edge weights in the graph are unique.
+   * @param {Array<Array<{v: number, w: number}>>} adjList
+   * - adjacency list representation of a graph as returned by function generatePlanarGraphNl
+   * @param {boolean} directedGraph - true if the graph is directed, false otherwise
+   * @returns {boolean} true if all edge weights are unique, false otherwise
+   */
+  function hasUniqueEdgeWeights(adjList, directedGraph) {
+    const edgeWeights = new Set();
+    const visitedEdges = new Set();
+
+    // Note that the idx of a vertex in the adjList functions as an unique id for the vertex.
+    for (let vertexIdx = 0; vertexIdx < adjList.length; vertexIdx++) {
+      const edges = adjList[vertexIdx];
+      for (const edge of edges) {
+        const neighborIdx = edge.v;
+        const weight = edge.weight;
+
+        // Form a unique key for the edge based on the indices of the vertices.
+        const edgeKeyArr = [vertexIdx, neighborIdx];
+        if (!directedGraph) {
+          // If the graph is undirected, the order of the vertices in the edge does not matter.
+          edgeKeyArr.sort();
+        }
+        const edgeKey = edgeKeyArr.join("");
+
+        if (!visitedEdges.has(edgeKey) && edgeWeights.has(weight)) {
+          // If edge is unvisited and the weight is already in the set, edge weight is not unique.
+          return false;
+        }
+        visitedEdges.add(edgeKey);
+        edgeWeights.add(weight);
+      }
+    }
+    return true;
+  }
+  
+  /*
    * Creates an array of edges from a graph in neighbour list format.
    * @param {object} nlGraph Graph in neighbour list (adjacency list) format as returned by generatePlanarGraphNl
    * @param {boolean} isDirected Whether the graph is directed or not
@@ -628,6 +667,7 @@
     generatePlanarNl: generatePlanarGraphNl,
     nlToJsav: nlToJsav,
     copy: copyGraph,
+    hasUniqueEdgeWeights: hasUniqueEdgeWeights,
     nlToEdgeArr: nlToEdgeArr
   };
 })();
