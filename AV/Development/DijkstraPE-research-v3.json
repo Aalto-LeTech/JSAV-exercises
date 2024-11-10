@@ -2,7 +2,7 @@
   "translations" :{
     "en": {
       ".avTitle": "Dijkstra's Algorithm Proficiency Exercise",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Ari Korhonen, Johanna Sänger, Artturi Tilanterä",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Ari Korhonen, Johanna Sänger, Artturi Tilanterä, Teemu Taivainen",
       ".instructLabel": "Instructions:",
       ".instructions": "Simulate the execution of Dijkstra’s algorithm for the given graph below. Click on an <strong>edge</strong> (u, v) to either enqueue a corresponding element to the priority queue (PQ) or to update its priority in the PQ. To determine the correct order to process neighbours of each node, use the given adjacency list representation of the graph. Click <strong>Dequeue</strong> to remove the highest priority element from the PQ, and to add the corresponding edge to the spanning tree. Begin from the node A. The table at the bottom keeps track of the known shortest distance from A to each node and the parent node through which this shortest distance is achieved.",
       "av_ms_shortest": "Shortest paths from A.",
@@ -37,7 +37,7 @@
     },
     "fi": {
       ".avTitle": "Dijkstran algoritmi",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Ari Korhonen, Johanna Sänger, Artturi Tilanterä",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Ari Korhonen, Johanna Sänger, Artturi Tilanterä, Teemu Taivainen",
       ".instructLabel": "Ohjeet:",
       ".instructions": "Simuloi Dijkstran algoritmin suoritusta alla olevalle verkolle. Klikkaa <strong>särmää</strong> (u, v) joko lisätäksesi sitä vastaavan elementin prioriteettijonoon tai päivittääksesi tämän elementin prioriteettia. Määritä oikea järjestys kunkin solmun naapurien läpikäymiseksi käyttämällä annettua verkon seuraajaluetteloesitystä. Klikkaa <strong>Poista</strong> poistaaksesi korkeimman prioriteetin elementin priotiteettijonosta ja lisätäksesi vastaavan särmän virityspuuhun. Aloita solmusta A. Alimmaisena oleva taulukko pitää kirjaa lyhyimmästä tunnetusta etäisyydestä A:sta kullekin solmulle sekä vanhemmista, joiden kautta kulkemalla tämä lyhyin etäisyys saavutetaan.",
       "av_ms_shortest": "Lyhyimmät reitit A:sta.",
