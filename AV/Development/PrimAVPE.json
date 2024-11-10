@@ -2,9 +2,9 @@
   "translations" :{
     "en": {
       ".avTitle": "Prim's Algorithm Proficiency Exercise",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Artturi Tilanterä",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Artturi Tilanterä, Teemu Taivainen",
       ".instructLabel": "Instructions:",
-      ".instructions": "Reproduce the behavior of Prim's Algorithm for the given graph below. Click on the appropriate <strong>edges</strong> to add them to the MST. Start with Node A. In case of similar weights add nodes alphabetically.",
+      ".instructions": "Simulate the execution of Prim's Algorithm for the given graph below. Click on the <strong>edges</strong> (u, previous[u]) in the order that nodes u are removed from the priority queue and added to the spanning tree. Start from the node A.",
       "av_ms_mst": "Complete minimum spanning tree",
       "av_ms_select_a": "Start by selecting node A",
       "av_ms_select_node": "Select {node}, since it's closest to the MCST.",
@@ -20,9 +20,9 @@
     },
     "fi": {
       ".avTitle": "Primin algoritmi",
-      "av_Authors": "Mohammed Fawzi, Kasper Hellström",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Artturi Tilanterä, Teemu Taivainen",
       ".instructLabel": "Ohjeet:",
-      ".instructions": "Lisää särmät pienimpään virityspuuhun Primin algoritmin antamassa järjestyksessä. Aloita läpikäynti solmusta A. Klikkaa <strong>särmiä</strong> lisätäksesi ne virityspuuhun. Jos kahdella särmällä on sama paino, kaari, jonka solmut ovat aakkosjärjestyksessä ensimmäisenä.",
+      ".instructions": "Simuloi Primin algoritmin suoritusta alla olevalle verkolle. Klikkaa <strong>särmiä</strong> (u, previous[u]) samassa järjestyksessä kuin algoritmi poistaa solmut u prioriteettijonosta ja lisää ne virityspuuhun. Aloita läpikäynti solmusta A.",
       "av_ms_mst": "Verkon pienin virityspuu",
       "av_ms_select_a": "Aloitetaan valitsemalla solmu A.",
       "av_ms_select_node": "Valitaan solmu {node}, koska se sijaitsee lähinnä virityspuuta.",
