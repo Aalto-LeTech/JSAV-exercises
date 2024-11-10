@@ -685,6 +685,7 @@ createAdjacencyList, DijkstraInstanceGenerator, createLegend */
       }
     }
   }
+  
   /**
    * Converts the research instance graph to a suitable format for the
    * createAdjacencyList function.
