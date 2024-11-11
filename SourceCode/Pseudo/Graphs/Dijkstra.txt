@@ -5,7 +5,7 @@ Algorithm Dijkstra(G, source)
     distance[source] := 0
     insert source into Q
     while Q is not empty:
-        u := remove v from Q with smallest distance[]
+        u := remove vertex from Q with smallest distance[]
         for each (u, v) in E:
             if (dist := distance[u] + distance(u, v)) < distance[v]:
                 distance[v] := dist
