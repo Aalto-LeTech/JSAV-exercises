@@ -1,0 +1,188 @@
+/* Common CSS file for all graph algorithm exercises */
+
+/* Generic */
+#container {
+  background-color: white;
+}
+
+.jsavline {
+  height: 45px;
+  margin: 0 0 0 20px;
+}
+
+#procontrols {
+  text-align: center;
+}
+
+.jsavgraph {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.jsavgraph svg {
+  z-index: 0;
+}
+
+/*Legend*/
+
+.legendtext {
+  z-index: 110;
+}
+
+.legend-other {
+  fill: #e2d5ae;
+}
+
+.legend-spanning {
+  fill: #78c679;
+}
+
+.legend-fringe {
+  fill: #d59f0d;
+}
+
+/* Legend in model answer */
+.jsavmodelanswer .legend {
+  position: absolute;
+  left: 650px;
+  z-index: 5;
+}
+
+.textcentering {
+  text-align: center;
+}
+
+.avcontainer .jsavhorizontalarray > li:first-child {
+  max-width: none !important;
+  min-width: 70px !important;
+}
+
+/* Pseudocode: default code line and highlighted line */
+.jsavcodeline {
+  background-color: #eee;
+}
+
+/* Unvisited  */
+.jsavgraph .jsavnode, .jsavmatrix .jsavnode {
+  background-color: #e2d5ae;
+}
+
+.jsavgraph .jsavedge {
+  stroke-width: 10;
+  stroke: #e2d5ae;
+}
+
+/* Fringe (Prim & Dijkstra) */
+.jsavgraph .jsavnode.fringe, .jsavmatrix .jsavnode.fringe {
+  background-color: #d59f0d;
+}
+
+.jsavgraph .jsavedge.fringe{
+  stroke-width: 10;
+  stroke: #d7a939;
+}
+
+/* Visited (DFS, BFS), Spanning tree (Prim, Dijkstra, Kruskal) */
+.jsavgraph .jsavnode.visited,
+.jsavgraph .jsavnode.spanning, .jsavmatrix .jsavnode.spanning {
+  background-color: #78c679;
+}
+
+.jsavgraph .jsavedge.visited,
+.jsavgraph .jsavedge.spanning {
+  stroke-width: 16;
+  stroke: #78c679;
+}
+
+/* Recently dequeued node (Prim, Dijkstra) */
+.jsavgraph .jsavnode.focusnode {
+  border: 2px solid;
+}
+    
+/* Comparison operation in model answer (Prim, Dijkstra) */
+.compare, .jsavgraph .jsavnode.compare, .jsavmatrix .jsavnode.compare {
+  color: white;
+  background-color: #606060;
+}
+
+.jsavgraph .jsavedge.compare {
+  stroke: #808080;  
+}
+
+span.compare {
+  padding: 3px;
+}
+
+/* Text span to denote a user action in the model answer */
+span.action {
+  padding: 3px;
+  background: black;
+  color: white;
+  font-weight: bold;
+}
+
+/* Update of value in a model answer (Prim, Dijkstra */
+.jsavmatrix .jsavnode.updated {
+  color: white;
+  background-color: black;
+  font-weight: bold;
+}
+
+.jsavtree .jsavnode.updated {
+  color: white;
+  background-color: black;
+  font-weight: bold;
+}
+
+.jsavgraph .jsavedgelabel {
+  font-size: 16px;
+  background-color: transparent;
+  text-shadow: 0 0 5px #fff;
+}
+
+.jsavautoresize .jsavnode {
+  min-width: 45px;
+  min-height: 45px;
+}
+
+/* Priority queue (Prim, Dijkstra) */
+.jsavtree {
+  min-width: 400px;
+  min-height: 250px;
+  margin: 0px;
+}
+
+.bintree {
+  min-width: 400px;
+  min-height: 250px;
+  max-width: 400px;
+  max-height: 250px;
+  margin: auto;
+  background-color: #ffffff;
+  border: 1px #000000 solid;
+}
+
+.prioqueue {
+  text-align: center;
+  margin: 0px;
+}
+
+.jsavtree svg {
+  margin: 10px;
+}
+
+.jsavtreenode {
+  margin: 10px;
+}
+
+#dequeueButton {
+  float: right;
+  position: relative;
+  margin: 15px;    
+  z-index: 110;
+}
+
+.jsavbinarytree {
+  background-color: white;
+  border: 1px solid black;
+}

@@ -1,0 +1,17 @@
+Algorithm Prim(G, source)
+    foreach v in V:
+        distance[v] := infinity
+        previous[v] := undefined
+        visited[v] := false
+    distance[source] := 0
+    insert source into Q
+    while Q is not empty:
+        u := remove vertex from Q with smallest distance[]
+        visited[u] := true
+        for each (u, v) in E:
+            if (visited[v] = false AND 
+            (dist := distance(u, v)) < distance[v]):
+                distance[v] := dist
+                previous[v] := u
+                update or insert v into Q
+    return previous[]

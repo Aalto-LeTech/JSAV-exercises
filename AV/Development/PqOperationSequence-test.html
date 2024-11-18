@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow" />
+<title>Test Suite</title>
+<link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.19.4.css">
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script src="https://code.jquery.com/qunit/qunit-2.19.4.js"></script>
+  <script src="PqOperationSequence.js"></script>
+  <script>
+  
+    QUnit.module('PqOperation', function() {
+      QUnit.test('vertex letter sorting', function(assert) {
+        let op = new PqOperation('enq', 'AB');
+        let op2 = new PqOperation('enq', 'BA');
+        assert.equal(op.edge, 'AB');
+        assert.equal(op2.edge, 'AB');
+      })
+
+      QUnit.test('equality', function(assert) {
+        let op = new PqOperation('enq', 'AB');
+        let op2 = new PqOperation('enq', 'AB');
+        let op3 = new PqOperation('deq', 'AB');
+        let op4 = new PqOperation('enq', 'AE');
+
+        // Equality is symmetric
+        assert.true(op.equals(op2));
+        assert.true(op2.equals(op));
+
+        // Different operation, same edge
+        assert.false(op.equals(op3));
+
+        // Same operation, different edge
+        assert.false(op.equals(op4));
+      })
+
+      QUnit.test('toString', function(assert) {
+        let op = new PqOperation('enq', 'AB');
+        assert.equal(op.toString(), 'enq AB');
+
+        let op2 = new PqOperation('deq', 'AC');
+        assert.equal(op2.toString(), 'deq AC');
+
+        // Test a string representation of a sequence of operations.
+        // Use JSON.stringify to compare lists of strings.
+        let arr = [op, op2].map((x) => x.toString(x));
+        assert.equal(
+          JSON.stringify(arr),
+          JSON.stringify(['enq AB', 'deq AC']));
+
+      })      
+
+    })
+
+    QUnit.module('OperableSet', function() {
+
+      QUnit.test('size', function(assert) {
+        let s = new OperableSet();
+        assert.equal(s.size(), 0)
+
+        s.add('a');
+        assert.equal(s.size(), 1);
+
+        s.add('b');
+        assert.equal(s.size(), 2);
+
+        // Adding an element twice has no effect
+        s.add('a');
+        assert.equal(s.size(), 2);
+      })
+
+      QUnit.test('toString', function(assert) {
+        let s = new OperableSet();
+        s.add('a');
+        s.add('b');
+        assert.equal(s.toString(), '["a","b"]');
+      })
+
+      QUnit.test('union', function(assert) {
+        let s1 = new OperableSet();
+        s1.add('a');
+        s1.add('b');
+        assert.equal(s1.toString(), '["a","b"]');
+
+        let s2 = new OperableSet();
+        s2.add('b');
+        s2.add('c');
+        assert.equal(s2.toString(), '["b","c"]');
+
+        let s3 = s1.union(s2);
+        // Intersection does not change the original sets
+        assert.equal(s1.toString(), '["a","b"]');
+        assert.equal(s2.toString(), '["b","c"]');
+        // The result of the union is correct
+        assert.equal(s3.toString(), '["a","b","c"]');
+      })
+
+      QUnit.test('intersection', function(assert) {
+        let s1 = new OperableSet();
+        s1.add('a');
+        s1.add('b');
+        assert.equal(s1.toString(), '["a","b"]');
+
+        let s2 = new OperableSet();
+        s2.add('b');
+        s2.add('c');
+        assert.equal(s2.toString(), '["b","c"]');
+
+        let s3 = s1.intersection(s2);
+        // Intersection does not change the original sets
+        assert.equal(s1.toString(), '["a","b"]');
+        assert.equal(s2.toString(), '["b","c"]');
+        // The result of the intersection is correct
+        assert.equal(s3.toString(), '["b"]');
+      })
+
+    })
+    
+    QUnit.module('PqOperationSequence', function() {
+
+      QUnit.test('push-undo-toString', function(assert) {
+        let s = new PqOperationSequence();
+        assert.equal(s.toString(), '');
+
+        s.push(new PqOperation('enq', 'AB'));
+        assert.equal(s.toString(), 'enq AB');
+
+        s.push(new PqOperation('deq', 'EF'));
+        assert.equal(s.toString(), 'enq AB deq EF');
+
+        s.undo();
+        assert.equal(s.toString(), 'enq AB');
+
+      })
+
+      QUnit.test('clear-length', function(assert) {
+        let s = new PqOperationSequence();
+        assert.equal(s.toString(), '');
+        assert.equal(s.length(), 0)
+        
+        // Clear operation for an empty sequence does nothing
+        s.clear();
+        assert.equal(s.toString(), '');
+        assert.equal(s.length(), 0)
+
+        // length() describes the length of the sequence
+        s.push(new PqOperation('enq', 'AB'));
+        assert.equal(s.length(), 1);
+        s.push(new PqOperation('deq', 'EF'));
+        assert.equal(s.length(), 2);
+
+        // Clear operation empties the sequence, resulting length() == 0
+        s.clear();
+        assert.equal(s.toString(), '');
+        assert.equal(s.length(), 0)
+
+      })
+
+      QUnit.test('grading-empty', function(assert) {      
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        // Both sequences empty
+        // -> grade 0 / 0
+        assert.equal(student.length(), 0);
+        assert.equal(model.length(), 0);
+        let grade = student.gradeAgainst(model);        
+        assert.equal(grade.studentGrade, 0);
+        assert.equal(grade.maxGrade, 0);
+
+        // Student sequence empty, model has one operation
+        // -> grade 0 / 1
+        model.push(new PqOperation('enq', 'AB'));        
+        assert.equal(student.length(), 0);
+        assert.equal(model.length(), 1);
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 0);
+        assert.equal(grade.maxGrade, 1);
+
+        // Student sequence has one operation, model empty
+        // -> grade 0 / 0
+        model.clear();
+        student.push(new PqOperation('enq', 'AB'));
+        assert.equal(student.length(), 1);
+        assert.equal(model.length(), 0);
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 0);
+        assert.equal(grade.maxGrade, 0);
+      })
+
+      QUnit.test('fromString', function(assert) { 
+        let x = "enq AB deq BC";
+        let opSeq = new PqOperationSequence();
+        opSeq.fromString(x);
+        assert.equal(opSeq.toString(), x);
+      })
+
+      QUnit.test('simpleDequeue', function(assert) { 
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        // Simple case: one dequeue operation, perfect match
+        student.fromString('deq AB');
+        model.fromString('deq AB');
+        let grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 1);
+        assert.equal(grade.maxGrade, 1);
+      })
+
+      QUnit.test('simpleEnqueue', function(assert) {
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        // Another simple case: one enqueue operation, perfect match
+        // Dequeue & update are handled in a different code block in
+        // PqOperationSequence.gradeAgainst(), therefore a separate
+        // unit test.
+        student.fromString('enq AB');
+        model.fromString('enq AB');
+        assert.equal(student.length(), 1);
+        assert.equal(model.length(), 1);
+
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 1);
+        assert.equal(grade.maxGrade, 1);
+      })
+
+      QUnit.test('consecutiveDequeuePartial', function(assert) {
+        // Several consecutive dequeue operations, partial match
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        student.fromString('deq AB deq DC');
+        model.fromString(  'deq AB deq DC deq EB');
+
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 2);
+        assert.equal(grade.maxGrade, 3);
+      })
+
+      QUnit.test('consecutiveDequeueMissing', function(assert) {
+        // Several consecutive dequeue operations.
+        // The grading stops at the missing dequeue operation.
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        student.fromString('deq AB deq EB');
+        model.fromString(  'deq AB deq DC deq EB');
+
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 1);
+        assert.equal(grade.maxGrade, 3);
+      })
+
+      QUnit.test('consecutiveDequeueExtra', function(assert) {
+        // Several consecutive dequeue operations.
+        // The grading stops at the extra dequeue operation.
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        student.fromString('deq AB deq DC deq XF deq EB');
+        model.fromString(  'deq AB deq DC deq EB');
+
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 2);
+        assert.equal(grade.maxGrade, 3);
+      })
+
+
+      QUnit.test('consecutiveEndUpd', function(assert) {
+        // Several consecutive enqueue operations in the same order
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        student.fromString('enq AB upd DC enq DE');
+        model.fromString(  'enq AB upd DC enq DE');
+
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 3);
+        assert.equal(grade.maxGrade, 3);
+      })
+
+      QUnit.test('consecutiveEndUpdOrderAgnostic', function(assert) {
+        // Several consecutive enqueue operations in a different order
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        // All permutations of three elements 
+        let testSequences = [
+          'enq AB upd DC enq DE',
+          'enq AB enq DE upd DC',
+          'upd DC enq AB enq DE',
+          'upd DC enq DE enq AB',
+          'enq DE enq AB upd DC',
+          'enq DE upd DC enq AB '
+        ]
+        model.fromString(  'enq AB upd DC enq DE');
+
+        for (const s of testSequences) {
+          student.fromString('enq AB enq DE upd DC');
+          grade = student.gradeAgainst(model);
+          assert.equal(grade.studentGrade, 3);
+          assert.equal(grade.maxGrade, 3);
+        }
+      })
+
+      QUnit.test('consecutiveEndUpdMissing', function(assert) {
+        // Several consecutive enqueue & operations
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        // Missing operation (upd DC)
+        student.fromString('enq AB enq DE');
+        model.fromString(  'enq AB upd DC enq DE');
+
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 2);
+        assert.equal(grade.maxGrade, 3);
+      })
+
+      QUnit.test('consecutiveEndUpdExtra', function(assert) {
+        // Several consecutive enqueue & operations
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        // Extra operation (upd DF)
+        // Note: points are not subtracted for extra operations, but the
+        // grading ends there: the last dequeue operations are not matched.
+        student.fromString('enq AB upd DC upd DF enq DE deq GD');
+        model.fromString(  'enq AB upd DC enq DE deq GD');
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 3);
+        assert.equal(grade.maxGrade, 4);
+      })
+
+      QUnit.test('fullSequenceCorrect', function(assert) {
+        // Full sequence with enqueue, dequeue and update operations
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        const s1 = 'enq AB deq AB enq BC enq BD deq BD upd CD enq BX deq DE';
+        const modelOps = 8;
+        student.fromString(s1);
+        model.fromString(s1);
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, modelOps);
+        assert.equal(grade.maxGrade, modelOps);
+
+        // swap enqueue operations (BC, BD) and enqueue/update (CD, BX)
+        // s1 =    'enq AB deq AB enq BC enq BD deq BD upd CD enq BX deq DE';
+        const s2 = 'enq AB deq AB enq BD enq BC deq BD enq BX upd CD deq DE';
+        student.fromString(s2);
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, modelOps);
+        assert.equal(grade.maxGrade, modelOps);
+      })
+
+      QUnit.test('fullSequenceIncorrect', function(assert) {
+        // Full sequence with enqueue, dequeue and update operations
+        let student = new PqOperationSequence();
+        let model = new PqOperationSequence();
+
+        const s1 = 'enq AB deq AB enq BC enq BD deq BD upd CD enq BX deq DE';
+        const modelOps = 8;
+        student.fromString(s1);
+        model.fromString(s1);
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, modelOps);
+        assert.equal(grade.maxGrade, modelOps);
+
+        // swap *dequeue* operations (AB, BD)
+        // s1 =    'enq AB deq AB enq BC enq BD deq BD upd CD enq BX deq DE';
+        const s2 = 'enq AB deq BD enq BC enq BD deq AB upd CD enq BX deq DE';
+        student.fromString(s2);
+        grade = student.gradeAgainst(model);
+        assert.equal(grade.studentGrade, 1);
+        assert.equal(grade.maxGrade, modelOps);
+      })
+    })
+  </script>
+</body>
+</html>
