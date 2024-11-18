@@ -2,7 +2,12 @@
 
 JavaScript algorithm exercises made using the [JSAV framework](https://github.com/vkaravir/JSAV).
 
-This branch merges exercises from [TRAKY](https://version.aalto.fi/gitlab/course/traky) and [jsav-exercise-recorder](https://github.com/Aalto-LeTech/jsav-exercise-recorder) repositories to one place.
+This branch merges exercises from
+[traky](https://version.aalto.fi/gitlab/course/traky) and
+[jsav-exercise-recorder](https://github.com/Aalto-LeTech/jsav-exercise-recorder)
+ repositories to one place. 
+
+Currently work in progress.
 
 ## Exercises
 
