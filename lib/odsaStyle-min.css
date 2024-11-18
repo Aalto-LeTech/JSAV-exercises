@@ -70,7 +70,7 @@
 .jsavhorizontalarray .jsavnode {
   line-height: 30px !important;
   min-width: 30px !important;
-  /* max-width: 30px !important; */
+  max-width: 30px !important;
   min-height: 30px !important;
   max-height: 30px !important;
 }
@@ -120,6 +120,7 @@
 }
 
 .jsavcodeline {
+  margin-bottom: 1px;
   font-size: 14px;
   line-height: 16px;
 }

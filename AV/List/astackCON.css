@@ -1,0 +1,45 @@
+#astackVarCON {
+  height: 425px;
+}
+
+#astackVarCON .jsavoutput.jsavline {
+  height: 35px;
+}
+
+#astackTopCON {
+  height: 200px;
+}
+
+#astackTopCON .jsavoutput.jsavline {
+  height: 30px;
+}
+
+#astackPushCON {
+  height: 225px;
+}
+
+#astackPushCON .jsavoutput.jsavline {
+  height: 15px;
+}
+
+#astackPushCON .jsavcode{
+  position: relative;
+  top: -5px;
+  left: 175px;
+  width: 450px;
+}
+
+#astackPopCON {
+  height: 225px;
+}
+
+#astackPopCON .jsavoutput.jsavline {
+  height: 15px;
+}
+
+#astackPopCON .jsavcode{
+  position: relative;
+  top: 35px;
+  left: 175px;
+  width: 500px;
+}
