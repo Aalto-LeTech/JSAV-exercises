@@ -1,0 +1,49 @@
+{
+  "translations" :{
+    "en": {
+      ".avTitle": "Prim's Algorithm Proficiency Exercise",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Artturi Tilanterä, Teemu Taivainen",
+      ".instructLabel": "Instructions:",
+      ".instructions": "Simulate the execution of Prim's Algorithm for the given graph below. Click on the <strong>edges</strong> (u, previous[u]) in the order that nodes u are removed from the priority queue and added to the spanning tree. Start from the node A.",
+      "av_ms_mst": "Complete minimum spanning tree",
+      "av_ms_select_a": "Start by selecting node A",
+      "av_ms_select_node": "Select {node}, since it's closest to the MCST.",
+      "av_ms_add_edge": "Add edge ({from}, {to}) to the MCST.",
+      "av_ms_unreachable": "The nearest unvisited node is at infinite distance. The algorithm ends.",
+      "av_ms_update_distances": "Update distance to {node}'s neighbors. For updated nodes, set closest node to {node}",
+      "#help": "Help",
+      "#about": "About",
+      "reset": "New Exercise",
+      "legend": "Legend",
+      "legend_unvisited": "Other",
+      "legend_spanning_tree": "Spanning tree"
+    },
+    "fi": {
+      ".avTitle": "Primin algoritmi",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Artturi Tilanterä, Teemu Taivainen",
+      ".instructLabel": "Ohjeet:",
+      ".instructions": "Simuloi Primin algoritmin suoritusta alla olevalle verkolle. Klikkaa <strong>särmiä</strong> (u, previous[u]) samassa järjestyksessä kuin algoritmi poistaa solmut u prioriteettijonosta ja lisää ne virityspuuhun. Aloita läpikäynti solmusta A.",
+      "av_ms_mst": "Verkon pienin virityspuu",
+      "av_ms_select_a": "Aloitetaan valitsemalla solmu A.",
+      "av_ms_select_node": "Valitaan solmu {node}, koska se sijaitsee lähinnä virityspuuta.",
+      "av_ms_add_edge": "Lisätään särmä ({from}, {to}) virityspuuhun.",
+      "av_ms_unreachable": "Etäisyys lähimpään solmuun, jossa ei ole vierailtu, on ääretön. Algoritmi päättyy.",
+      "av_ms_update_distances": "Päivitetään etäisyyksiä {node}-solmun naapureihin. Päivitetyille solmuille asetetaan lähin solmu {node}:ksi.",
+      "#help": "Ohje",
+      "#about": "Lisätietoa",
+      "reset": "Uusi Tehtävä",
+      "legend": "Selite",
+      "legend_unvisited": "Muu",
+      "legend_spanning_tree": "Virityspuu"
+    }
+  },
+  "params": {
+    "JXOP-feedback": "continuous",
+    "JXOP-fixmode": "fix"
+  },
+  "code": {
+    "Pseudo": {
+      "url": "../../SourceCode/Pseudo/Graphs/Prim.txt"
+    }
+  }
+}
