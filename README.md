@@ -1,14 +1,14 @@
-#JSAV exercises
+# JSAV exercises
 
 JavaScript algorithm exercises made using the [JSAV framework](https://github.com/vkaravir/JSAV).
 
-##Exercises
+## Exercises
 
 Check the exercises here:
 
 http://aalto-letech.github.io/JSAV-exercises/
 
-##Getting started
+## Getting started
 
 After cloning the repo you should run the following commands:
 
@@ -20,7 +20,7 @@ make
 cd ..
 ```
 
-##Updating gh-pages
+## Updating gh-pages
 
 You can update gh-pages with the update script:
 
