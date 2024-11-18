@@ -1,0 +1,193 @@
+#jsavcontainer {
+  height: max-content;
+  border: khaki 2px solid;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.jsavvaluelabel {
+  font-size: xx-small !important;
+}
+
+.jsavautoresize .jsavnode {
+  min-width: 30px !important;
+  /* background-color: transparent; */
+}
+
+.jsavline {
+  height: 38px;
+}
+
+.jsavcanvas {
+  min-width: 200px !important;
+  margin: 5px;
+}
+.jsavcanvas svg, .jsavedgelabel {
+  z-index: 1;
+}
+.jsavcanvas > svg {
+  display: none;
+}
+.jsavcanvas > svg text {
+  display: block;
+}
+.jsavcanvas > svg rect {
+  display: block;
+}
+
+.selected {
+  background-color: yellow !important;
+}
+
+.views-container {
+  display: flex;
+  justify-content: center;
+}
+.import-export, .final-grade, .jsavoutput, .player-controls, .view-control,
+.model-answer, .slide-show, .compare-view, .detailed-view {
+  text-align: center;
+  margin: 2px;
+}
+.jsavoutput .jsavtitle {
+  margin: 5px;
+}
+.jsavtitle {
+  margin-bottom: 10px !important;
+  font-size: xx-large !important;
+}
+.instructions-div {
+  margin: 2px 20%;
+  background-color: lightblue;
+  padding: 1px 10px;
+  border-radius: 5px;
+}
+
+.animation-view, .model-answer-view {
+  width: 600px;
+  border: solid 1px black;
+  margin: 2px;
+  padding: 2px;
+}
+
+.jsavtree, .jsavcommontree, .jsavautoresize, .jsavbinarytree {
+  left: 0px !important;
+  margin: auto;
+}
+
+button {
+  margin: 0.5%;
+}
+
+.auto-animation {
+  display: flex;
+  justify-content: center;
+}
+
+animation-stop {
+  border: 2px solid white;
+}
+
+.animation-button {
+  background-color: #202020;
+  box-shadow: 2px 5px #888888;
+  width: 30px;
+  height: 30px;
+  padding: 0px;
+  cursor: pointer;
+}
+
+.animation-stop:hover {
+  background-color: #404040;
+}
+
+.animation-play-pause {
+  border-top: 15px solid transparent;
+  border-left: 30px solid #202020;
+  border-bottom: 15px solid transparent;
+  border-right: 0px;
+  background-color: transparent;
+  transition: 100ms all ease;
+}
+
+.animation-play-pause.pause {
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  border-top: 0px white;
+  border-left: 10px solid #202020;
+  border-bottom: 0px white;
+  border-right: 10px solid #202020;
+}
+
+.animation-play-pause.pause:hover {
+  background-color: transparent;
+  border-left: 10px solid #404040;
+  border-right: 10px solid #404040;
+}
+
+.animation-play-pause:hover {
+  border-color: transparent transparent transparent #404040;
+}
+
+p {
+  margin: 5px !important;
+}
+
+#model-answer path {
+display: none;
+}
+
+.selected {
+  background: #9d9d9d;
+}
+
+.no-data {
+  text-align: center;
+}
+
+.model-answer {
+  min-height: 350px;
+}
+
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* A Close button. This must be named with `jaal-` because the Bootstrap
+ * library also has a `close` class. */
+.jaal-close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  display: block;
+}
+
+.jaal-close:hover,
+.jaal-close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#modal-content, #animation-container, #model-answer-container {
+  overflow: scroll;
+}

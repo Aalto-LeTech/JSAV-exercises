@@ -51,6 +51,17 @@
 .jsavtree .jsavnode.highlighted {
   background-color: #4ebd44;
 }
+
+.jsavindex.updated {
+  background-color: #4ebd44;
+  font-weight: bold;
+}
+
+.jsavtree .jsavnode.updated {
+  background-color: #4ebd44;
+  font-weight: bold;
+}
+
 .jsavgraph .jsavedgelabel {
   font-size: 16px;
   background-color: transparent;
@@ -88,6 +99,10 @@
 
 .jsavtreenode {
   margin: 10px;
+}
+
+.focusnode {
+  border: 2px solid;
 }
 
 .avcontainer .jsavhorizontalarray > li:first-child {
