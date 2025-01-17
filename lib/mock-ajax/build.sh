@@ -15,5 +15,5 @@ cat comment.js >> odsaAV-min.js
 
 cat submitter.js >> odsaAV-min.js
 
-rm ../OpenDSA/lib/odsaAV-min.js
-mv odsaAV-min.js ../OpenDSA/lib
+rm ../odsaAV-min.js
+mv odsaAV-min.js ..
