@@ -36,6 +36,10 @@ The JSAV-based visual algorithm simulation exercises are bound to the
    jquery.transit and raphael.
 - `lib/` contains JS libraries common to OpenDSA, and JS libraries
    jQuery and jQuery-UI.
+- `lib/mock-ajax/` contains source code for `lib/odsaAV-min.js`
+   which is compatible with JSAV Exercise Recorder, pretends to
+   send the submission to a learning management system, and prints
+   debug data to the web browser's console.
 
 ## Developing and testing the exercises
 
