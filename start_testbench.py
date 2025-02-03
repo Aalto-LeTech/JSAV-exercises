@@ -10,7 +10,32 @@ if len(sys.argv) == 2:
     PORT = int(sys.argv[1])
 
 
-Handler = http.server.SimpleHTTPRequestHandler
+class TestbenchHandler(http.server.SimpleHTTPRequestHandler):
+    """
+    Modified SimpleHTTPRequestHandler from
+    https://github.com/python/cpython/blob/3.10/Lib/http/server.py#L643
+    """
+    def send_head(self):
+        """Common code for GET and HEAD commands.
+
+        This sends the response code and MIME headers.
+
+        Return value is either a file object (which has to be copied
+        to the outputfile by the caller unless the command was HEAD,
+        and must be closed by the caller under all circumstances), or
+        None, in which case the caller has nothing further to do.
+
+        """        
+        # Serve a development version of odsaAV-min.js.
+        # See lib/mock-ajax/README.md.
+        if self.path == "/lib/odsaAV-min.js":
+            self.path = "/lib/mock-ajax/odsaAV-min.js"    
+
+        path = self.translate_path(self.path)
+
+        return super().send_head()
+
+Handler = TestbenchHandler
 
 with socketserver.TCPServer(("", PORT), Handler) as httpd:
     print("serving at port", PORT)
