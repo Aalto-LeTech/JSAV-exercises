@@ -1,11 +1,13 @@
-import js from "@eslint/js";
 import globals from "globals";
+import pluginJs from "@eslint/js";
 
+
+/** @type {import('eslint').Linter.Config[]} */
 export default [
-  js.configs.recommended,
+  {files: ["**/*.js"], languageOptions: {sourceType: "script"}},
   {
     ignores: ["eslint.config.mjs"],
-    languageOptions: {
+    languageOptions: { 
       globals: {
         ...globals.browser,
         ...globals.jquery,
@@ -129,5 +131,6 @@ export default [
 
       "no-bitwise": 2
     }
-  }
+  },
+  pluginJs.configs.recommended,
 ];
