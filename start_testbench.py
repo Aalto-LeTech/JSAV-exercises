@@ -32,8 +32,6 @@ class TestbenchHandler(http.server.SimpleHTTPRequestHandler):
         if self.path == "/lib/odsaAV-min.js":
             self.path = "/lib/mock-ajax/odsaAV-min.js"
 
-        path = self.translate_path(self.path)
-
         return super().send_head()
 
 
