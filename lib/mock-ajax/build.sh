@@ -15,5 +15,3 @@ cat comment.js >> odsaAV-min.js
 
 cat submitter.js >> odsaAV-min.js
 
-rm ../odsaAV-min.js
-mv odsaAV-min.js ..
