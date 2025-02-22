@@ -1,0 +1,22 @@
+{
+  "name": "jsav-exercises",
+  "version": "1.0.0",
+  "description": "JavaScript algorithm exercises made using the JSAV framework",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Aalto-LeTech/JSAV-exercises.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Aalto-LeTech/JSAV-exercises/issues"
+  },
+  "homepage": "https://github.com/Aalto-LeTech/JSAV-exercises#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.20.0",
+    "eslint": "^9.20.1",
+    "globals": "^15.14.0"
+  }
+}
