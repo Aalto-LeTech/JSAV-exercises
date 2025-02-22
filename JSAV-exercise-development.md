@@ -56,7 +56,7 @@ This repository uses [ESlint](https://eslint.org/) to lint JavaScript code. ESli
 
    For real time linting, set up ESlint in your code editor. For example, in Visual Studio Code, install [ESlint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
 
-## Testing the exercises
+## Testing exercises
 
 To test the exercises locally, you should disable browser cache. The following steps outline the workflow:
 
