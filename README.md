@@ -12,8 +12,7 @@ Currently work in progress.
 ## TODO
 
 - Integrate JSAV exercise recorder (as submodule?)
-- Add JSAV library as submodule?
-- Transfer JSAV issues from [jsav-exercise-recorder](https://github.com/Aalto-LeTech/jsav-exercise-recorder) to this repo
+- Add JSAV library as submodule
 - Update exercises list seen in github pages?
 
 ## Exercises
@@ -23,6 +22,25 @@ Check the exercises here:
 <http://aalto-letech.github.io/JSAV-exercises/>
 
 The exercise list should be updated!
+
+## Running the exercises locally
+
+The exercises can be easily run locally, which is very useful for manually testing them. To do this, open a Unix terminal,
+clone the repository and run
+
+```bash
+./start_testbench.py
+```
+
+This will start a Python-based web server on your machine, allowing you to access the exercises by opening their HTML files in your
+web browser. By default, the URL is `http://localhost:8000/`. To open, for example, a simulation exercise of Dijkstra's algorithm, open
+`http://localhost:8000/AV/Development/DijkstraPE-research-v3.html`.
+
+TODO: Tell about the need to build JSAV if we move to submodule.
+
+## Developing the exercises
+
+Instructions for setting up development environment with code linting and developing the exercises can be found from [development README](JSAV-exercise-development.md).
 
 ## Description of files
 
@@ -40,6 +58,7 @@ The JSAV-based visual algorithm simulation exercises are bound to the
    which is compatible with JSAV Exercise Recorder, pretends to
    send the submission to a learning management system, and prints
    debug data to the web browser's console.
+- `SourceCode/` ??
 
 ## Developing and testing the exercises
 
