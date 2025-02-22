@@ -2,3 +2,5 @@
 *~
 #Mac stuff
 .DS_Store
+
+node_modules/
