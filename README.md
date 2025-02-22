@@ -29,18 +29,20 @@ The exercises can be easily run locally, which is very useful for manually testi
 clone the repository and run
 
 ```bash
-./start_testbench.py
+./start_testbench.py <PORT>
 ```
 
 This will start a Python-based web server on your machine, allowing you to access the exercises by opening their HTML files in your
-web browser. By default, the URL is `http://localhost:8000/`. To open, for example, a simulation exercise of Dijkstra's algorithm, open
+web browser. The port parameter is optional. By default, port `8000` is used and the exercise files are found from URL `http://localhost:8000/`. To open, for example, a simulation exercise of Dijkstra's algorithm, open
 `http://localhost:8000/AV/Development/DijkstraPE-research-v3.html`.
+
+NOTE: If you are testing changes to the exercises, you should disable browser cache. Consult [development README](JSAV-exercise-development.md).
 
 TODO: Tell about the need to build JSAV if we move to submodule.
 
 ## Developing the exercises
 
-Instructions for setting up development environment with code linting and developing the exercises can be found from [development README](JSAV-exercise-development.md).
+Instructions for setting up development environment with code linting and for developing and testing the exercises can be found from [development README](JSAV-exercise-development.md).
 
 ## Description of files
 
@@ -59,79 +61,6 @@ The JSAV-based visual algorithm simulation exercises are bound to the
    send the submission to a learning management system, and prints
    debug data to the web browser's console.
 - `SourceCode/` ??
-
-## Developing and testing the exercises
-
-This is a local configuration to test a JSAV-based visual algorithm simulation
-exercise with ?JSAV Exercise Recorder? in local development.
-
-- Some developer instruction here, linting
-
-### Testing
-
-Open a UNIX terminal and start the script:
-
-```bash
-./start_testbench.py
-```
-
-This starts a Python-based web server on your machine and allows you to access exercise html files in you web browser. By default, the URL is `http://localhost:8000/`.
-
-To test modification to exercise recorder (if/when exercise recorder is integrated):
-
-You will need to install a Node.js program
-[watchify](https://www.npmjs.com/package/watchify). E.g.
-
-```bash
-npm install -g watchify
-```
-
-In another terminal:
-
-```bash
-./update-recorder.sh
-```
-
-This starts a Node.js program [watchify](https://www.npmjs.com/package/watchify)
-which will update the JSAV Exercise recorder on the local Python-based web
-server. This happens automatically and continuously every time the source code
-file of JSAV Exercise Recorder is edited and saved.
-
-Now the testing of exercises and recorder works as follows:
-
-1. Open <http://localhost:8000/AV/Development/> with your web browser.
-
-2. Open developer tools on your browser.
-   (Firefox: Press F12)
-
-3. Disable cache in developer tools.
-   (Firefox: Select the Network tab. Tick the 'Disable Cache' box.)
-
-4. Click the link of one of the HTML files in the browser's normal page view.
-   Example: DijkstraPE-research.html.
-
-5. The JSAV-based exercise starts now. You can edit the source code on the
-   disk with your favorite text editor and then update the page in your
-   browser to see the changes.
-
-6. Finally shutdown the scripts start at steps 1 and 2 with Ctrl+C.
-
-### Testing Finnish translations
-
-One can test the Finnish translation of a JSAV exercise by adding the following
-string at the end of the exercise URL: `?JOP-lang=fi&JXOP-code=finnish`
-
-Example:
-
-- [English Red-black tree](http://localhost:8000/OpenDSA/AV/Development/redBlackTreePRO.html)
-- [Finnish Red-black tree](http://localhost:8000/OpenDSA/AV/Development/redBlackTreePRO.html?JOP-lang=fi&JXOP-code=finnish)
-
-The URL parameter `JOP-lang` controls the language of the exercise interface.
-Its value should correspond to a key under key `translations` in the exercise
-translation JSON file, e.g. redBlackTreePRO.json.
-
-The URL parameter `JXOP-code`controls the language of the pseudocode,
-corresponding to a key under key `code`in the exercise translation JSON file.
 
 ## Updating gh-pages
 
