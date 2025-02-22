@@ -1,8 +1,6 @@
 # Developing JSAV Exercises
 
-## Software development
-
-The testbench is this repository is useful for developing JSAV exercises
+This repository is useful for developing JSAV exercises
 standalone, even without JSAV Exercise Recorder, full OpenDSA source, or a
 learning management system. JSAV exercises are pure browser-side JavaScript,
 HTML and CSS. If you would like to develop JSAV exercises but don't know how to
@@ -12,12 +10,12 @@ start, here is suggested reading in order.
    JSAV API documentation, and even a tutorials to create slideshows and
    exercises.
 
-2. [JSAV-exercise-notes.md](JSAV-exercise-notes.md). In this local repository, 
+2. [JSAV-exercise-notes.md](JSAV-exercise-notes.md). In this repository,
    written by Johanna Sänger who developed existing OpenDSA exercises further.
    This document contains a walkthrough of the code of one exercise.
 
-3. [Testbench README](testbench/README.md). Good-to-know information, at least
-   "Testing Finnish Translations"
+3. [Main README of the repository](README.md). If you did not read this yet, please consult it for
+   instructions on how to test the exercises locally.
 
 4. [OpenDSA System Documentation](https://opendsa.readthedocs.io/en/latest/AV.html). OpenDSA is the
    open source interactive textbook which contains algorithm visualization
@@ -26,7 +24,7 @@ start, here is suggested reading in order.
    to develop a new, standalone JSAV exercise, but some information here might
    be useful if you're wondering the meaning of some testbench code.
 
-## Steps to develop exercises in this repository with code linting
+## Setting up development environment with code linting
 
 This repository uses [ESlint](https://eslint.org/) to lint JavaScript code. ESlint is a tool for identifying and reporting on patterns found in JavaScript code, with the goal of making code more consistent and avoiding bugs. The configuration file `eslint.config.mjs` is adapted from [OpenDSA repository](https://github.com/OpenDSA/OpenDSA). You do not really *need* npm or ESlint to develop JSAV exercises, but it is highly recommended to use them. The following steps are for setting up development environment with ESlint.
 
@@ -42,18 +40,16 @@ This repository uses [ESlint](https://eslint.org/) to lint JavaScript code. ESli
 2. Clone this repository (using a SSH key).
 
    ```bash
-   git clone git@github.com:Aalto-LeTech/jsav-exercise-recorder.git
+   git clone git@github.com:Aalto-LeTech/JSAV-exercises.git
 
-   cd jsav-exercise-recorder # Move to the repository root
+   cd JSAV-exercises # Move to the repository root
    ```
 
-3. Install the (development) dependencies listed in `package.json`.
+3. Install ESlint and its dependencies listed in `package.json`.
 
    ```bash
    npm install
    ```
-
-   Most dependencies are for the jsav-exercise-recorder, but ESlint is meant to be used when developing exercises.
 
 4. You should be good to go. JavaScript code can be linted with the following command:
 
@@ -68,14 +64,14 @@ This repository uses [ESlint](https://eslint.org/) to lint JavaScript code. ESli
 The *design* of JSAV exercises is another, advanced aspect involving user
 interface design, computing education research, and learning sciences.
 
-**Learning sciences**
+### Learning sciences
 
 Mayer, Richard E (2017). *Instruction Based on Visualizations*. In: [Handbook of
   Research on Learning and
   Instruction](https://www.routledge.com/Handbook-of-Research-on-Learning-and-Instruction/Mayer-Alexander/p/book/9781138831766),
   pp. 483-501. Routledge, New York, NY, USA. ISBN 978-1-138-83176-6.
 
-**Computing education research**
+### Computing education research**
 
 Sorva, Juha (2012). [Visual program simulation in introductory programming
 education](https://aaltodoc.aalto.fi/handle/123456789/3534). Doctoral
