@@ -1,4 +1,6 @@
-#Temp files
+# Temp files
 *~
-#Mac stuff
+# Mac stuff
 .DS_Store
+
+node_modules/
