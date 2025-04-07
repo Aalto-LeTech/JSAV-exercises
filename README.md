@@ -42,21 +42,23 @@ Instructions for setting up development environment with code linting and for de
 
 ## Description of files
 
-The JSAV-based visual algorithm simulation exercises are bound to the
-[OpenDSA electronic textbook](https://opendsa-server.cs.vt.edu/).
-
-- `AV/Development/` contains the actual exercises.
+- `AV/` contains the actual exercises. The `Development/` subdirectory
+   contains most recently developed exercises.
 - `DataStructures/` contains implementations for visualizable data
-  structures based on JSAV.
-- `JSAV/` contains browser-ready JSAV library, including JS libraries
-   jquery.transit and raphael.
+   structures based on JSAV.
+- `JSAV/` contains the JSAV library, including JS libraries
+   jquery.transit and raphael. The browser-ready built versions are in `build/`subdirectory.
 - `lib/` contains JS libraries common to OpenDSA, and JS libraries
-   jQuery and jQuery-UI.
-- `lib/mock-ajax/` contains source code for `lib/odsaAV-min.js`
-   which is compatible with JSAV Exercise Recorder, pretends to
-   send the submission to a learning management system, and prints
-   debug data to the web browser's console.
-- `SourceCode/` ??
+   jQuery and jQuery-UI. File `lib/jsav-exercise-recorder-bundle.js`contains bundled JSAV
+   Exercise Recorder.
+- `lib/mock-ajax/` contains code for mock version of `lib/odsaAV-min.js`.
+   The mock version of this file only pretends to send the submission to a
+   learning management system and allows local testing of exercises. Furthermore,
+   it is compatible with JSAV Exercise Recorder and prints debug data to the web browser's console.
+- `SourceCode/` holds code fragments and implementations that appear in a OpenDSA eBook instance. The pseudocode
+   snippets found from `Pseudo/` subdirectory are used in some of the exercises.
+- `doc/` contains documentation about the exercises and their development.
+- `start_testbench.py` is a Python script that starts a web server for testing the exercises locally.
 
 ## Design of JSAV exercises
 
