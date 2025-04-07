@@ -23,8 +23,8 @@ The exercise list should be updated!
 
 ## Running exercises locally
 
-The exercises can be easily run locally, which is very useful for manually testing them. To do this, open a Unix terminal,
-clone the repository and run
+The exercises can be easily run locally, which is very useful for manually testing them.
+To do this, open a Unix terminal, clone the repository and run
 
 ```bash
 ./start_testbench.py <PORT>
