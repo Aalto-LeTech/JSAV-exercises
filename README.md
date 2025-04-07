@@ -13,12 +13,6 @@ This repository is a modified version of the [OpenDSA](https://github.com/OpenDS
 The exercises are used in Aalto University course CS-A1141 Data Structures and Algorithms Y by including
 this repository as a submodule in the course material repository.
 
-## TODO
-
-- Integrate JSAV exercise recorder (as submodule?)
-- Add JSAV library as submodule
-- Update exercises list seen in github pages?
-
 ## Exercises
 
 Check the exercises here:
