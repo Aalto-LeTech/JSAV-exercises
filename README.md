@@ -2,12 +2,16 @@
 
 JavaScript algorithm exercises made using the [JSAV framework](https://github.com/vkaravir/JSAV).
 
-This repo merges exercises from
-[traky](https://version.aalto.fi/gitlab/course/traky) and
-[jsav-exercise-recorder](https://github.com/Aalto-LeTech/jsav-exercise-recorder)
-repositories to one place. Aim is to have all the future development of the exercises in this repository.
+This repository contains
 
-Currently work in progress.
+- JSAV Visual Algorithm Simulation (VAS) exercises
+- Both a compiled version and the source code of the [JSAV library](https://github.com/vkaravir/JSAV)
+- Compiled version of the [JSAV Exercise Recorder](https://github.com/Aalto-LeTech/jsav-exercise-recorder)
+- Code that allows integration of JSAV exercises to Aalto University's A+ learning management system
+
+This repository is a modified version of the [OpenDSA](https://github.com/OpenDSA/OpenDSA) project.
+The exercises are used in Aalto University course CS-A1141 Data Structures and Algorithms Y by including
+this repository as a submodule in the course material repository.
 
 ## TODO
 
