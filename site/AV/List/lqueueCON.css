@@ -1,0 +1,44 @@
+#lqueueIntroCON {
+  height: 455px;
+}
+
+#lqueueIntroCON .jsavoutput.jsavline {
+  height: 40px;
+}
+
+#lqueueIntroCON .jsavcode{
+  position: relative;
+  left: 150px;
+  top: -10px;
+  width:535px;
+}
+
+#lqueueEnqueueCON {
+  height: 255px;
+}
+
+#lqueueEnqueueCON .jsavoutput.jsavline {
+  height: 20px;
+}
+
+#lqueueEnqueueCON .jsavcode{
+  position: relative;
+  left: 195px;
+  top: -10px;
+  width:450px;
+}
+
+#lqueueDequeueCON {
+  height: 300px;
+}
+
+#lqueueDequeueCON .jsavoutput.jsavline {
+  height: 20px;
+}
+
+#lqueueDequeueCON .jsavcode{
+  position: relative;
+  left: 150px;
+  top: -10px;
+  width:550px;
+}

@@ -1,0 +1,27 @@
+#container {
+  width: 800px;
+  height: 700px;
+}
+
+.jsavnode.discarded {
+  background-color: #ddd;
+}
+.jsavgraph .jsavedge.discarded {
+  stroke: #d4d4d4;
+  stroke-dasharray: 5;
+}
+
+.jsavautoresize .jsavnode {
+  min-width: 45px;
+  min-height: 45px;
+}
+
+.jsavmatrix .jsavarray li.jsavnode {
+  min-width: 35px;
+  height: 35px;
+}
+
+.jsavmatrix .jsavarray li.jsavnode:first-child {
+  min-width: 50px;
+  height: 35px;
+}

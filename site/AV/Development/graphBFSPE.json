@@ -1,0 +1,45 @@
+{
+  "translations" :{
+    "en": {
+      ".avTitle": "Breadth-First Search Proficiency Exercise",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Artturi Tilanterä, Teemu Taivainen",
+      ".instructLabel": "Instructions:",
+      ".instructions": "Simulate the execution of the Breadth-First Search (BFS) algorithm for the graph below. Click on the <strong>edges</strong> (u, v) in the order that nodes v are visited by the BFS algorithm. Start from the neighbours of node A. To determine the correct order to visit neighbours of each node, use the adjacency list representation of the graph located below pseudocode.",
+      "av_ms_final": "Final BFS tree",
+      "av_ms_dequeue": "Dequeue {node}",
+      "av_ms_process_edge": "Process edge ({from}, {to}).",
+      "av_ms_already_visited": " Node {node} already visited",
+      "av_ms_all_neighbors_visited": "All the neighbors of {node} have already been visited.\n",
+      "av_ms_queue_empty": "The queue is empty and there are no unvisited neighbors. The algorithm finishes execution.",
+      "queue_label": "Queue Q implemented with a linked list",
+      "#help": "Help",
+      "#about": "About",
+      "reset": "New Exercise"
+    },
+    "fi": {
+      ".avTitle": "Leveyssuuntainen haku",
+      "av_Authors": "Mohammed Fawzi, Kasper Hellström, Johanna Sänger, Artturi Tilanterä, Teemu Taivainen",
+      ".instructLabel": "Ohjeet:",
+      ".instructions": "Simuloi leveyssuuntaisen haun (BFS) suoritusta alla olevalle verkolle. Klikkaa <strong>särmiä</strong> (u, v) samassa järjestyksessä kuin BFS-algoritmi käy solmut v läpi. Aloita läpikäynti solmun A naapureista. Määritä oikea järjestys kunkin solmun naapurien läpikäymiseksi käyttämällä pseudokoodin alapuolella olevaa verkon seuraajaluetteloesitystä.",
+      "av_ms_final": "Lopullinen leveyshaun tuottama puu",
+      "av_ms_dequeue": "Poistetaan {node} jonosta.",
+      "av_ms_process_edge": "Käsitellään särmä ({from}, {to}).",
+      "av_ms_already_visited": " Solmussa {node} on jo käyty.",
+      "av_ms_all_neighbors_visited": "Kaikki {node}:n naapurit on käyty läpi.\n",
+      "av_ms_queue_empty": "Jono on tyhjä ja kaikki naapurit on käyty läpi. Algoritmin suoritus päättyy.",
+      "queue_label": "Jono Q toteutettuna linkitetyllä listalla",
+      "#help": "Ohje",
+      "#about": "Lisätietoa",
+      "reset": "Uusi tehtävä"
+    }
+  },
+  "params": {
+    "JXOP-feedback": "continuous",
+    "JXOP-fixmode": "fix"
+  },
+  "code" : {
+    "Pseudo": {
+        "url": "../../SourceCode/Pseudo/Graphs/bfs.txt"
+    }
+  }
+}

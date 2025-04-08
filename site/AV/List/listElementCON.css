@@ -1,0 +1,33 @@
+.jsavverticalarray .jsavnode.widerecord {
+  max-width: 170px !important;
+  min-width: 170px !important;
+}
+
+.jsavhorizontalarray .jsavnode.widerecord {
+  max-width: 170px !important;
+  min-width: 170px !important;
+}
+
+#listElementDataCON {
+  height: 465px;
+}
+
+#listElementDataCON .jsavoutput.jsavline {
+  height: 75px;
+}
+
+#listElementTypeCON {
+  height: 420px;
+}
+
+#listElementTypeCON .jsavoutput.jsavline {
+  height: 50px;
+}
+
+#listElementDeleteCON {
+  height: 450px;
+}
+
+#listElementDeleteCON .jsavoutput.jsavline {
+  height: 65px;
+}

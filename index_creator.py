@@ -1,6 +1,6 @@
 from glob import glob
 
-files = glob('a/exercises/jsav/*.html')
+file_paths = glob('site/AV/*/*.html')
 
 html = ('<html>\n'
 	'<head>\n'
@@ -25,8 +25,9 @@ html = ('<html>\n'
 	'<h1>JSAV Exercises</h1>\n'
 	'<ul>\n')
 
-for ex in files:
-  html += '<li><a href="'+ex+'">'+ex+'</a></li>\n'
+for exercise_path in file_paths:
+	exercise_name = exercise_path.split('/')[-1]
+	html += '<li><a href="'+exercise_path+'">'+exercise_name+'</a></li>\n'
 
 html += '</ul><body></html>'
 
