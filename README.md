@@ -2,6 +2,10 @@
 
 JavaScript algorithm exercises made using the [JSAV framework](https://github.com/vkaravir/JSAV).
 
+Check the exercises here:
+
+<http://aalto-letech.github.io/JSAV-exercises/>
+
 This repository contains
 
 - JSAV Visual Algorithm Simulation (VAS) exercises
@@ -12,14 +16,6 @@ This repository contains
 This repository is a modified version of the [OpenDSA](https://github.com/OpenDSA/OpenDSA) project.
 The exercises are used in Aalto University course CS-A1141 Data Structures and Algorithms Y by including
 this repository as a submodule in the course material repository.
-
-## Exercises
-
-Check the exercises here:
-
-<http://aalto-letech.github.io/JSAV-exercises/>
-
-The exercise list should be updated!
 
 ## Running exercises locally
 
@@ -99,14 +95,17 @@ LMS](https://apluslms.github.io/). These courses have custom code to integrate
 the JSAV exercises into the material. Contact Artturi Tilanterä or Ari Korhonen
 (firstname.lastname(at)aalto.fi) for more information.
 
-## Updating gh-pages
+## Updating GitHub pages
 
-You can update gh-pages with the update script:
+You can update the showcased exercises to match the latest version of `main` branch by running
+the `update` script in the `gh-pages` branch:
 
 ```bash
-git checkout gh-pages
+git switch gh-pages
 ./update
 git commit -m "Updated gh-pages"
 git push origin gh-pages
-git checkout master
+git switch main # return to main branch
 ```
+
+This will copy the latest version of the exercises to `gh-pages` branch and update the `index.html` file.
