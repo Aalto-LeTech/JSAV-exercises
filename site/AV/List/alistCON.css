@@ -1,0 +1,58 @@
+#alistVarsCON {
+  height: 270px;
+}
+
+#alistVarsCON .jsavoutput.jsavline {
+  height: 50px;
+}
+
+#alistIntroCON {
+  height: 190px;
+}
+
+#alistIntroCON .jsavoutput.jsavline {
+  height: 40px;
+}
+
+#alistInsertCON {
+  height: 320px;
+}
+
+#alistInsertCON .jsavcode {
+  margin-left: 285px;
+  width: 560px;
+}
+
+#alistInsertCON .jsavlabel{
+  margin-bottom: 0;
+}
+
+#alistInsertCON .jsavoutput.jsavline {
+  height: 30px;
+}
+
+#alistAppendCON {
+  height: 270px;
+}
+
+#alistAppendCON .jsavcode {
+  margin-left: 350px;
+  width: 400px;
+}
+
+#alistAppendCON .jsavoutput.jsavline {
+  height: 20px;
+}
+
+#alistRemoveCON {
+  height: 350px;
+}
+
+#alistRemoveCON .jsavcode {
+  margin-left: 285px;
+  width: 500px;
+}
+
+#alistRemoveCON .jsavoutput.jsavline {
+  height: 30px;
+}

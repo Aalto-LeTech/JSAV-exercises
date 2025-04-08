@@ -1,0 +1,19 @@
+#container {
+    width: 900px;
+    height: 700px;
+}
+
+.jsavgraph {
+    min-width: 500px;
+    min-height: 500px;
+}
+
+.codeblock {
+    float: left;
+}
+
+.neighbourlistblock {
+    float: left;
+    clear: left; /* to place the block under pseudo code */
+    margin-left: 40px; 
+}

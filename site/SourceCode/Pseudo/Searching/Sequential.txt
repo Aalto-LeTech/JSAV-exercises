@@ -1,0 +1,16 @@
+/* *** ODSATag: Sequential *** */
+Sequential(A: array, k: integer)
+  for i = 1 to arraySize(A) do
+    if A[i] == k
+      return i
+  return arraySize(A)
+/* *** ODSAendTag: Sequential *** */
+
+/* *** ODSATag: SequentialLargest *** */
+Sequential(A: array)
+  maxIndex = 1;
+  for i = 2 to arraySize(A) do
+    if A[i] > A[maxIndex]
+      maxIndex = i
+  return maxIndex
+/* *** ODSAendTag: SequentialLargest *** */

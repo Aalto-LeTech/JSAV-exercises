@@ -1,0 +1,97 @@
+#llistRepCON {
+  height: 60px;
+}
+
+#llistBadCON {
+  height: 240px;
+}
+
+#llistBadCON .jsavoutput.jsavline {
+  height: 70px;
+}
+
+#llistBadDelCON {
+  height: 240px;
+}
+
+#llistBadDelCON .jsavoutput.jsavline {
+  height: 70px;
+}
+
+#llistInitCON {
+  height: 100px;
+}
+
+#llistHeaderCON {
+  height: 100px;
+}
+
+#llistVarsCON {
+  height: 250px;
+}
+
+#llistVarsCON .jsavoutput.jsavline {
+  height: 50px;
+}
+
+#llistConsCON {
+  height: 350px;
+}
+
+#llistConsCON .jsavoutput.jsavline {
+  height: 50px;
+}
+
+#llistInsertCON  .jsavcanvas {
+  height: 340px;
+}
+
+#llistInsertCON .jsavoutput.jsavline {
+  height: 30px;
+}
+
+#llistInsertCON .jsavcode{
+  top: 145px;
+  width: 600px;
+  position: relative;
+}
+
+#llistSpecialCON {
+  height: 290px;
+}
+
+#llistSpecialCON .jsavoutput.jsavline {
+  height: 30px;
+}
+
+#llistSpecialCON .jsavcode{
+  margin-left: 338px;
+  width: 510px;
+}
+
+#llistRemoveCON {
+  height: 465px;
+}
+
+#llistRemoveCON .jsavcode{
+  position: relative;
+  top: 140px;
+  width: 700px;
+}
+
+#llistRemoveCON .jsavoutput.jsavline{
+  height: 20px;
+}
+
+#llistOtherCON {
+  height: 420px;
+}
+
+#llistOtherCON .jsavcode{
+  position: relative;
+  width: 700px;
+}
+
+#llistOtherCON .jsavoutput.jsavline{
+  height: 55px;
+}
