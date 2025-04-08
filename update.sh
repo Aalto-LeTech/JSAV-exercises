@@ -1,33 +1,41 @@
 #!/bin/bash
+set -euo pipefail # Use 'strict mode'
 
-#remove a directory
-rm -fR a
+# Directory to which to move all the files needed for showcasing exercises
+OUTPUT_DIR="site"
 
-#create a directories
-mkdir a
-mkdir a/JSAV
+# Clean output directory
+rm -rf "$OUTPUT_DIR"
 
-#copy exercises and lib directories from master
-git checkout master -- exercises
-git checkout master -- lib
+# Create output directory
+mkdir "$OUTPUT_DIR"
 
-#move directories
-git mv exercises a
-git mv lib a
+# Copy required files from main
 
-#build JSAV
-cd JSAV
-make
-cd ..
+# Exercise files
+git checkout main -- \
+  AV \
+  DataStructures \
+  SourceCode \
+  lib
 
-#copy necessay JSAV files
-cp -r JSAV/build a/JSAV
-cp -r JSAV/css a/JSAV
-cp -r JSAV/extras a/JSAV
-cp -r JSAV/lib a/JSAV
+# JSAV library
+git checkout main -- \
+  JSAV/build \
+  JSAV/css \
+  JSAV/extras \
+  JSAV/lib
 
-git add a/JSAV
+# Move files to output directory
+git mv \
+  AV \
+  DataStructures \
+  SourceCode \
+  lib \
+  JSAV \
+  "$OUTPUT_DIR/"
 
-python index_creator.py
+# Create index.html that will be the front page of GitHub pages
+python3 index_creator.py
 
-echo Done! Ready to commit changes!
+echo "Updating pages completed! Ready to commit changes."
