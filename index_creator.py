@@ -1,6 +1,6 @@
 from glob import glob
 
-files = glob('a/exercises/jsav/*.html')
+files = glob('site/AV/*/*.html')
 
 html = ('<html>\n'
 	'<head>\n'
