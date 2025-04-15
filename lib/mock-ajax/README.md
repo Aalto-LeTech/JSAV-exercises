@@ -24,28 +24,6 @@ This is a debug print to show the data recorded by JSAV Exercise Recorder:
 first as a JavaScript object, then as a JSON string containing specifically
 encoded JSAV Exercise Recorder data ("JAAL recording").
 
-# Developing the code
-
-First, you should not need that in the context of JSAV-exercises repo; the
-code is just for the testbench. However, if you need to know, read the
-following.
-
-If you need to debug or develop the OpenDSA---MOOC-grader code:
-
-1. Install node.js https://nodejs.org/en/
-2. Install uglify-js:
-
-    npm install uglify-js -g
-
-3. run build.sh
-
-    - To build a minified version which is harder for an average student to
-      decipher, just type `./build.sh`.
-
-    - To build a human-readable version for debugging, type
-      `./build.sh --debug`.
-
-
 ## Authors
 
 Teemu Lehtinen wrote the original code in 2015.
